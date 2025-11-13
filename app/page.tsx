@@ -1,11 +1,19 @@
 "use client"
 
 import Link from "next/link"
-import { ChevronRight, Shield, Zap, MessageCircle } from "lucide-react"
+import { ChevronRight, Shield, Zap, MessageCircle, User } from "lucide-react"
 import PricingCard from "@/components/pricing-card"
 import Navbar from "@/components/navbar"
+import { useEffect, useState } from "react"
 
 export default function Home() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  useEffect(() => {
+    // Проверяем авторизацию на клиенте
+    const authStatus = localStorage.getItem("isAuthenticated") === "true"
+    setIsAuthenticated(authStatus)
+  }, [])
   return (
     <>
       <Navbar />
@@ -32,16 +40,25 @@ export default function Home() {
               <span className="block mt-2 text-green-400 font-semibold">Защитите свои данные уже сегодня.</span>
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/auth/signup" className="btn-primary flex items-center gap-2 justify-center text-base md:text-lg px-8 py-4 shadow-xl shadow-green-900/30 hover:shadow-green-900/50 transform hover:scale-105 transition-all">
-                Начать сейчас 🚀 <ChevronRight size={22} />
-              </Link>
-              <Link href="#pricing" className="btn-secondary text-base md:text-lg px-8 py-4 transform hover:scale-105 transition-all">
-                Узнать больше 👇
-              </Link>
+              {isAuthenticated ? (
+                <Link href="/dashboard" className="btn-primary flex items-center gap-2 justify-center text-base md:text-lg px-8 py-4 shadow-xl shadow-green-900/30 hover:shadow-green-900/50 transform hover:scale-105 transition-all">
+                  <User size={22} />
+                  Личный кабинет
+                </Link>
+              ) : (
+                <>
+                  <Link href="/auth/signup" className="btn-primary flex items-center gap-2 justify-center text-base md:text-lg px-8 py-4 shadow-xl shadow-green-900/30 hover:shadow-green-900/50 transform hover:scale-105 transition-all">
+                    Начать сейчас 🚀 <ChevronRight size={22} />
+                  </Link>
+                  <Link href="#pricing" className="btn-secondary text-base md:text-lg px-8 py-4 transform hover:scale-105 transition-all">
+                    Узнать больше 👇
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
-      </section>      {/* Features Section */}
+      </section>
       <section className="section-spacing bg-card-bg border-t border-b border-border">
         <div className="container-wide">
           <div className="text-center mb-4">

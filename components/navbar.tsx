@@ -1,11 +1,18 @@
 "use client"
 
 import Link from "next/link"
-import { Menu, X } from "lucide-react"
-import { useState } from "react"
+import { Menu, X, User } from "lucide-react"
+import { useState, useEffect } from "react"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  useEffect(() => {
+    // Проверяем авторизацию на клиенте
+    const authStatus = localStorage.getItem("isAuthenticated") === "true"
+    setIsAuthenticated(authStatus)
+  }, [])
 
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-accent/30 shadow-lg shadow-green-900/10">
@@ -25,12 +32,21 @@ export default function Navbar() {
             <Link href="/faq" className="hover:text-accent transition text-white">
               ❓ FAQ
             </Link>
-            <Link href="/auth/login" className="hover:text-accent transition text-white">
-              🔑 Вход
-            </Link>
-            <Link href="/auth/signup" className="btn-primary">
-              🚀 Начать
-            </Link>
+            {isAuthenticated ? (
+              <Link href="/dashboard" className="btn-primary flex items-center gap-2">
+                <User size={18} />
+                Личный кабинет
+              </Link>
+            ) : (
+              <>
+                <Link href="/auth/login" className="hover:text-accent transition text-white">
+                  🔑 Вход
+                </Link>
+                <Link href="/auth/signup" className="btn-primary">
+                  🚀 Начать
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -58,20 +74,33 @@ export default function Navbar() {
             >
               ❓ FAQ
             </Link>
-            <Link
-              href="/auth/login"
-              className="block py-3 hover:text-accent transition text-white hover:bg-accent/10 rounded-lg px-4"
-              onClick={() => setIsOpen(false)}
-            >
-              🔑 Вход
-            </Link>
-            <Link
-              href="/auth/signup"
-              className="block mt-4 btn-primary w-full text-center py-3"
-              onClick={() => setIsOpen(false)}
-            >
-              🚀 Начать
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                href="/dashboard"
+                className="mt-4 btn-primary w-full text-center py-3 flex items-center justify-center gap-2"
+                onClick={() => setIsOpen(false)}
+              >
+                <User size={18} />
+                Личный кабинет
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  className="block py-3 hover:text-accent transition text-white hover:bg-accent/10 rounded-lg px-4"
+                  onClick={() => setIsOpen(false)}
+                >
+                  🔑 Вход
+                </Link>
+                <Link
+                  href="/auth/signup"
+                  className="block mt-4 btn-primary w-full text-center py-3"
+                  onClick={() => setIsOpen(false)}
+                >
+                  🚀 Начать
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
