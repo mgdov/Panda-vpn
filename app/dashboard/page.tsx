@@ -1,57 +1,60 @@
 "use client"
-
 import { useState } from "react"
 import DashboardSidebar from "@/components/shared/dashboard-sidebar"
-import StatsGrid from "@/components/shared/stats-grid"
 import DashboardPlansTab from "@/components/shared/dashboard-plans-tab"
 import DashboardKeysTab from "@/components/shared/dashboard-keys-tab"
 import DashboardSupportTab from "@/components/shared/dashboard-support-tab"
+import StatsGrid from "@/components/shared/stats-grid"
 import MobileSidebarToggle from "@/components/shared/mobile-sidebar-toggle"
 
-export default function DashboardPage() {
+const DashboardPage = () => {
+    const [copiedKey, setCopiedKey] = useState<string | null>(null)
     const [activeTab, setActiveTab] = useState<"plans" | "keys" | "support">("plans")
     const [sidebarOpen, setSidebarOpen] = useState(false)
-    const [copiedKey, setCopiedKey] = useState<string | null>(null)
 
-    // Временные данные пользователя
+    // Временная заглушка для пользователя
     const user = {
-        email: "demo@pandavpn.com",
+        email: "user@example.com"
     }
 
     // Тарифы
     const plans = [
         {
             id: "1month",
-            name: "1 месяц",
-            icon: "🐼",
+            name: "Тариф Бамбук",
+            icon: "🌿",
             price: "149",
-            period: "",
+            period: "1 месяц",
+            description: "Лёгкий, как первый шаг Панды на путь воина. Для тех, кто хочет попробовать и понять силу сервиса.",
             highlighted: false,
         },
         {
             id: "3months",
-            name: "3 месяца",
-            icon: "🐼",
+            name: "Ученик Боевого Панды",
+            icon: "🥋",
             price: "299",
-            period: "",
+            period: "3 месяца",
+            description: "Входит во вкус, начинает тренировку. Популярный тариф — баланс силы и выгоды.",
             discount: "-33%",
             highlighted: true,
         },
         {
             id: "6months",
-            name: "6 месяцев",
-            icon: "🐼‍⬛",
+            name: "Воин Дракона",
+            icon: "🐉",
             price: "549",
-            period: "",
+            period: "6 месяцев",
+            description: "Тариф для тех, кто не отступает. Выбор тех, кто хочет стабильности и максимальной защиты.",
             discount: "-38%",
             highlighted: false,
         },
         {
             id: "1year",
-            name: "1 год",
+            name: "Легендарный Мастер",
             icon: "👑",
             price: "999",
-            period: "",
+            period: "12 месяцев",
+            description: "Год абсолютного спокойствия. Сила. Мудрость. Стабильность. Лучший тариф для настоящих мастеров.",
             discount: "-44%",
             highlighted: false,
         },
@@ -110,7 +113,7 @@ export default function DashboardPage() {
             <MobileSidebarToggle sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
             {/* Main Content */}
-            <main className="relative flex-1 w-full ml-0 md:ml-80 px-4 sm:px-6 md:px-12 lg:px-16 py-8 md:py-12 lg:py-16 transition-all z-10 overflow-x-hidden">
+            <main className="relative flex-1 w-full ml-0 md:ml-64 px-4 sm:px-6 md:px-12 lg:px-16 py-8 md:py-12 lg:py-16 transition-all z-10 overflow-x-hidden">
                 {/* Welcome Section */}
                 <div className="mb-8 md:mb-10">
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-3 bg-linear-to-r from-white to-green-400 bg-clip-text text-transparent">Добро пожаловать!</h1>
@@ -128,5 +131,8 @@ export default function DashboardPage() {
                 </div>
             </main>
         </div>
+
     )
 }
+
+export default DashboardPage

@@ -6,6 +6,7 @@ interface Plan {
     icon: string
     price: string
     period: string
+    description: string
     discount?: string
     highlighted?: boolean
 }
@@ -13,36 +14,41 @@ interface Plan {
 const plans: Plan[] = [
     {
         id: "1month",
-        name: "1 месяц",
-        icon: "🐼",
+        name: "Тариф Бамбук",
+        icon: "🌿",
         price: "149",
-        period: "",
+        period: "1 месяц",
+        description: "Лёгкий, как первый шаг Панды на путь воина. Для тех, кто хочет попробовать и понять силу сервиса.",
+        discount: "",
         highlighted: false,
     },
     {
         id: "3months",
-        name: "3 месяца",
-        icon: "🐼",
+        name: "Ученик Боевого Панды",
+        icon: "🥋",
         price: "299",
-        period: "",
+        period: "3 месяца",
+        description: "Входит во вкус, начинает тренировку. Популярный тариф — баланс силы и выгоды.",
         discount: "-33%",
         highlighted: true,
     },
     {
         id: "6months",
-        name: "6 месяцев",
-        icon: "🐼‍⬛",
+        name: "Воин Дракона",
+        icon: "🐉",
         price: "549",
-        period: "",
+        period: "6 месяцев",
+        description: "Тариф для тех, кто не отступает. Выбор тех, кто хочет стабильности и максимальной защиты.",
         discount: "-38%",
         highlighted: false,
     },
     {
         id: "1year",
-        name: "1 год",
+        name: "Легендарный Мастер",
         icon: "👑",
         price: "999",
-        period: "",
+        period: "12 месяцев",
+        description: "Год абсолютного спокойствия. Сила. Мудрость. Стабильность. Лучший тариф для настоящих мастеров.",
         discount: "-44%",
         highlighted: false,
     },
@@ -79,12 +85,13 @@ export default function PricingSection() {
                             )}
                             <div className="p-5 md:p-6 flex flex-col items-center grow">
                                 <div className="text-3xl md:text-4xl mb-2 drop-shadow-lg group-hover:scale-110 transition-transform">{plan.icon}</div>
-                                <h3 className="text-base md:text-lg font-bold mb-2 text-white text-center">{plan.name}</h3>
+                                <h3 className="text-base md:text-lg font-bold mb-1 text-white text-center">{plan.name}</h3>
+                                <div className="mb-1 text-xs text-gray-400 text-center">{plan.period}</div>
+                                <div className="mb-2 text-xs text-gray-300 text-center">{plan.description}</div>
                                 <div className="mb-2 text-center flex items-end justify-center gap-1">
                                     <span className="text-2xl md:text-3xl font-black text-green-400">{plan.price}</span>
                                     <span className="text-xs text-gray-400">₽</span>
                                 </div>
-                                <div className="mb-2 text-xs text-gray-500 text-center">{plan.period}</div>
                                 <div className="mt-auto w-full flex justify-center">
                                     <a
                                         href="https://yookassa.ru/"
