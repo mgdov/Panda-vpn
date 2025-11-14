@@ -95,8 +95,8 @@ const DashboardPage = () => {
     return (
         <div className="relative min-h-screen flex bg-[#0e151b] overflow-x-hidden">
             {/* Декоративные элементы */}
-            <div className="pointer-events-none absolute -top-32 -left-32 w-[500px] h-[500px] bg-green-700/30 rounded-full blur-3xl opacity-60 z-0" />
-            <div className="pointer-events-none absolute bottom-0 right-0 w-[400px] h-[400px] bg-green-400/20 rounded-full blur-2xl opacity-40 z-0" />
+            <div className="pointer-events-none absolute -top-32 -left-32 w-[400px] h-[400px] bg-green-700/25 rounded-full blur-3xl opacity-50 z-0 animate-pulse" />
+            <div className="pointer-events-none absolute bottom-0 right-0 w-[350px] h-[350px] bg-green-400/15 rounded-full blur-2xl opacity-30 z-0" />
 
 
             {/* Sidebar */}
@@ -113,18 +113,18 @@ const DashboardPage = () => {
             <MobileSidebarToggle sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
             {/* Main Content */}
-            <main className="relative flex-1 w-full ml-0 md:ml-64 px-4 sm:px-6 md:px-12 lg:px-16 py-8 md:py-12 lg:py-16 transition-all z-10 overflow-x-hidden">
+            <main className="relative flex-1 w-full ml-0 md:ml-64 px-4 sm:px-6 md:px-10 lg:px-12 py-6 md:py-8 lg:py-10 transition-all z-10 overflow-x-hidden">
                 {/* Welcome Section */}
-                <div className="mb-8 md:mb-10">
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-3 bg-linear-to-r from-white to-green-400 bg-clip-text text-transparent">Добро пожаловать!</h1>
-                    <p className="text-gray-400 text-base md:text-lg">Управляйте вашим VPN аккаунтом</p>
+                <div className="mb-6 md:mb-8">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2 bg-linear-to-r from-white to-green-400 bg-clip-text text-transparent">Добро пожаловать!</h1>
+                    <p className="text-gray-400 text-sm md:text-base">Управляйте вашим VPN аккаунтом</p>
                 </div>
 
                 {/* Stats Cards */}
                 <StatsGrid keysCount={vpnKeys.length} />
 
                 {/* Content Card */}
-                <div className="bg-white/5 backdrop-blur-xl border border-green-700/20 rounded-2xl md:rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 lg:p-12">
+                <div className="bg-white/5 backdrop-blur-xl border border-green-700/20 rounded-xl md:rounded-2xl shadow-xl p-4 sm:p-5 md:p-6 lg:p-8">
                     {activeTab === "plans" && <DashboardPlansTab plans={plans} />}
                     {activeTab === "keys" && <DashboardKeysTab vpnKeys={vpnKeys} copiedKey={copiedKey} onCopyKey={copyToClipboard} />}
                     {activeTab === "support" && <DashboardSupportTab />}

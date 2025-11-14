@@ -32,18 +32,22 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden">
+      {/* Декоративные элементы */}
+      <div className="pointer-events-none fixed -top-32 -left-32 w-[400px] h-[400px] bg-green-700/20 rounded-full blur-3xl opacity-40 z-0 animate-pulse" />
+      <div className="pointer-events-none fixed bottom-0 right-0 w-[350px] h-[350px] bg-green-400/10 rounded-full blur-2xl opacity-25 z-0" />
+
+      <div className="w-full max-w-md relative z-10">
         {/* Logo */}
-        <div className="text-center mb-6 md:mb-8">
-          <div className="text-4xl md:text-5xl mb-3 md:mb-4">⚡</div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white">Panda VPN</h1>
-          <p className="text-sm md:text-base text-gray-300 mt-2">Введите учетные данные</p>
+        <div className="text-center mb-5 md:mb-6">
+          <div className="text-3xl md:text-4xl mb-2 animate-float">⚡</div>
+          <h1 className="text-xl md:text-2xl font-bold text-white">Panda VPN</h1>
+          <p className="text-xs md:text-sm text-gray-300 mt-1.5">Введите учетные данные</p>
         </div>
 
         {/* Demo credentials info */}
-        <div className="mb-4 md:mb-6 p-3 md:p-4 bg-green-900/20 border border-green-500/50 rounded-lg">
-          <p className="text-xs md:text-sm text-white mb-2 font-semibold">🔑 Тестовые данные для входа:</p>
+        <div className="mb-4 md:mb-5 p-3 md:p-4 bg-green-900/20 border border-green-500/50 rounded-lg hover:border-green-500/70 transition-all duration-300 hover:scale-105">
+          <p className="text-xs md:text-sm text-white mb-1.5 font-semibold">🔑 Тестовые данные для входа:</p>
           <div className="space-y-1 text-xs md:text-sm text-gray-300">
             <p><strong>Email:</strong> demo@pandavpn.com</p>
             <p><strong>Пароль:</strong> demo123</p>
@@ -53,38 +57,38 @@ export default function LoginPage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
           <div>
-            <label className="block text-xs md:text-sm font-medium text-white mb-2">Email</label>
+            <label className="block text-xs md:text-sm font-medium text-white mb-1.5">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full px-3 md:px-4 py-2.5 md:py-3 text-sm md:text-base bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-3 md:px-4 py-2.5 md:py-3 text-sm md:text-base bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 hover:border-gray-600"
               required
             />
           </div>
 
           <div>
-            <label className="block text-xs md:text-sm font-medium text-white mb-2">Пароль</label>
+            <label className="block text-xs md:text-sm font-medium text-white mb-1.5">Пароль</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-3 md:px-4 py-2.5 md:py-3 text-sm md:text-base bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-3 md:px-4 py-2.5 md:py-3 text-sm md:text-base bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 hover:border-gray-600"
               required
             />
           </div>
 
-          <button type="submit" disabled={isLoading} className="btn-primary w-full text-sm md:text-base">
+          <button type="submit" disabled={isLoading} className="btn-primary w-full text-sm md:text-base hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
             {isLoading ? "Загрузка..." : "Войти"}
           </button>
         </form>
 
         {/* Link to signup */}
-        <p className="text-center text-xs md:text-sm text-gray-400 mt-4 md:mt-6">
+        <p className="text-center text-xs md:text-sm text-gray-400 mt-4 md:mt-5">
           Нет аккаунта?{" "}
-          <Link href="/auth/signup" className="text-green-400 hover:text-green-300 transition">
+          <Link href="/auth/signup" className="text-green-400 hover:text-green-300 transition-colors duration-300 font-medium">
             Создать аккаунт
           </Link>
         </p>

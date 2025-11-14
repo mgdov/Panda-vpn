@@ -62,21 +62,21 @@ export default function FAQPage() {
       <Navbar />
 
       {/* Декоративные элементы */}
-      <div className="pointer-events-none fixed -top-32 -left-32 w-[500px] h-[500px] bg-green-700/20 rounded-full blur-3xl opacity-50 z-0" />
-      <div className="pointer-events-none fixed bottom-0 right-0 w-[400px] h-[400px] bg-green-400/10 rounded-full blur-2xl opacity-30 z-0" />
+      <div className="pointer-events-none fixed -top-32 -left-32 w-[400px] h-[400px] bg-green-700/20 rounded-full blur-3xl opacity-40 z-0 animate-pulse" />
+      <div className="pointer-events-none fixed bottom-0 right-0 w-[350px] h-[350px] bg-green-400/10 rounded-full blur-2xl opacity-25 z-0" />
 
-      <section className="section-spacing container-wide relative z-10">
+      <section className="py-12 md:py-16 container-wide relative z-10">
         <div className="max-w-3xl mx-auto px-4">
-          <div className="text-center mb-8 md:mb-12">
-            <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-gradient-to-r from-green-900/40 to-green-800/40 border border-green-600/50 rounded-full backdrop-blur-sm shadow-lg shadow-green-900/20">
-              <HelpCircle size={20} className="text-green-400" />
-              <span className="text-xs md:text-sm font-bold text-green-400 uppercase tracking-wider">FAQ</span>
+          <div className="text-center mb-6 md:mb-8">
+            <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 bg-linear-to-r from-green-900/40 to-green-800/40 border border-green-600/50 rounded-full backdrop-blur-sm shadow-lg shadow-green-900/20">
+              <HelpCircle size={18} className="text-green-400" />
+              <span className="text-xs font-semibold text-green-400 uppercase tracking-wide">FAQ</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-white via-green-200 to-green-400 bg-clip-text text-transparent">Часто задаваемые вопросы</h1>
-            <p className="text-center text-sm md:text-base text-gray-300 leading-relaxed">Найдите ответы на популярные вопросы о Panda VPN</p>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2.5 bg-linear-to-r from-white via-green-200 to-green-400 bg-clip-text text-transparent">Часто задаваемые вопросы</h1>
+            <p className="text-center text-xs md:text-sm text-gray-300 leading-relaxed">Найдите ответы на популярные вопросы о Panda VPN</p>
           </div>
 
-          <div className="space-y-4 md:space-y-5">
+          <div className="space-y-3 md:space-y-4">
             {faqItems.map((item, index) => (
               <FAQItem
                 key={index}
