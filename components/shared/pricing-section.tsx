@@ -1,4 +1,4 @@
-import PricingCard from "@/components/shared/pricing-card"
+"use client"
 
 interface Plan {
     id: string
@@ -55,6 +55,7 @@ const plans: Plan[] = [
 ]
 
 export default function PricingSection() {
+
     return (
         <section id="pricing" className="py-12 md:py-16 container-wide relative z-10">
             <div className="text-center mb-8 md:mb-12">
@@ -79,48 +80,46 @@ export default function PricingSection() {
                                     <span>Популярный</span>
                                 </div>
                             )}
-                            {plan.discount && !plan.highlighted && (
-                                <div className="absolute top-3 right-3 bg-linear-to-r from-red-500 to-orange-500 text-white px-3 py-1.5 text-xs font-bold rounded-lg shadow-lg">
+                            {plan.discount && (
+                                <div className="absolute top-3 left-3 bg-linear-to-r from-orange-500 to-red-500 text-white px-2.5 py-1 text-xs font-extrabold rounded-md shadow-md">
                                     {plan.discount}
                                 </div>
                             )}
-                            <div className="p-6 flex flex-col items-start grow">
-                                <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-3xl mb-4 ${plan.highlighted ? 'bg-green-500/20' : 'bg-slate-700/50'} group-hover:scale-110 transition-transform duration-300`}>
-                                    {plan.icon}
+
+                            <div className="p-5 md:p-6 flex flex-col flex-1">
+                                <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 shadow-md ${plan.highlighted
+                                    ? "bg-linear-to-br from-green-600/40 to-green-500/30"
+                                    : "bg-white/5 border border-white/10"
+                                    }`}>
+                                    <span className="text-3xl">{plan.icon}</span>
                                 </div>
-                                <h3 className="text-lg font-bold mb-2 text-white">{plan.name}</h3>
-                                <div className="mb-3 text-sm text-gray-400">{plan.period}</div>
-                                <div className="mb-6 text-sm text-gray-300 leading-relaxed grow">{plan.description}</div>
-                                <div className="mb-6 flex items-baseline gap-1">
-                                    <span className="text-3xl font-bold text-white">{plan.price}</span>
-                                    <span className="text-base text-gray-400">₽</span>
+
+                                <h3 className="text-lg md:text-xl font-bold mb-2 text-white h-14 flex items-center">{plan.name}</h3>
+
+                                <div className="mb-4 h-20 flex flex-col justify-center">
+                                    <div className="flex items-baseline gap-1 mb-1">
+                                        <span className={`text-3xl md:text-4xl font-black ${plan.highlighted ? "text-white" : "text-white"}`}>
+                                            {plan.price}
+                                        </span>
+                                        <span className="text-lg text-gray-400 font-medium">₽</span>
+                                    </div>
+                                    <p className="text-sm text-gray-400 font-medium">{plan.period}</p>
                                 </div>
-                                <div className="w-full">
-                                    <a
-                                        href="https://yookassa.ru/"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={`block text-center rounded-xl py-3 px-6 font-semibold transition-all duration-300 text-sm ${plan.highlighted
-                                            ? "bg-linear-to-r from-green-500 to-emerald-500 text-white shadow-lg shadow-green-500/40 hover:shadow-xl hover:shadow-green-500/50 hover:scale-105"
-                                            : "bg-slate-700/80 text-white hover:bg-slate-600 hover:shadow-lg hover:scale-105 border border-slate-600/50"
-                                            }`}
-                                    >
-                                        {plan.highlighted ? "✨ Выбрать" : "Выбрать"}
-                                    </a>
-                                </div>
+
+                                <p className="text-xs md:text-sm text-gray-300 mb-5 leading-relaxed flex-1 min-h-20">
+                                    {plan.description}
+                                </p>
+
+                                <button className={`w-full py-2.5 md:py-3 px-4 rounded-xl font-bold transition-all duration-300 shadow-lg text-sm md:text-base mt-auto ${plan.highlighted
+                                    ? "bg-linear-to-r from-green-500 to-emerald-500 text-white hover:shadow-2xl hover:shadow-green-500/50 hover:scale-105 active:scale-95"
+                                    : "bg-white/10 text-white hover:bg-white/15 border border-white/20 hover:border-white/30 hover:scale-105 active:scale-95"
+                                    }`}>
+                                    {plan.highlighted ? "⚡ Выбрать" : "Выбрать"}
+                                </button>
                             </div>
                         </div>
                     </div>
                 ))}
-            </div>
-
-            <div className="mt-8 text-center">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-900/20 border border-green-500/50 rounded-lg backdrop-blur-sm hover:scale-105 transition-transform duration-300">
-                    <span className="text-xl">🎁</span>
-                    <p className="text-xs md:text-sm text-green-400 font-medium">
-                        Все тарифы включают 7 дней бесплатного пробного периода
-                    </p>
-                </div>
             </div>
         </section>
     )

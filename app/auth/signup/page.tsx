@@ -150,32 +150,6 @@ export default function SignupPage() {
                 </p>
               </div>
             )}
-
-            {!password && (
-              <div className="mt-3 p-3 bg-white/5 border border-white/10 rounded-lg space-y-2">
-                <p className="text-xs font-semibold text-gray-300 flex items-center gap-2">
-                  <span>💡 Требования к паролю:</span>
-                </p>
-                <div className="space-y-1 ml-2 text-xs text-gray-400">
-                  <p className="flex items-center gap-2">
-                    <span>📏</span>
-                    <span>Минимум 8 символов (лучше 12+)</span>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <span>🔤</span>
-                    <span>Заглавные (A-Z) и строчные (a-z) буквы</span>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <span>🔢</span>
-                    <span>Цифры (0-9)</span>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <span>🔣</span>
-                    <span>Спецсимволы (!@#$%^&* и т.д.)</span>
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
 
           <div>
