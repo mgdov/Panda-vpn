@@ -3,7 +3,7 @@
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
+    await request.json()
 
     // Payment processing logic will go here
     // Using YuKassa API to create payment
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       success: true,
       message: "Payment integration ready",
     })
-  } catch (error) {
+  } catch {
     return Response.json({ error: "Payment processing error" }, { status: 500 })
   }
 }

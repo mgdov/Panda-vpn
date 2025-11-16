@@ -157,7 +157,7 @@ export default function LoginPage() {
         </p>
 
         <p className="text-center text-xs text-gray-600 mt-4">
-          Нажимая "Войти", вы согласны с нашими условиями обслуживания
+          Нажимая &ldquo;Войти&rdquo;, вы согласны с нашими условиями обслуживания
         </p>
       </div>
     </div>
