@@ -69,37 +69,40 @@ export default function PricingSection() {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5 max-w-7xl mx-auto">
                 {plans.map((plan) => (
                     <div key={plan.id} className="group">
-                        <div className={`relative rounded-xl overflow-hidden transition-all duration-300 h-full flex flex-col ${plan.highlighted
-                            ? "border-2 border-green-500 bg-linear-to-br from-green-950/60 to-black shadow-xl shadow-green-600/40 scale-[1.02]"
-                            : "border border-green-800/30 bg-black/40 hover:border-green-600/70 shadow-lg hover:shadow-xl hover:shadow-green-900/30 hover:scale-[1.02] hover:-translate-y-1"
+                        <div className={`relative rounded-2xl overflow-hidden transition-all duration-300 h-full flex flex-col ${plan.highlighted
+                            ? "border-2 border-green-500/80 bg-linear-to-br from-green-900/50 via-green-950/40 to-slate-900/90 shadow-2xl shadow-green-500/30"
+                            : "border border-slate-700/50 bg-linear-to-br from-slate-800/60 to-slate-900/80 hover:border-slate-600/70 shadow-lg hover:shadow-xl hover:shadow-slate-700/30 hover:scale-[1.02] hover:-translate-y-1"
                             }`}>
                             {plan.highlighted && (
-                                <div className="absolute top-0 right-0 bg-linear-to-l from-green-500 to-green-600 text-white px-2.5 py-1 text-xs font-bold rounded-bl-lg shadow-lg animate-pulse">
-                                    ⭐ Популярный
+                                <div className="absolute top-3 right-3 bg-linear-to-r from-green-500 to-emerald-500 text-white px-3 py-1.5 text-xs font-bold rounded-lg shadow-lg flex items-center gap-1">
+                                    <span>🌿</span>
+                                    <span>Популярный</span>
                                 </div>
                             )}
                             {plan.discount && !plan.highlighted && (
-                                <div className="absolute top-0 right-0 bg-linear-to-l from-orange-500 to-red-600 text-white px-2.5 py-1 text-xs font-bold rounded-bl-lg shadow-lg">
+                                <div className="absolute top-3 right-3 bg-linear-to-r from-red-500 to-orange-500 text-white px-3 py-1.5 text-xs font-bold rounded-lg shadow-lg">
                                     {plan.discount}
                                 </div>
                             )}
-                            <div className="p-4 md:p-5 flex flex-col items-center grow">
-                                <div className="text-3xl mb-2 drop-shadow-lg group-hover:scale-110 transition-transform duration-300">{plan.icon}</div>
-                                <h3 className="text-sm md:text-base font-bold mb-1 text-white text-center">{plan.name}</h3>
-                                <div className="mb-1 text-xs text-gray-400 text-center">{plan.period}</div>
-                                <div className="mb-2 text-xs text-gray-300 text-center min-h-12 flex items-center px-2">{plan.description}</div>
-                                <div className="mb-3 text-center flex items-baseline justify-center gap-1">
-                                    <span className="text-2xl font-black text-green-400">{plan.price}</span>
-                                    <span className="text-xs text-gray-400">₽</span>
+                            <div className="p-6 flex flex-col items-start grow">
+                                <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-3xl mb-4 ${plan.highlighted ? 'bg-green-500/20' : 'bg-slate-700/50'} group-hover:scale-110 transition-transform duration-300`}>
+                                    {plan.icon}
                                 </div>
-                                <div className="mt-auto w-full flex justify-center">
+                                <h3 className="text-lg font-bold mb-2 text-white">{plan.name}</h3>
+                                <div className="mb-3 text-sm text-gray-400">{plan.period}</div>
+                                <div className="mb-6 text-sm text-gray-300 leading-relaxed grow">{plan.description}</div>
+                                <div className="mb-6 flex items-baseline gap-1">
+                                    <span className="text-3xl font-bold text-white">{plan.price}</span>
+                                    <span className="text-base text-gray-400">₽</span>
+                                </div>
+                                <div className="w-full">
                                     <a
                                         href="https://yookassa.ru/"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className={`inline-block text-center rounded-lg py-2 px-4 font-semibold transition-all duration-300 text-xs md:text-sm w-full ${plan.highlighted
-                                            ? "bg-linear-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-600/50 hover:shadow-xl hover:scale-105"
-                                            : "bg-slate-800 text-white hover:bg-green-600 hover:shadow-lg hover:scale-105"
+                                        className={`block text-center rounded-xl py-3 px-6 font-semibold transition-all duration-300 text-sm ${plan.highlighted
+                                            ? "bg-linear-to-r from-green-500 to-emerald-500 text-white shadow-lg shadow-green-500/40 hover:shadow-xl hover:shadow-green-500/50 hover:scale-105"
+                                            : "bg-slate-700/80 text-white hover:bg-slate-600 hover:shadow-lg hover:scale-105 border border-slate-600/50"
                                             }`}
                                     >
                                         {plan.highlighted ? "✨ Выбрать" : "Выбрать"}

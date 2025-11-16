@@ -40,11 +40,13 @@ export default function FeaturesSection() {
                         return (
                             <div key={index} className="relative group overflow-hidden rounded-xl transition-all duration-300 hover:-translate-y-1">
                                 <div className="absolute inset-0 bg-linear-to-br from-green-600/20 to-green-900/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                <div className="relative p-5 md:p-6 bg-linear-to-br from-slate-900 to-slate-800 border border-green-700/30 rounded-xl hover:border-green-600/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-900/30 h-full flex flex-col">
-                                    <div className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl bg-linear-to-br from-green-600 to-green-700 mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                        <Icon className="text-white" size={24} />
+                                <div className="relative  p-5 md:p-6 bg-linear-to-br from-slate-900 to-slate-800 border border-green-700/30 rounded-xl hover:border-green-600/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-900/30 h-full flex flex-col">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl bg-linear-to-br from-green-600 to-green-700 mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                                            <Icon className="text-white" size={24} />
+                                        </div>
+                                        <h3 className="text-base md:text-lg font-bold mb-2 text-white">{feature.title}</h3>
                                     </div>
-                                    <h3 className="text-base md:text-lg font-bold mb-2 text-white">{feature.title}</h3>
                                     <p className="text-xs md:text-sm text-gray-400 leading-relaxed grow">
                                         {feature.description}
                                     </p>
