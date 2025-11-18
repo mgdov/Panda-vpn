@@ -1,26 +1,35 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import DashboardSidebar from "@/components/shared/dashboard-sidebar"
 import DashboardPlansTab from "@/components/shared/dashboard-plans-tab"
 import DashboardKeysTab from "@/components/shared/dashboard-keys-tab"
 import DashboardSupportTab from "@/components/shared/dashboard-support-tab"
 import StatsGrid from "@/components/shared/stats-grid"
 import MobileSidebarToggle from "@/components/shared/mobile-sidebar-toggle"
+import { logout, getProfile, getStoredUser, type MarzbanClient } from "@/lib/api"
+import type { VPNKey } from "@/components/shared/vpn-key-card"
 
 const DashboardPage = () => {
     const [copiedKey, setCopiedKey] = useState<string | null>(null)
     const [activeTab, setActiveTab] = useState<"plans" | "keys" | "support">("plans")
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+    const [clients, setClients] = useState<MarzbanClient[]>([])
+    const [userEmail, setUserEmail] = useState<string>("")
 
-    // Временная заглушка для пользователя
-    const user = {
-        email: "user@example.com"
-    }
+    // Load user email on client side only to avoid hydration mismatch
+    useEffect(() => {
+        const user = getStoredUser()
+        if (user?.email) {
+            setUserEmail(user.email)
+        }
+    }, [])
 
-    // Тарифы
+    // Тарифы (привяжите id к tariff_code бэка)
     const plans = [
         {
-            id: "1month",
+            id: "MONTH_50",
             name: "Тариф Бамбук",
             icon: "🌿",
             price: "149",
@@ -29,7 +38,7 @@ const DashboardPage = () => {
             highlighted: false,
         },
         {
-            id: "3months",
+            id: "MONTH_150",
             name: "Ученик Боевого Панды",
             icon: "🥋",
             price: "299",
@@ -39,7 +48,7 @@ const DashboardPage = () => {
             highlighted: true,
         },
         {
-            id: "6months",
+            id: "MONTH_300",
             name: "Воин Дракона",
             icon: "🐉",
             price: "549",
@@ -49,7 +58,7 @@ const DashboardPage = () => {
             highlighted: false,
         },
         {
-            id: "1year",
+            id: "YEAR_900",
             name: "Легендарный Мастер",
             icon: "👑",
             price: "999",
@@ -60,29 +69,35 @@ const DashboardPage = () => {
         },
     ]
 
-    // Временные VPN ключи
-    const vpnKeys = [
-        {
-            id: "1",
-            name: "Основной ключ",
-            key: "vless://a1b2c3d4-e5f6-7890-abcd-ef1234567890@server1.pandavpn.com:443",
-            server: "🇺🇸 США, Нью-Йорк",
-            expiresAt: "2025-12-13",
-            status: "active" as const,
-        },
-        {
-            id: "2",
-            name: "Резервный ключ",
-            key: "vless://x9y8z7w6-v5u4-3210-zyxw-vu9876543210@server2.pandavpn.com:443",
-            server: "🇩🇪 Германия, Берлин",
-            expiresAt: "2025-12-13",
-            status: "active" as const,
-        },
-    ]
+    const vpnKeys: VPNKey[] = clients.map((c, idx) => ({
+        id: c.marzban_client_id || c.id,
+        name: `Ключ #${idx + 1} (${c.protocol})`,
+        key: c.config_text || c.subscription_url || "",
+        server: `${c.transport.toUpperCase()}`,
+        expiresAt: new Date(c.expires_at).toLocaleDateString(),
+        status: c.active ? "active" : "inactive",
+    }))
 
-    const handleLogout = () => {
-        localStorage.removeItem("isAuthenticated")
-        localStorage.removeItem("userEmail")
+    useEffect(() => {
+        let mounted = true
+        ;(async () => {
+            try {
+                const profile = await getProfile()
+                if (!mounted) return
+                setClients(profile.clients || [])
+            } catch (e: any) {
+                setError(e?.message || "Ошибка загрузки профиля")
+            } finally {
+                setLoading(false)
+            }
+        })()
+        return () => {
+            mounted = false
+        }
+    }, [])
+
+    const handleLogout = async () => {
+        await logout()
         window.location.href = "/"
     }
 
@@ -105,7 +120,7 @@ const DashboardPage = () => {
                 setActiveTab={setActiveTab}
                 sidebarOpen={sidebarOpen}
                 setSidebarOpen={setSidebarOpen}
-                userEmail={user.email}
+                userEmail={userEmail}
                 onLogout={handleLogout}
             />
 
@@ -114,6 +129,8 @@ const DashboardPage = () => {
 
             {/* Main Content */}
             <main className="relative flex-1 w-full ml-0 md:ml-64 px-4 sm:px-6 md:px-10 lg:px-12 py-6 md:py-8 lg:py-10 transition-all z-10 overflow-x-hidden">
+                {loading && <div className="text-gray-300">Загрузка...</div>}
+                {!loading && error && <div className="text-red-400">{error}</div>}
                 {/* Welcome Section */}
                 <div className="mb-6 md:mb-8">
                     <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2 bg-linear-to-r from-white to-green-400 bg-clip-text text-transparent">Добро пожаловать!</h1>
@@ -121,7 +138,7 @@ const DashboardPage = () => {
                 </div>
 
                 {/* Stats Cards */}
-                <StatsGrid keysCount={vpnKeys.length} />
+                    <StatsGrid keysCount={vpnKeys.length || 0} />
 
                 {/* Content Card */}
                 <div className="bg-white/5 backdrop-blur-xl border border-green-700/20 rounded-xl md:rounded-2xl shadow-xl p-4 sm:p-5 md:p-6 lg:p-8">

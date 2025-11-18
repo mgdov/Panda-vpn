@@ -4,30 +4,29 @@ import type React from "react"
 
 import Link from "next/link"
 import { useState } from "react"
+import { login as apiLogin, setAuth } from "@/lib/api"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
     setIsLoading(true)
 
-    // Проверка тестовых данных
-    if (email === "demo@pandavpn.com" && password === "demo123") {
-      // Сохраняем флаг авторизации
-      localStorage.setItem("isAuthenticated", "true")
-      localStorage.setItem("userEmail", email)
-
-      setTimeout(() => {
-        window.location.href = "/dashboard"
-      }, 1000)
-    } else {
-      setTimeout(() => {
-        setIsLoading(false)
-        alert("Неверный email или пароль. Используйте demo@pandavpn.com / demo123")
-      }, 1000)
+    try {
+      const auth = await apiLogin(email, password)
+      setAuth(auth)
+      window.location.href = "/dashboard"
+    } catch (err: any) {
+      const errorMessage = err?.message || err?.payload?.message || err?.payload?.error || "Ошибка входа"
+      setError(errorMessage)
+      console.error("Login error:", err)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -44,6 +43,13 @@ export default function LoginPage() {
           <h1 className="text-xl md:text-2xl font-bold text-white">Panda VPN</h1>
           <p className="text-xs md:text-sm text-gray-300 mt-1.5">Введите учетные данные</p>
         </div>
+
+        {/* Error message */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-900/20 border border-red-500/50 rounded-lg">
+            <p className="text-sm text-red-400">{error}</p>
+          </div>
+        )}
 
         {/* Demo credentials info */}
         <div className="mb-4 md:mb-5 p-3 md:p-4 bg-green-900/20 border border-green-500/50 rounded-lg hover:border-green-500/70 transition-all duration-300 hover:scale-105">

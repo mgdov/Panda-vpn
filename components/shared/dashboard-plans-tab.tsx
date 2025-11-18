@@ -13,6 +13,8 @@ interface DashboardPlansTabProps {
     plans: Plan[]
 }
 
+import PaymentButton from "@/components/payment-button"
+
 export default function DashboardPlansTab({ plans }: DashboardPlansTabProps) {
     return (
         <div>
@@ -46,17 +48,11 @@ export default function DashboardPlansTab({ plans }: DashboardPlansTabProps) {
                                     <span className="text-sm text-gray-400">₽</span>
                                 </div>
                                 <div className="mt-auto w-full flex justify-center">
-                                    <a
-                                        href="https://yookassa.ru/"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={`inline-block text-center rounded-lg py-3 px-6 font-semibold transition-all duration-300 text-sm md:text-base w-full ${plan.highlighted
-                                            ? "bg-linear-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-600/40 hover:shadow-xl hover:scale-105"
-                                            : "bg-slate-800 text-white hover:bg-green-600 hover:shadow-lg hover:scale-105"
-                                            }`}
-                                    >
-                                        {plan.highlighted ? "✨ Выбрать" : "Выбрать"}
-                                    </a>
+                                    <div className={`inline-block w-full ${plan.highlighted
+                                        ? "shadow-lg shadow-green-600/40 hover:shadow-xl"
+                                        : ""}`}>
+                                        <PaymentButton tariffCode={plan.id} label={plan.highlighted ? "✨ Выбрать" : "Выбрать"} />
+                                    </div>
                                 </div>
                             </div>
                         </div>
