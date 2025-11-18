@@ -5,6 +5,7 @@ import type React from "react"
 import Link from "next/link"
 import { useState } from "react"
 import { Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react"
+import { apiClient } from "@/lib/api/client"
 
 interface PasswordStrength {
   score: number
@@ -57,7 +58,9 @@ export default function SignupPage() {
 
     setIsLoading(true)
 
-    setTimeout(() => {
+    try {
+      await apiClient.register({ email, password })
+
       localStorage.setItem("isAuthenticated", "true")
       localStorage.setItem("userEmail", email)
 
@@ -65,7 +68,11 @@ export default function SignupPage() {
       setTimeout(() => {
         window.location.href = "/dashboard"
       }, 1500)
-    }, 1000)
+    } catch (err: unknown) {
+      setIsLoading(false)
+      const errorMessage = err instanceof Error ? err.message : "Ошибка регистрации"
+      setError(errorMessage)
+    }
   }
 
   return (

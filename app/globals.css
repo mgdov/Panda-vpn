@@ -3,6 +3,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@layer base {
+  body {
+    font-family: 'Montserrat', sans-serif;
+  }
+}
+
 :root {
   /* Updated color scheme: black background, white text, green accents */
   --background: 0 0% 6%;

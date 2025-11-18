@@ -5,6 +5,7 @@ import type React from "react"
 import Link from "next/link"
 import { useState } from "react"
 import { Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react"
+import { apiClient } from "@/lib/api/client"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -19,7 +20,9 @@ export default function LoginPage() {
     setError("")
     setIsLoading(true)
 
-    if (email === "demo@pandavpn.com" && password === "demo123") {
+    try {
+      await apiClient.login({ email, password })
+
       localStorage.setItem("isAuthenticated", "true")
       localStorage.setItem("userEmail", email)
 
@@ -27,9 +30,10 @@ export default function LoginPage() {
       setTimeout(() => {
         window.location.href = "/dashboard"
       }, 1500)
-    } else {
+    } catch (err: unknown) {
       setIsLoading(false)
-      setError("Неверный email или пароль. Используйте demo@pandavpn.com / demo123")
+      const errorMessage = err instanceof Error ? err.message : "Ошибка входа"
+      setError(errorMessage)
     }
   }
 
