@@ -60,14 +60,15 @@ const DashboardPage = () => {
             }))
             setPlans(formattedPlans)
 
-            // Load VPN keys
+            // Load VPN keys (из marzban_clients)
             const keys = await apiClient.getProfileKeys()
-            setVpnKeys(keys.map((key: any) => ({
+            setVpnKeys(keys.map((key) => ({
                 id: key.id,
                 key: key.config_text || "Generating...",
                 location: "🌍 Auto-select",
                 status: key.active ? "active" : "expired",
-                expiresAt: key.expires_at,
+                expiresAt: key.expires_at || null,
+                marzban_client_id: key.marzban_client_id, // Для использования в /configs/*
             })))
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "Unknown error"

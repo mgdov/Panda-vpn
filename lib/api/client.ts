@@ -15,8 +15,13 @@ import type {
     CreatePaymentRequest,
     RenewRequest,
     CreateClientRequest,
+    CreateClientResponse,
     VPNClient,
+    InternalClient,
+    MeResponse,
 } from "./types"
+import { getErrorMessage, isNetworkError } from "./errors"
+import { adaptUsageStats, adaptVPNConfig } from "./adapters"
 
 class APIClient {
     private baseUrl: string
@@ -49,8 +54,16 @@ class APIClient {
 
     private async request<T>(
         endpoint: string,
-        options: RequestInit = {}
+        options: RequestInit = {},
+        retryOn401: boolean = true
     ): Promise<T> {
+        const fullUrl = `${this.baseUrl}${endpoint}`
+        
+        // Логирование в development режиме
+        if (process.env.NODE_ENV === 'development') {
+            console.log('[API Request]', options.method || 'GET', fullUrl)
+        }
+
         try {
             const token = this.getToken()
             const headers: Record<string, string> = {
@@ -62,30 +75,46 @@ class APIClient {
                 headers["Authorization"] = `Bearer ${token}`
             }
 
-            const url = `${this.baseUrl}${endpoint}`
-
-            const response = await fetch(url, {
+            let response = await fetch(fullUrl, {
                 ...options,
                 headers,
                 mode: 'cors',
                 credentials: 'omit',
             })
 
-            if (response.status === 401) {
-                // Try to refresh token
+            // Логирование ответа в development режиме
+            if (process.env.NODE_ENV === 'development') {
+                console.log('[API Response]', response.status, fullUrl)
+            }
+
+            // Обработка 401 - автоматический refresh токена
+            if (response.status === 401 && retryOn401) {
                 const refreshed = await this.refreshAccessToken()
                 if (refreshed) {
-                    // Retry request with new token
-                    return this.request<T>(endpoint, options)
+                    // Повторяем запрос с новым токеном
+                    const newToken = this.getToken()
+                    if (newToken) {
+                        headers["Authorization"] = `Bearer ${newToken}`
+                    }
+                    response = await fetch(fullUrl, {
+                        ...options,
+                        headers,
+                        mode: 'cors',
+                        credentials: 'omit',
+                    })
+                } else {
+                    // Если refresh не удался, разлогиниваем
+                    this.clearTokens()
+                    throw new Error("invalid refresh token")
                 }
-                // If refresh failed, clear tokens and throw
-                this.clearTokens()
-                throw new Error("Authentication failed")
             }
 
             if (!response.ok) {
-                const error = await response.json().catch(() => ({ message: "Unknown error" }))
-                throw new Error(error.message || `HTTP ${response.status}`)
+                const error = await response.json().catch(() => ({ 
+                    message: `HTTP ${response.status}` 
+                }))
+                const errorMessage = getErrorMessage(error.message || `HTTP ${response.status}`)
+                throw new Error(errorMessage)
             }
 
             if (response.status === 204) {
@@ -94,10 +123,12 @@ class APIClient {
 
             return response.json()
         } catch (error) {
-            // Silently handle expected connection errors
+            // Обработка сетевых ошибок
             if (error instanceof TypeError && error.message === "Failed to fetch") {
                 throw new Error(`API server unavailable at ${this.baseUrl}`)
             }
+            
+            // Пробрасываем ошибку дальше
             throw error
         }
     }
@@ -141,12 +172,18 @@ class APIClient {
                 }
             )
 
-            if (!response.ok) return false
+            if (!response.ok) {
+                // Если refresh не удался, токен истек
+                this.clearTokens()
+                return false
+            }
 
             const data: AuthResponse = await response.json()
             this.setTokens(data.access_token, data.refresh_token)
             return true
-        } catch {
+        } catch (error) {
+            // При любой ошибке очищаем токены
+            this.clearTokens()
             return false
         }
     }
@@ -171,45 +208,72 @@ class APIClient {
         return this.request<Tariff[]>(API_CONFIG.ENDPOINTS.TARIFFS)
     }
 
+    // ВАЖНО: Это заглушка - всегда возвращает один узел
+    // Не использовать для реальных данных
     async getNodes(): Promise<Node[]> {
-        return this.request<Node[]>(API_CONFIG.ENDPOINTS.NODES)
+        const nodes = await this.request<Node[]>(API_CONFIG.ENDPOINTS.NODES)
+        // Защита от null/undefined
+        return Array.isArray(nodes) ? nodes : []
     }
 
     // User endpoints
+    // ВАЖНО: /me возвращает только JWT claims, не полный user
+    // Для получения полного профиля используйте /profile
+    async getMe(): Promise<MeResponse> {
+        return this.request<MeResponse>(API_CONFIG.ENDPOINTS.ME || '/me')
+    }
+
     async getProfile(): Promise<ProfileResponse> {
         return this.request<ProfileResponse>(API_CONFIG.ENDPOINTS.PROFILE)
     }
 
     async getProfileKeys(): Promise<VPNKey[]> {
-        return this.request<VPNKey[]>(API_CONFIG.ENDPOINTS.PROFILE_KEYS)
+        const keys = await this.request<VPNKey[]>(API_CONFIG.ENDPOINTS.PROFILE_KEYS)
+        // Защита от null/undefined
+        return Array.isArray(keys) ? keys : []
     }
 
     async getProfileUsage(clientId?: string): Promise<UsageStats> {
         const query = clientId ? `?client_id=${clientId}` : ""
-        return this.request<UsageStats>(
+        const data = await this.request<any>(
             `${API_CONFIG.ENDPOINTS.PROFILE_USAGE}${query}`
         )
+        // Адаптируем формат от Marzban
+        return adaptUsageStats(data)
     }
 
-    async getMeClients(): Promise<VPNClient[]> {
-        return this.request<VPNClient[]>(API_CONFIG.ENDPOINTS.ME_CLIENTS)
+    // ВАЖНО: /me/clients возвращает InternalClient[] (из таблицы clients)
+    // Это НЕ то же самое, что /profile/keys (который возвращает VPNClient[] из marzban_clients)
+    async getMeClients(): Promise<InternalClient[]> {
+        const clients = await this.request<InternalClient[]>(API_CONFIG.ENDPOINTS.ME_CLIENTS)
+        // Защита от null/undefined
+        return Array.isArray(clients) ? clients : []
     }
 
-    async createClient(data: CreateClientRequest): Promise<{ client_id: string; uuid: string }> {
-        return this.request(API_CONFIG.ENDPOINTS.ME_CLIENTS, {
+    async createClient(data: CreateClientRequest): Promise<CreateClientResponse> {
+        // ВАЖНО: client_id и uuid - это РАЗНЫЕ UUID
+        // client_id - для revoke
+        // uuid - для конфигурации VPN
+        return this.request<CreateClientResponse>(API_CONFIG.ENDPOINTS.ME_CLIENTS, {
             method: "POST",
             body: JSON.stringify(data),
         })
     }
 
+    // ВАЖНО: clientId здесь - это внутренний UUID из InternalClient.id (из таблицы clients)
+    // НЕ используйте marzban_client_id!
     async revokeClient(clientId: string): Promise<void> {
         return this.request(`${API_CONFIG.ENDPOINTS.ME_CLIENTS}/${clientId}/revoke`, {
             method: "POST",
         })
     }
 
+    // ВАЖНО: clientId здесь - это Marzban ID (marzban_client_id), НЕ внутренний UUID
+    // Используйте marzban_client_id из VPNKey или VPNClient
     async getVPNConfig(clientId: string): Promise<{ config: string; subscription_url: string }> {
-        return this.request(`${API_CONFIG.ENDPOINTS.VPN_CONFIG}/${clientId}`)
+        const data = await this.request<any>(`${API_CONFIG.ENDPOINTS.VPN_CONFIG}/${clientId}`)
+        // Адаптируем формат от Marzban
+        return adaptVPNConfig(data)
     }
 
     // Payment endpoints
@@ -247,6 +311,8 @@ class APIClient {
         )
     }
 
+    // ВАЖНО: Пагинация не реализована на бэкенде
+    // Всегда возвращаются все записи, но параметры можно передать
     async getBillingHistory(page = 1, limit = 20): Promise<BillingHistory> {
         return this.request<BillingHistory>(
             `${API_CONFIG.ENDPOINTS.BILLING_HISTORY}?page=${page}&limit=${limit}`

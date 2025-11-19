@@ -3,6 +3,9 @@ export interface AuthResponse {
     access_token: string
     refresh_token: string
     expires_in: number
+    refresh_expires_at: string
+    user: User
+    roles: string[]
 }
 
 export interface Tariff {
@@ -26,25 +29,44 @@ export interface Node {
     port?: number
 }
 
+// MarzbanClient - клиенты из таблицы marzban_clients (используется в /profile/keys)
 export interface VPNClient {
     id: string
     user_id: string
     marzban_client_id: string
     protocol: string
-    transport: string
+    transport: string | null
     created_at: string
-    expires_at: string
+    expires_at: string | null
     active: boolean
-    subscription_url?: string
-    config_text?: string
+    subscription_url: string | null
+    config_text: string | null
+}
+
+// InternalClient - клиенты из таблицы clients (используется в /me/clients)
+export interface InternalClient {
+    id: string
+    uuid_key: string
+    protocol: string
+    transport: string
+    flow: string | null
+    status: string
+    expires_at: string | null
 }
 
 export interface User {
     id: string
-    email?: string
-    telegram_id?: number
+    email: string | null
+    telegram_id: number | null
     roles: string[]
-    marzban_username?: string
+    marzban_username: string | null
+    marzban_id: string | null
+    is_active: boolean
+    is_admin: boolean
+    referral_code: string | null
+    referred_by: string | null
+    created_at: string
+    updated_at: string
 }
 
 export interface ProfileResponse {
@@ -60,20 +82,21 @@ export interface VPNKey {
     user_id: string
     marzban_client_id: string
     protocol: string
-    transport: string
+    transport: string | null
     created_at: string
-    expires_at: string
+    expires_at: string | null
     active: boolean
-    subscription_url?: string
-    config_text?: string
+    subscription_url: string | null
+    config_text: string | null
 }
 
+// UsageStats - формат может отличаться в зависимости от Marzban API
 export interface UsageStats {
-    client_id: string
+    client_id?: string
     up: number
     down: number
     total: number
-    expires: string
+    expires?: string
 }
 
 export interface PaymentResponse {
@@ -86,20 +109,28 @@ export interface PaymentResponse {
 
 export interface Invoice {
     id: string
-    user_id: string
-    tariff_id: string
+    user_id: string | null
+    tariff_id: string | null
     amount: number
     currency: string
     status: string
+    external_id: string | null
+    metadata: Record<string, unknown>
     created_at: string
     updated_at: string
 }
 
 export interface Payment {
     id: string
-    status: string
+    invoice_id: string
+    provider: string
+    provider_payment_id: string
     amount: number
     currency: string
+    status: string
+    raw_payload: Record<string, unknown>
+    created_at: string
+    updated_at: string
 }
 
 export interface PaymentDetails {
@@ -112,16 +143,19 @@ export interface BillingState {
         client_id: string
         user_id: string
         status: string
-        expires_at: string
-        last_sync: string
+        expires_at: string | null
+        last_sync: string | null
         auto_renew: boolean
-        last_payment_id?: string
+        last_payment_id: string | null
+        created_at: string
+        updated_at: string
     }
     events: Array<{
         id: string
-        action: string
-        amount: number
-        currency: string
+        payment_id: string
+        event_type: string
+        reason: string | null
+        raw_payload: Record<string, unknown>
         created_at: string
     }>
 }
@@ -138,6 +172,15 @@ export interface BillingHistory {
     }>
 }
 
+// MeResponse - ответ от /me endpoint (только JWT claims, не полный user)
+export interface MeResponse {
+    uid: string
+    user_id: string // Дубликат uid
+    roles: string[]
+    exp: number // Unix timestamp (секунды)
+    iat: number // Unix timestamp (секунды)
+}
+
 export interface LoginRequest {
     email: string
     password: string
@@ -146,6 +189,7 @@ export interface LoginRequest {
 export interface RegisterRequest {
     email: string
     password: string
+    referral?: string
 }
 
 export interface CreatePaymentRequest {
@@ -163,7 +207,13 @@ export interface RenewRequest {
 export interface CreateClientRequest {
     protocol: string
     transport: string
-    flow?: string
-    node_id: string
-    meta?: Record<string, unknown>
+    flow: string
+    node_id?: string | null
+    meta?: Record<string, unknown> | null
+}
+
+// CreateClientResponse - ответ от POST /me/clients
+export interface CreateClientResponse {
+    client_id: string // UUID из таблицы clients (для revoke)
+    uuid: string // UUID ключ для VPN конфигурации (другой UUID!)
 }
