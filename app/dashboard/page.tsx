@@ -1,14 +1,35 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
+import type { Tariff, VPNKey as ApiVPNKey } from "@/lib/api/types"
 import DashboardSidebar from "@/components/shared/dashboard-sidebar"
 import DashboardPlansTab from "@/components/shared/dashboard-plans-tab"
 import DashboardKeysTab from "@/components/shared/dashboard-keys-tab"
 import DashboardSupportTab from "@/components/shared/dashboard-support-tab"
 import StatsGrid from "@/components/shared/stats-grid"
 import MobileSidebarToggle from "@/components/shared/mobile-sidebar-toggle"
+
+type DashboardPlan = {
+    id: string
+    name: string
+    icon: string
+    price: string
+    period: string
+    description: string
+    highlighted?: boolean
+    discount?: string
+}
+
+type DashboardVPNKey = {
+    id: string
+    key: string
+    location: string
+    status: "active" | "expired"
+    expiresAt: string | null
+    marzban_client_id?: string
+}
 
 const DashboardPage = () => {
     const router = useRouter()
@@ -18,20 +39,10 @@ const DashboardPage = () => {
     const [copiedKey, setCopiedKey] = useState<string | null>(null)
     const [activeTab, setActiveTab] = useState<"plans" | "keys" | "support">("plans")
     const [sidebarOpen, setSidebarOpen] = useState(false)
-    const [plans, setPlans] = useState<any[]>([])
-    const [vpnKeys, setVpnKeys] = useState<any[]>([])
+    const [plans, setPlans] = useState<DashboardPlan[]>([])
+    const [vpnKeys, setVpnKeys] = useState<DashboardVPNKey[]>([])
 
-    useEffect(() => {
-        checkAuth()
-    }, [router])
-
-    useEffect(() => {
-        if (isAuthenticated) {
-            loadDashboardData()
-        }
-    }, [isAuthenticated])
-
-    const checkAuth = () => {
+    const checkAuth = useCallback(() => {
         const auth = localStorage.getItem("isAuthenticated")
         const email = localStorage.getItem("userEmail")
 
@@ -42,13 +53,17 @@ const DashboardPage = () => {
             router.push("/auth/login")
         }
         setIsLoading(false)
-    }
+    }, [router])
 
-    const loadDashboardData = async () => {
+    useEffect(() => {
+        checkAuth()
+    }, [checkAuth])
+
+    const loadDashboardData = useCallback(async () => {
         try {
             // Load tariffs
             const tariffs = await apiClient.getTariffs()
-            const formattedPlans = tariffs.map((tariff: any) => ({
+            const formattedPlans: DashboardPlan[] = tariffs.map((tariff: Tariff) => ({
                 id: tariff.code,
                 name: tariff.name,
                 icon: getIconForDuration(tariff.duration_seconds),
@@ -62,14 +77,15 @@ const DashboardPage = () => {
 
             // Load VPN keys (из marzban_clients)
             const keys = await apiClient.getProfileKeys()
-            setVpnKeys(keys.map((key) => ({
+            const formattedKeys: DashboardVPNKey[] = keys.map((key: ApiVPNKey) => ({
                 id: key.id,
                 key: key.config_text || "Generating...",
                 location: "🌍 Auto-select",
                 status: key.active ? "active" : "expired",
                 expiresAt: key.expires_at || null,
                 marzban_client_id: key.marzban_client_id, // Для использования в /configs/*
-            })))
+            }))
+            setVpnKeys(formattedKeys)
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "Unknown error"
 
@@ -82,7 +98,13 @@ const DashboardPage = () => {
             // Fallback to static data
             loadStaticData()
         }
-    }
+    }, [])
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            loadDashboardData()
+        }
+    }, [isAuthenticated, loadDashboardData])
 
     const loadStaticData = () => {
         setPlans([
@@ -134,6 +156,7 @@ const DashboardPage = () => {
                 location: "🇺🇸 США (Нью-Йорк)",
                 status: "active",
                 expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                marzban_client_id: "demo-1",
             },
             {
                 id: "2",
@@ -141,6 +164,7 @@ const DashboardPage = () => {
                 location: "🇩🇪 Германия (Франкфурт)",
                 status: "active",
                 expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                marzban_client_id: "demo-2",
             },
         ])
     }

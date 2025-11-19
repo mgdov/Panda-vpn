@@ -16,11 +16,10 @@ import type {
     RenewRequest,
     CreateClientRequest,
     CreateClientResponse,
-    VPNClient,
     InternalClient,
     MeResponse,
 } from "./types"
-import { getErrorMessage, isNetworkError } from "./errors"
+import { getErrorMessage } from "./errors"
 import { adaptUsageStats, adaptVPNConfig } from "./adapters"
 
 class APIClient {
@@ -181,7 +180,7 @@ class APIClient {
             const data: AuthResponse = await response.json()
             this.setTokens(data.access_token, data.refresh_token)
             return true
-        } catch (error) {
+        } catch {
             // При любой ошибке очищаем токены
             this.clearTokens()
             return false
@@ -235,7 +234,7 @@ class APIClient {
 
     async getProfileUsage(clientId?: string): Promise<UsageStats> {
         const query = clientId ? `?client_id=${clientId}` : ""
-        const data = await this.request<any>(
+        const data = await this.request<Record<string, unknown>>(
             `${API_CONFIG.ENDPOINTS.PROFILE_USAGE}${query}`
         )
         // Адаптируем формат от Marzban
@@ -271,7 +270,7 @@ class APIClient {
     // ВАЖНО: clientId здесь - это Marzban ID (marzban_client_id), НЕ внутренний UUID
     // Используйте marzban_client_id из VPNKey или VPNClient
     async getVPNConfig(clientId: string): Promise<{ config: string; subscription_url: string }> {
-        const data = await this.request<any>(`${API_CONFIG.ENDPOINTS.VPN_CONFIG}/${clientId}`)
+        const data = await this.request<Record<string, unknown>>(`${API_CONFIG.ENDPOINTS.VPN_CONFIG}/${clientId}`)
         // Адаптируем формат от Marzban
         return adaptVPNConfig(data)
     }
