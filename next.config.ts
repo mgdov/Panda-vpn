@@ -5,13 +5,13 @@ const nextConfig: NextConfig = {
   output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
   
   async rewrites() {
-    // В production используем переменную окружения, в dev - хардкод
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://103.74.92.81:8000';
+    // В production используем переменную окружения
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://vpn-p.ru';
     
     return [
       {
         source: '/api/:path*',
-        destination: `${apiUrl}/:path*`,
+        destination: `${apiUrl}/api/:path*`,
       },
     ]
   },

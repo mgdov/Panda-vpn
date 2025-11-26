@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const API_BASE_URL = 'http://103.74.92.81:8000'
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL || 'https://vpn-p.ru'}/api`
 
 export async function GET(
     request: NextRequest,

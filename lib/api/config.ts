@@ -3,50 +3,50 @@ export const API_CONFIG = {
   BASE_URL: process.env.NEXT_PUBLIC_API_URL || "https://vpn-p.ru",
   ENDPOINTS: {
     // Auth
-    AUTH_TELEGRAM: "/auth/telegram",
-    AUTH_REGISTER: "/auth/register",
-    AUTH_LOGIN: "/auth/login",
-    AUTH_REFRESH: "/auth/refresh",
-    AUTH_LOGOUT: "/auth/logout",
+    AUTH_TELEGRAM: "/api/auth/telegram",
+    AUTH_REGISTER: "/api/auth/register",
+    AUTH_LOGIN: "/api/auth/login",
+    AUTH_REFRESH: "/api/auth/refresh",
+    AUTH_LOGOUT: "/api/auth/logout",
 
     // Public
-    TARIFFS: "/tariffs",
-    NODES: "/nodes",
+    TARIFFS: "/api/tariffs",
+    NODES: "/api/nodes",
 
     // User
-    ME: "/auth/me",
-    ME_CLIENTS: "/me/clients",
-    PROFILE: "/profile",
-    PROFILE_KEYS: "/profile/keys",
-    PROFILE_USAGE: "/profile/usage",
+    ME: "/api/auth/me",
+    ME_CLIENTS: "/api/me/clients",
+    PROFILE: "/api/profile",
+    PROFILE_KEYS: "/api/profile/keys",
+    PROFILE_USAGE: "/api/profile/usage",
 
     // VPN
-    VPN_CONFIG: "/me/vpn/config",
-    VPN_RENEW: "/vpn/renew",
-    VPN_TOPUP: "/vpn/topup",
+    VPN_CONFIG: "/api/me/vpn/config",
+    VPN_RENEW: "/api/vpn/renew",
+    VPN_TOPUP: "/api/vpn/topup",
 
     // Payments
-    PAYMENTS_CREATE: "/payments/create",
-    PAYMENTS_GET: "/payments",
-    PAYMENTS_WEBHOOK: "/payments/webhook",
+    PAYMENTS_CREATE: "/api/payments/create",
+    PAYMENTS_GET: "/api/payments",
+    PAYMENTS_WEBHOOK: "/api/payments/webhook",
 
     // Billing
-    BILLING_STATE: "/billing/state",
-    BILLING_HISTORY: "/billing/history",
+    BILLING_STATE: "/api/billing/state",
+    BILLING_HISTORY: "/api/billing/history",
 
     // Admin
-    ADMIN_USERS: "/admin/users",
-    ADMIN_CLIENTS: "/admin/clients",
-    ADMIN_NODES: "/admin/nodes",
-    ADMIN_PAYMENTS: "/admin/payments",
-    ADMIN_TARIFFS: "/admin/tariffs/list",
-    ADMIN_PROMOS: "/admin/promos",
-    ADMIN_REFERRALS: "/admin/referral",
-    ADMIN_MAIL_QUEUE: "/admin/mail/queue",
-    ADMIN_MAIL_SEND: "/admin/mail/send",
-    ADMIN_BACKUPS: "/admin/backups",
-    ADMIN_STATS: "/admin/stats",
-    ADMIN_AUDIT: "/admin/audit",
+    ADMIN_USERS: "/api/admin/users",
+    ADMIN_CLIENTS: "/api/admin/clients",
+    ADMIN_NODES: "/api/admin/nodes",
+    ADMIN_PAYMENTS: "/api/admin/payments",
+    ADMIN_TARIFFS: "/api/admin/tariffs/list",
+    ADMIN_PROMOS: "/api/admin/promos",
+    ADMIN_REFERRALS: "/api/admin/referral",
+    ADMIN_MAIL_QUEUE: "/api/admin/mail/queue",
+    ADMIN_MAIL_SEND: "/api/admin/mail/send",
+    ADMIN_BACKUPS: "/api/admin/backups",
+    ADMIN_STATS: "/api/admin/stats",
+    ADMIN_AUDIT: "/api/admin/audit",
   },
 } as const
 
