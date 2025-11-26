@@ -1,6 +1,6 @@
 // API Configuration
 export const API_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || "http://103.74.92.81:8000",
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || "https://vpn-p.ru",
   ENDPOINTS: {
     // Auth
     AUTH_TELEGRAM: "/auth/telegram",
