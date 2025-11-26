@@ -14,14 +14,14 @@ export const API_CONFIG = {
     NODES: "/nodes",
 
     // User
-    ME: "/me",
+    ME: "/auth/me",
     ME_CLIENTS: "/me/clients",
     PROFILE: "/profile",
     PROFILE_KEYS: "/profile/keys",
     PROFILE_USAGE: "/profile/usage",
 
     // VPN
-    VPN_CONFIG: "/vpn/config",
+    VPN_CONFIG: "/me/vpn/config",
     VPN_RENEW: "/vpn/renew",
     VPN_TOPUP: "/vpn/topup",
 

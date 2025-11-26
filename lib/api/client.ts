@@ -110,10 +110,26 @@ class APIClient {
 
             if (!response.ok) {
                 const error = await response.json().catch(() => ({ 
-                    message: `HTTP ${response.status}` 
+                    detail: `HTTP ${response.status}` 
                 }))
-                const errorMessage = getErrorMessage(error.message || `HTTP ${response.status}`)
-                throw new Error(errorMessage)
+                
+                // FastAPI возвращает ошибки в формате { "detail": "..." } или { "detail": [...] }
+                let errorMessage: string
+                
+                if (Array.isArray(error.detail)) {
+                    // Ошибки валидации Pydantic (422)
+                    const firstError = error.detail[0]
+                    errorMessage = firstError?.msg || firstError?.message || `Validation error: ${firstError?.loc?.join('.')}`
+                } else if (typeof error.detail === 'string') {
+                    // Обычная ошибка от сервиса
+                    errorMessage = error.detail
+                } else {
+                    // Fallback
+                    errorMessage = error.message || error.detail || `HTTP ${response.status}`
+                }
+                
+                const translatedMessage = getErrorMessage(errorMessage)
+                throw new Error(translatedMessage)
             }
 
             if (response.status === 204) {
@@ -204,7 +220,8 @@ class APIClient {
 
     // Public endpoints
     async getTariffs(): Promise<Tariff[]> {
-        return this.request<Tariff[]>(API_CONFIG.ENDPOINTS.TARIFFS)
+        const response = await this.request<{ tariffs: Tariff[]; total: number }>(API_CONFIG.ENDPOINTS.TARIFFS)
+        return response.tariffs || []
     }
 
     // ВАЖНО: Это заглушка - всегда возвращает один узел
@@ -232,21 +249,33 @@ class APIClient {
         return Array.isArray(keys) ? keys : []
     }
 
-    async getProfileUsage(clientId?: string): Promise<UsageStats> {
+    async getProfileUsage(clientId?: string): Promise<UsageStats[]> {
         const query = clientId ? `?client_id=${clientId}` : ""
-        const data = await this.request<Record<string, unknown>>(
-            `${API_CONFIG.ENDPOINTS.PROFILE_USAGE}${query}`
-        )
-        // Адаптируем формат от Marzban
-        return adaptUsageStats(data)
+        const data = await this.request<Array<{
+            client_id: string
+            bytes_up: number
+            bytes_down: number
+            total_bytes: number
+            quota_bytes: number | null
+            usage_percent: number | null
+            date: string
+        }>>(`${API_CONFIG.ENDPOINTS.PROFILE_USAGE}${query}`)
+        // Адаптируем формат - возвращаем массив
+        return data.map(item => ({
+            client_id: item.client_id,
+            up: item.bytes_up,
+            down: item.bytes_down,
+            total: item.total_bytes,
+            expires: undefined
+        }))
     }
 
     // ВАЖНО: /me/clients возвращает InternalClient[] (из таблицы clients)
     // Это НЕ то же самое, что /profile/keys (который возвращает VPNClient[] из marzban_clients)
     async getMeClients(): Promise<InternalClient[]> {
-        const clients = await this.request<InternalClient[]>(API_CONFIG.ENDPOINTS.ME_CLIENTS)
+        const response = await this.request<{ clients: InternalClient[]; total: number }>(API_CONFIG.ENDPOINTS.ME_CLIENTS)
         // Защита от null/undefined
-        return Array.isArray(clients) ? clients : []
+        return Array.isArray(response.clients) ? response.clients : []
     }
 
     async createClient(data: CreateClientRequest): Promise<CreateClientResponse> {
@@ -267,12 +296,13 @@ class APIClient {
         })
     }
 
-    // ВАЖНО: clientId здесь - это Marzban ID (marzban_client_id), НЕ внутренний UUID
-    // Используйте marzban_client_id из VPNKey или VPNClient
+    // ВАЖНО: clientId здесь - это внутренний UUID из MarzbanClient.id
     async getVPNConfig(clientId: string): Promise<{ config: string; subscription_url: string }> {
-        const data = await this.request<Record<string, unknown>>(`${API_CONFIG.ENDPOINTS.VPN_CONFIG}/${clientId}`)
-        // Адаптируем формат от Marzban
-        return adaptVPNConfig(data)
+        const data = await this.request<{ client_id: string; config_text: string; subscription_url: string | null; protocol: string }>(`${API_CONFIG.ENDPOINTS.VPN_CONFIG}/${clientId}`)
+        return {
+            config: data.config_text || "",
+            subscription_url: data.subscription_url || ""
+        }
     }
 
     // Payment endpoints

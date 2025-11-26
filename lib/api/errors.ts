@@ -40,6 +40,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   'invalid body': 'Неверный формат данных',
   'email already exists': 'Email уже зарегистрирован',
   'invalid login': 'Неверный email или пароль',
+  'invalid credentials': 'Неверный email или пароль',
   'user inactive': 'Аккаунт деактивирован',
   'invalid refresh token': 'Сессия истекла. Пожалуйста, войдите снова',
   'refresh_token required': 'Токен обновления обязателен',
@@ -53,6 +54,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   'not allowed': 'Доступ запрещен',
   'client does not belong to user': 'Клиент не принадлежит пользователю',
   'tariff_code required': 'Код тарифа обязателен',
+  'tariff not found': 'Тариф не найден',
   'unsupported payment method': 'Неподдерживаемый метод оплаты',
   'invoice not found': 'Инвойс не найден',
   'failed to list tariffs': 'Ошибка загрузки тарифов',
@@ -62,6 +64,10 @@ const ERROR_MESSAGES: Record<string, string> = {
   'marzban unavailable': 'Сервис VPN временно недоступен',
   'failed to fetch usage': 'Ошибка загрузки статистики',
   'API server unavailable': 'Сервер API недоступен',
+  'value is not a valid email address': 'Неверный формат email',
+  'ensure this value has at least 6 characters': 'Пароль должен содержать минимум 6 символов',
+  'field required': 'Обязательное поле не заполнено',
+  'validation error': 'Ошибка валидации данных',
 }
 
 /**
@@ -78,23 +84,46 @@ export const getErrorMessage = (error: unknown): string => {
       return ERROR_MESSAGES[message]
     }
     
-    // Проверяем частичное совпадение
+    // Проверяем частичное совпадение (сначала более специфичные)
     for (const [code, msg] of Object.entries(ERROR_MESSAGES)) {
-      if (message.includes(code)) {
+      if (message.includes(code.toLowerCase())) {
         return msg
       }
     }
     
-    // Если это сообщение об API недоступности
+    // Специальные случаи
     if (message.includes('api server unavailable') || message.includes('failed to fetch')) {
       return ERROR_MESSAGES['API server unavailable']
     }
     
+    if (message.includes('email') && message.includes('valid')) {
+      return ERROR_MESSAGES['value is not a valid email address']
+    }
+    
+    if (message.includes('at least') && message.includes('character')) {
+      return ERROR_MESSAGES['ensure this value has at least 6 characters']
+    }
+    
+    // Возвращаем оригинальное сообщение, если не нашли перевод
     return error.message
   }
   
   if (typeof error === 'string') {
-    return ERROR_MESSAGES[error.toLowerCase()] || error
+    const lowerError = error.toLowerCase()
+    
+    // Проверяем точное совпадение
+    if (ERROR_MESSAGES[lowerError]) {
+      return ERROR_MESSAGES[lowerError]
+    }
+    
+    // Проверяем частичное совпадение
+    for (const [code, msg] of Object.entries(ERROR_MESSAGES)) {
+      if (lowerError.includes(code.toLowerCase())) {
+        return msg
+      }
+    }
+    
+    return error
   }
   
   return 'Произошла неизвестная ошибка'
