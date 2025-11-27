@@ -15,34 +15,43 @@ export default function Navbar() {
   }, [])
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-accent/30 shadow-lg shadow-green-900/10">
+    <nav className="sticky top-0 z-50 glass-effect border-b border-green-500/20 shadow-2xl">
       <div className="container-wide">
-        <div className="flex items-center justify-between h-14">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 font-bold text-lg text-white hover:text-accent transition-colors duration-300">
-            <span className="text-2xl">🐼</span>
-            <span>Panda VPN</span>
+          <Link href="/" className="flex items-center gap-3 font-bold text-xl text-white hover:scale-105 transition-all duration-300 group">
+            <span className="text-3xl group-hover:scale-110 transition-transform duration-300">🐼</span>
+            <span className="gradient-text">Panda VPN</span>
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/about" className="hover:text-accent transition-colors duration-300 text-white text-sm">
-              📚 О нас
+          <div className="hidden md:flex items-center gap-8">
+            <Link href="/about" className="relative text-gray-300 hover:text-green-400 transition-all duration-300 text-sm font-medium group">
+              <span className="flex items-center gap-2">
+                📚 О нас
+              </span>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-green-400 to-emerald-400 group-hover:w-full transition-all duration-300"></span>
             </Link>
-            <Link href="/faq" className="hover:text-accent transition-colors duration-300 text-white text-sm">
-              ❓ FAQ
+            <Link href="/faq" className="relative text-gray-300 hover:text-green-400 transition-all duration-300 text-sm font-medium group">
+              <span className="flex items-center gap-2">
+                ❓ FAQ
+              </span>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-green-400 to-emerald-400 group-hover:w-full transition-all duration-300"></span>
             </Link>
             {isAuthenticated ? (
-              <Link href="/dashboard" className="btn-primary flex items-center gap-2 text-sm px-4 py-2">
+              <Link href="/dashboard" className="relative px-6 py-2.5 bg-linear-to-r from-green-500 to-emerald-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-green-500/50 transition-all duration-300 hover:scale-105 flex items-center gap-2 text-sm">
                 <User size={16} />
                 Личный кабинет
               </Link>
             ) : (
               <>
-                <Link href="/auth/login" className="hover:text-accent transition-colors duration-300 text-white text-sm">
-                  🔑 Вход
+                <Link href="/auth/login" className="relative text-gray-300 hover:text-green-400 transition-all duration-300 text-sm font-medium group">
+                  <span className="flex items-center gap-2">
+                    🔑 Вход
+                  </span>
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-green-400 to-emerald-400 group-hover:w-full transition-all duration-300"></span>
                 </Link>
-                <Link href="/auth/signup" className="btn-primary text-sm px-4 py-2">
+                <Link href="/auth/signup" className="relative px-6 py-2.5 bg-linear-to-r from-green-500 to-emerald-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-green-500/50 transition-all duration-300 hover:scale-105 text-sm">
                   🚀 Начать
                 </Link>
               </>

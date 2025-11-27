@@ -64,12 +64,16 @@ export default function DashboardPage() {
             />
 
             <main className="relative flex-1 w-full ml-0 md:ml-64 px-4 sm:px-6 md:px-10 lg:px-12 py-6 md:py-8 lg:py-10 transition-all z-10 overflow-x-hidden">
-                <div className="mb-6 md:mb-8">
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2 bg-linear-to-r from-white to-green-400 bg-clip-text text-transparent">
-                        Добро пожаловать, {userEmail.split("@")[0]}!
+                <div className="mb-6 space-y-3 md:mb-8">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1.5 text-xs font-semibold text-gray-100 ring-1 ring-green-500/30">
+                        <span className="text-base">🐼</span>
+                        Panda VPN
+                    </div>
+                    <h1 className="text-3xl font-semibold text-white sm:text-[34px]">
+                        Привет, {userEmail.split("@")[0]} — ваш дашборд готов
                     </h1>
-                    <p className="text-gray-400 text-sm md:text-base">
-                        Управляйте вашим VPN аккаунтом
+                    <p className="text-sm text-gray-400 sm:text-base">
+                        Управляйте подпиской, ключами и обращениями в одном месте.
                     </p>
                 </div>
 

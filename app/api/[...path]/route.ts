@@ -1,14 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL || 'https://vpn-p.ru'}/api`
+const envBase = process.env.NEXT_PUBLIC_API_URL?.trim()
+const fallbackBase = "https://vpn-p.ru"
+const rawBase = envBase && envBase.startsWith("http")
+    ? envBase.replace(/\/$/, "")
+    : fallbackBase
+const API_BASE_URL = rawBase.endsWith("/api") ? rawBase : `${rawBase}/api`
+
+if (process.env.NODE_ENV === 'development') {
+    console.log('[Proxy] Base URL:', API_BASE_URL)
+}
+
+function buildUrl(pathSegments: string[]): string {
+    const segments = [...pathSegments]
+    if (segments[0] === "api") {
+        segments.shift()
+    }
+    const normalizedPath = segments.join("/")
+    return normalizedPath ? `${API_BASE_URL}/${normalizedPath}` : API_BASE_URL
+}
+
+async function parseJsonSafe(response: Response) {
+    const text = await response.text()
+    if (!text) return {}
+    try {
+        return JSON.parse(text)
+    } catch {
+        return { error: text }
+    }
+}
 
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ path: string[] }> }
 ) {
     const { path: pathArray } = await params
-    const path = pathArray.join('/')
-    const url = `${API_BASE_URL}/${path}`
+    const url = buildUrl(pathArray)
+    if (process.env.NODE_ENV === 'development') {
+        console.log('[Proxy]', 'GET', url)
+    }
 
     try {
         const response = await fetch(url, {
@@ -18,7 +48,10 @@ export async function GET(
             },
         })
 
-        const data = await response.json()
+        const data = await parseJsonSafe(response)
+        if (process.env.NODE_ENV === 'development') {
+            console.log('[Proxy] Response', response.status, url)
+        }
         return NextResponse.json(data, { status: response.status })
     } catch (error) {
         console.error('Proxy error:', error)
@@ -34,9 +67,11 @@ export async function POST(
     { params }: { params: Promise<{ path: string[] }> }
 ) {
     const { path: pathArray } = await params
-    const path = pathArray.join('/')
-    const url = `${API_BASE_URL}/${path}`
+    const url = buildUrl(pathArray)
     const body = await request.json()
+    if (process.env.NODE_ENV === 'development') {
+        console.log('[Proxy]', 'POST', url)
+    }
 
     try {
         const response = await fetch(url, {
@@ -50,7 +85,10 @@ export async function POST(
             body: JSON.stringify(body),
         })
 
-        const data = await response.json()
+        const data = await parseJsonSafe(response)
+        if (process.env.NODE_ENV === 'development') {
+            console.log('[Proxy] Response', response.status, url)
+        }
         return NextResponse.json(data, { status: response.status })
     } catch (error) {
         console.error('Proxy error:', error)
@@ -66,9 +104,11 @@ export async function PUT(
     { params }: { params: Promise<{ path: string[] }> }
 ) {
     const { path: pathArray } = await params
-    const path = pathArray.join('/')
-    const url = `${API_BASE_URL}/${path}`
+    const url = buildUrl(pathArray)
     const body = await request.json()
+    if (process.env.NODE_ENV === 'development') {
+        console.log('[Proxy]', 'PUT', url)
+    }
 
     try {
         const response = await fetch(url, {
@@ -82,7 +122,10 @@ export async function PUT(
             body: JSON.stringify(body),
         })
 
-        const data = await response.json()
+        const data = await parseJsonSafe(response)
+        if (process.env.NODE_ENV === 'development') {
+            console.log('[Proxy] Response', response.status, url)
+        }
         return NextResponse.json(data, { status: response.status })
     } catch (error) {
         console.error('Proxy error:', error)
@@ -98,8 +141,10 @@ export async function DELETE(
     { params }: { params: Promise<{ path: string[] }> }
 ) {
     const { path: pathArray } = await params
-    const path = pathArray.join('/')
-    const url = `${API_BASE_URL}/${path}`
+    const url = buildUrl(pathArray)
+    if (process.env.NODE_ENV === 'development') {
+        console.log('[Proxy]', 'DELETE', url)
+    }
 
     try {
         const response = await fetch(url, {
@@ -116,7 +161,10 @@ export async function DELETE(
             return new NextResponse(null, { status: 204 })
         }
 
-        const data = await response.json()
+        const data = await parseJsonSafe(response)
+        if (process.env.NODE_ENV === 'development') {
+            console.log('[Proxy] Response', response.status, url)
+        }
         return NextResponse.json(data, { status: response.status })
     } catch (error) {
         console.error('Proxy error:', error)

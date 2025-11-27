@@ -56,8 +56,12 @@ class APIClient {
         options: RequestInit = {},
         retryOn401: boolean = true
     ): Promise<T> {
-        const fullUrl = `${this.baseUrl}${endpoint}`
-        
+        const base = this.baseUrl.replace(/\/$/, "")
+        const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`
+        const fullUrl = base.endsWith("/api") && path.startsWith("/api/")
+            ? `${base}${path.replace(/^\/api/, "")}`
+            : `${base}${path}`
+
         // Логирование в development режиме
         if (process.env.NODE_ENV === 'development') {
             console.log('[API Request]', options.method || 'GET', fullUrl)
@@ -109,13 +113,13 @@ class APIClient {
             }
 
             if (!response.ok) {
-                const error = await response.json().catch(() => ({ 
-                    detail: `HTTP ${response.status}` 
+                const error = await response.json().catch(() => ({
+                    detail: `HTTP ${response.status}`
                 }))
-                
+
                 // FastAPI возвращает ошибки в формате { "detail": "..." } или { "detail": [...] }
                 let errorMessage: string
-                
+
                 if (Array.isArray(error.detail)) {
                     // Ошибки валидации Pydantic (422)
                     const firstError = error.detail[0]
@@ -127,7 +131,7 @@ class APIClient {
                     // Fallback
                     errorMessage = error.message || error.detail || `HTTP ${response.status}`
                 }
-                
+
                 const translatedMessage = getErrorMessage(errorMessage)
                 throw new Error(translatedMessage)
             }
@@ -142,7 +146,7 @@ class APIClient {
             if (error instanceof TypeError && error.message === "Failed to fetch") {
                 throw new Error(`API server unavailable at ${this.baseUrl}`)
             }
-            
+
             // Пробрасываем ошибку дальше
             throw error
         }

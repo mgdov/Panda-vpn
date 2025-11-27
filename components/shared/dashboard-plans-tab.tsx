@@ -16,61 +16,81 @@ interface DashboardPlansTabProps {
 export default function DashboardPlansTab({ plans }: DashboardPlansTabProps) {
     return (
         <div>
-            <h2 className="text-xl md:text-2xl font-bold text-white mb-1.5 ">Выберите тариф</h2>
-            <p className=" text-gray-400 mb-6 text-xs md:text-sm">Гибкие тарифы для любых задач</p>
+            <h2 className="mb-2 text-2xl font-bold text-white sm:text-[28px]">Выберите тариф</h2>
+            <p className="mb-8 text-sm font-medium text-gray-300">Гибкие предложения под любые сценарии использования</p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5 max-w-7xl ">
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {plans.map((plan) => (
-                    <div key={plan.id} className="flex">
-                        <div className={`relative rounded-2xl overflow-hidden transition-all duration-300 group w-full flex flex-col ${plan.highlighted
-                            ? "border-2 border-green-500/80 bg-linear-to-br from-green-900/50 via-green-950/40 to-slate-900/90 shadow-2xl shadow-green-500/30"
-                            : "border border-slate-700/50 bg-linear-to-br from-slate-800/60 to-slate-900/80 hover:border-slate-600/60 shadow-lg hover:shadow-slate-700/20 hover:scale-[1.02] hover:-translate-y-0.5"
-                            }`}>
-                            {plan.highlighted && (
-                                <div className="absolute top-3 right-3 bg-linear-to-r from-green-500 to-emerald-500 text-white px-3 py-1.5 text-xs font-bold rounded-lg shadow-lg flex items-center gap-1">
-                                    <span>🌿</span>
-                                    <span>Популярный</span>
-                                </div>
-                            )}
-                            {plan.discount && !plan.highlighted && (
-                                <div className="absolute top-3 right-3 bg-linear-to-r from-red-500 to-orange-500 text-white px-3 py-1.5 text-xs font-bold rounded-lg shadow-lg">
-                                    {plan.discount}
-                                </div>
-                            )}
-                            <div className="p-6 md:p-7 flex flex-col items-start grow">
-                                <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-4xl mb-4 ${plan.highlighted ? 'bg-green-500/20' : 'bg-slate-700/50'} group-hover:scale-110 transition-transform duration-300`}>
+                    <article
+                        key={plan.id}
+                        className={`relative flex h-full flex-col overflow-hidden rounded-3xl border transition-all duration-300 ${plan.highlighted
+                                ? "border-emerald-400/60 bg-linear-to-br from-emerald-900/40 via-slate-900/70 to-slate-950/80 shadow-2xl shadow-emerald-500/30"
+                                : "border-white/10 bg-slate-900/70 hover:border-emerald-400/30 hover:shadow-xl hover:shadow-black/30"
+                            }`}
+                    >
+                        <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-transparent via-emerald-400/60 to-transparent" />
+
+                        {plan.highlighted && (
+                            <div className="absolute right-5 top-5 inline-flex items-center gap-2 rounded-full bg-linear-to-r from-emerald-500 to-emerald-600 px-4 py-1.5 text-xs font-bold text-white shadow-lg">
+                                <span>🌿</span>
+                                Популярный выбор
+                            </div>
+                        )}
+
+                        {!plan.highlighted && plan.discount && (
+                            <div className="absolute right-5 top-5 inline-flex items-center gap-2 rounded-full bg-linear-to-r from-orange-500 to-red-500 px-4 py-1.5 text-xs font-bold text-white shadow-lg">
+                                {plan.discount}
+                            </div>
+                        )}
+
+                        <div className="flex flex-1 flex-col gap-5 p-6 sm:p-7 lg:p-8">
+                            <div className="flex items-center gap-4">
+                                <div className={`flex h-16 w-16 items-center justify-center rounded-2xl text-4xl shadow-lg shadow-black/30 ${plan.highlighted ? "bg-emerald-500/20" : "bg-white/5"}`}>
                                     {plan.icon}
                                 </div>
-                                <h3 className="text-base md:text-lg font-bold mb-2 text-white">{plan.name}</h3>
-                                <p className="text-sm text-gray-400 mb-3">{plan.period}</p>
-                                <div className="mb-4 text-sm text-gray-300 leading-relaxed grow">{plan.description}</div>
-                                <div className="mb-4 flex items-baseline gap-1.5">
-                                    <span className="text-3xl font-bold text-white">{plan.price}</span>
-                                    <span className="text-sm text-gray-400">₽</span>
-                                </div>
-                                <div className="w-full">
-                                    <a
-                                        href="https://yookassa.ru/"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={`block text-center rounded-xl py-3 px-6 font-semibold transition-all duration-300 text-sm md:text-base ${plan.highlighted
-                                            ? "bg-linear-to-r from-green-500 to-emerald-500 text-white shadow-lg shadow-green-500/40 hover:shadow-xl hover:scale-105"
-                                            : "bg-slate-700/80 text-white hover:bg-slate-600 hover:shadow-lg hover:scale-105 border border-slate-600/50"
-                                            }`}
-                                    >
-                                        {plan.highlighted ? "✨ Выбрать" : "Выбрать"}
-                                    </a>
+                                <div>
+                                    <h3 className="text-lg font-bold text-white sm:text-xl">{plan.name}</h3>
+                                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-emerald-200/80 sm:text-sm">
+                                        {plan.period}
+                                    </p>
                                 </div>
                             </div>
+
+                            <p className="text-sm font-medium leading-relaxed text-gray-200 sm:text-base">
+                                {plan.description}
+                            </p>
+
+                            <div className="mt-auto flex items-end justify-between">
+                                <div>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-3xl font-bold text-white sm:text-4xl">{plan.price}</span>
+                                        <span className="text-sm font-semibold text-gray-400">₽</span>
+                                    </div>
+                                    <span className="text-xs font-medium text-gray-500">в месяц при оплате онлайн</span>
+                                </div>
+                                <div className="hidden text-sm font-semibold text-emerald-300 sm:block">
+                                    Без скрытых платежей
+                                </div>
+                            </div>
+
+                            <a
+                                href="https://yookassa.ru/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all duration-300 sm:text-base ${plan.highlighted
+                                        ? "bg-linear-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/40 hover:-translate-y-0.5 hover:shadow-xl"
+                                        : "bg-white/10 text-white hover:-translate-y-0.5 hover:border-emerald-400/40 hover:bg-white/15"
+                                    }`}
+                            >
+                                {plan.highlighted ? "✨ Активировать тариф" : "Выбрать тариф"}
+                            </a>
                         </div>
-                    </div>
+                    </article>
                 ))}
             </div>
 
-            <div className="mt-5 p-2.5 bg-green-900/20 border border-green-500/50 rounded-lg text-center">
-                <p className="text-xs text-green-400">
-                    💡 Все тарифы включают 7 дней бесплатного пробного периода
-                </p>
+            <div className="mt-8 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-5 py-4 text-center text-sm font-medium text-emerald-200">
+                💡 Все тарифы включают 7 дней бесплатного доступа и не ограничивают число устройств
             </div>
         </div>
     )

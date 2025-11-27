@@ -11,58 +11,62 @@ export default function AboutPage() {
       <div className="pointer-events-none fixed bottom-0 right-0 w-[350px] h-[350px] bg-green-400/10 rounded-full blur-2xl opacity-25 z-0" />
 
       {/* Hero Section */}
-      <section className="py-12 md:py-16 container-wide relative z-10">
-        <div className="max-w-3xl mx-auto px-4">
-          <div className="text-center mb-5">
-            <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 bg-linear-to-r from-green-900/40 to-green-800/40 border border-green-600/50 rounded-full backdrop-blur-sm shadow-lg shadow-green-900/20">
-              <span className="text-xl">🐼</span>
-              <span className="text-xs font-semibold text-green-400 uppercase tracking-wide">О нас</span>
-            </div>
+      <section className="relative z-10 py-16 sm:py-20">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-16 left-1/3 h-48 w-48 rounded-full bg-emerald-500/15 blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 h-60 w-60 rounded-full bg-teal-500/10 blur-3xl" />
+        </div>
+
+        <div className="relative mx-auto max-w-4xl px-4 text-center space-y-5">
+          <div className="inline-flex items-center justify-center gap-2 rounded-full bg-white/5 px-4 py-2 text-xs font-bold text-gray-100 ring-1 ring-green-500/35">
+            <span className="text-base">🐼</span>
+            О нас
           </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-3 md:mb-4 text-center bg-linear-to-r from-white via-green-200 to-green-400 bg-clip-text text-transparent">О Panda VPN</h1>
-          <p className="text-sm md:text-base text-gray-300 mb-6 md:mb-8 leading-relaxed text-center">
-            Мы создали <span className="text-green-400 font-semibold">Panda VPN</span>, чтобы каждый смог получить безопасный и надежный доступ в интернет без опасений за свою
-            приватность.
+          <h1 className="text-3xl font-extrabold text-white sm:text-4xl">
+            <span className="gradient-text">Panda VPN</span> — сервис, созданный людьми для людей
+          </h1>
+          <p className="mx-auto max-w-2xl text-sm font-medium leading-relaxed text-gray-200 sm:text-base">
+            Мы собрали команду, чтобы каждый мог чувствовать себя защищенным в сети и свободно работать с любимым
+            контентом, где бы он ни находился.
           </p>
         </div>
       </section>
 
       {/* Mission Section */}
-      <section className="py-12 md:py-16 bg-linear-to-br from-slate-900/60 to-black/40 border-y border-green-700/20 backdrop-blur-sm relative z-10">
+      <section className="relative z-10 py-16 sm:py-20">
         <div className="container-wide">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-center">
-            <div className="px-4">
-              <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 bg-green-900/30 border border-green-600/40 rounded-full">
-                <Shield size={14} className="text-green-400" />
-                <span className="text-xs font-semibold text-green-400 uppercase tracking-wide">Наша миссия</span>
+          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+            <div className="space-y-4 px-4">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1.5 text-xs font-bold text-gray-100 ring-1 ring-green-500/30">
+                <Shield size={14} className="text-emerald-300" />
+                Наша миссия
               </div>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold mb-3 md:mb-4 bg-linear-to-r from-white to-green-300 bg-clip-text text-transparent">Защита и свобода для всех</h2>
-              <p className="text-xs md:text-sm text-gray-300 mb-3 md:mb-4 leading-relaxed">
-                Panda VPN работает над тем, чтобы защитить конфиденциальность пользователей в интернете и обеспечить
-                безопасный доступ к информации без цензуры.
+              <h2 className="text-2xl font-bold text-white sm:text-3xl">
+                Свободный и безопасный интернет для каждого
+              </h2>
+              <p className="max-w-xl text-sm font-medium leading-relaxed text-gray-200 sm:text-base">
+                Panda VPN строится вокруг идеи приватности по умолчанию. Мы создаем инструменты, которые защищают ваши
+                данные и упрощают доступ к информации без гео-ограничений.
               </p>
-
-              <ul className="space-y-2 md:space-y-3">
+              <ul className="space-y-2 text-sm font-medium text-gray-100 sm:text-base">
                 {[
-                  "Надежное шифрование данных",
-                  "Быстрые и стабильные серверы",
-                  "Строгая политика невмешательства",
-                  "Поддержка различных протоколов",
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2.5 group">
-                    <div className="w-7 h-7 rounded-lg bg-linear-to-br from-green-600/30 to-green-700/30 flex items-center justify-center border border-green-600/40 group-hover:scale-110 transition-transform duration-300">
-                      <CheckCircle className="text-green-400 flex-shrink-0" size={16} />
-                    </div>
-                    <span className="text-xs md:text-sm text-gray-200 font-medium">{item}</span>
+                  "Надежное шифрование и строгая политика отсутствия логов",
+                  "Высокая скорость подключения на каждом сервере",
+                  "Команда поддержки, которая отвечает быстро и по делу",
+                  "Гибкие протоколы под любые сценарии использования",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 leading-snug">
+                    <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
+                    <span className="font-semibold text-white">{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="text-center order-first lg:order-last relative">
-              <div className="relative inline-block">
-                <div className="absolute inset-0 bg-linear-to-br from-green-600/20 to-green-900/20 rounded-full blur-2xl animate-pulse"></div>
-                <div className="text-6xl md:text-7xl lg:text-8xl relative drop-shadow-2xl hover:scale-110 transition-transform duration-300">🐼</div>
+            <div className="relative flex justify-center">
+              <div className="relative flex h-48 w-48 items-center justify-center rounded-full bg-slate-900/60 shadow-lg shadow-black/40 ring-1 ring-white/10 sm:h-56 sm:w-56">
+                <div className="absolute inset-0 rounded-full bg-linear-to-br from-emerald-500/10 to-transparent blur-2xl" />
+                <span className="relative text-6xl drop-shadow-2xl">🐼</span>
               </div>
             </div>
           </div>
@@ -70,69 +74,70 @@ export default function AboutPage() {
       </section>
 
       {/* Values Section */}
-      <section className="py-12 md:py-16 container-wide relative z-10">
-        <div className="text-center mb-6 md:mb-10">
-          <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 bg-linear-to-r from-green-900/40 to-green-800/40 border border-green-600/50 rounded-full backdrop-blur-sm shadow-lg shadow-green-900/20">
-            <span className="text-xl">⭐</span>
-            <span className="text-xs font-semibold text-green-400 uppercase tracking-wide">Ценности</span>
+      <section className="relative z-10 py-16 sm:py-20">
+        <div className="mx-auto max-w-5xl px-4 text-center space-y-4">
+          <div className="inline-flex items-center justify-center gap-2 rounded-full bg-white/5 px-4 py-1.5 text-xs font-bold text-gray-100 ring-1 ring-green-500/30">
+            <span className="text-base">⭐</span>
+            Наши ценности
           </div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold mb-2 bg-linear-to-r from-white to-green-300 bg-clip-text text-transparent">Наши ценности</h2>
-          <p className="text-xs md:text-sm text-gray-400 max-w-2xl mx-auto">Принципы, которыми мы руководствуемся каждый день</p>
+          <h2 className="text-2xl font-extrabold text-white sm:text-3xl">Что делает Panda VPN особенным</h2>
+          <p className="mx-auto max-w-2xl text-sm font-medium leading-relaxed text-gray-200 sm:text-base">
+            Мы опираемся на принципы прозрачности, скорости и заботы о пользователях. Каждый релиз проходит проверку на
+            соответствие этим трем столпам.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 px-4">
-          {[
-            {
-              icon: Shield,
-              title: "Приватность",
-              desc: "Ваши данные — ваши. Мы не собираем логи и не отслеживаем активность.",
-              color: "from-green-600 to-green-700"
-            },
-            {
-              icon: Zap,
-              title: "Скорость",
-              desc: "Оптимизированные серверы обеспечивают максимальную производительность.",
-              color: "from-blue-600 to-blue-700"
-            },
-            {
-              icon: Globe,
-              title: "Надежность",
-              desc: "99.9% uptime гарантирует постоянное соединение когда оно вам нужно.",
-              color: "from-purple-600 to-purple-700"
-            },
-          ].map((value, i) => {
-            const Icon = value.icon
-            return (
-              <div key={i} className="relative group overflow-hidden rounded-xl transition-all duration-300 hover:-translate-y-1">
-                <div className="absolute inset-0 bg-linear-to-br from-green-600/10 to-green-900/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative p-5 md:p-6 bg-linear-to-br from-slate-900 to-slate-800 border border-green-700/30 rounded-xl hover:border-green-600/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-900/30">
-                  <div className={`flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl bg-linear-to-br ${value.color} mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className="text-white" size={24} />
-                  </div>
-                  <h3 className="text-base md:text-lg font-bold mb-2 md:mb-3 text-white">{value.title}</h3>
-                  <p className="text-xs md:text-sm text-gray-400 leading-relaxed">{value.desc}</p>
+        <div className="container-wide mt-10">
+          <div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                icon: Shield,
+                title: "Приватность",
+                desc: "Ваши подключения остаются известными только вам. Мы не храним логи и не отслеживаем действия.",
+                accent: "from-emerald-500 to-emerald-600",
+              },
+              {
+                icon: Zap,
+                title: "Скорость",
+                desc: "Оптимизация серверов и умные маршруты дают стабильный пинг и высокую пропускную способность.",
+                accent: "from-sky-500 to-sky-600",
+              },
+              {
+                icon: Globe,
+                title: "Стабильность",
+                desc: "Инфраструктура с резервированием по всему миру обеспечивает 99.9% времени без простоев.",
+                accent: "from-violet-500 to-violet-600",
+              },
+            ].map(({ icon: Icon, title, desc, accent }) => (
+              <div key={title} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60 p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-emerald-400/40">
+                <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br ${accent} text-white shadow-lg shadow-black/20 transition-transform duration-300 group-hover:-translate-y-1`}>
+                  <Icon size={22} />
                 </div>
+                <h3 className="text-lg font-bold text-white">{title}</h3>
+                <p className="mt-2 text-sm font-medium leading-relaxed text-gray-200">{desc}</p>
               </div>
-            )
-          })}
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Team Section */}
-      <section className="py-12 md:py-16 bg-linear-to-br from-slate-900/60 to-black/40 border-y border-green-700/20 backdrop-blur-sm relative z-10">
-        <div className="container-wide text-center">
-          <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 bg-linear-to-r from-green-900/40 to-green-800/40 border border-green-600/50 rounded-full backdrop-blur-sm shadow-lg shadow-green-900/20">
-            <Users size={18} className="text-green-400" />
-            <span className="text-xs font-semibold text-green-400 uppercase tracking-wide">Команда</span>
+      <section className="relative z-10 py-16 sm:py-20">
+        <div className="mx-auto max-w-4xl px-4 text-center space-y-4">
+          <div className="inline-flex items-center justify-center gap-2 rounded-full bg-white/5 px-4 py-1.5 text-xs font-bold text-gray-100 ring-1 ring-green-500/30">
+            <Users size={16} className="text-emerald-300" />
+            Команда
           </div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold mb-3 bg-linear-to-r from-white to-green-300 bg-clip-text text-transparent">Создано с любовью</h2>
-          <p className="text-xs md:text-sm text-gray-300 mb-5 md:mb-6 max-w-2xl mx-auto leading-relaxed">
-            Наша команда состоит из опытных разработчиков и специалистов по безопасности, которые работают над тем, чтобы ваш интернет был <span className="text-green-400 font-semibold">безопасным и свободным</span>.
+          <h2 className="text-2xl font-extrabold text-white sm:text-3xl">Люди, которые стоят за сервисом</h2>
+          <p className="mx-auto max-w-2xl text-sm font-medium leading-relaxed text-gray-200 sm:text-base">
+            Мы любим технологии и делаем Panda VPN практичным. Поддержка отвечает на русском, разработчики выпускают
+            обновления каждую неделю, а безопасность остается в основе каждого решения.
           </p>
-          <div className="flex justify-center gap-3 text-4xl md:text-5xl">
-            <span className="hover:scale-125 transition-transform duration-300 drop-shadow-lg cursor-pointer">👨‍💻</span>
-            <span className="hover:scale-125 transition-transform duration-300 drop-shadow-lg cursor-pointer">👩‍💻</span>
-            <span className="hover:scale-125 transition-transform duration-300 drop-shadow-lg cursor-pointer">🔒</span>
+
+          <div className="flex items-center justify-center gap-4 text-3xl text-white sm:text-4xl">
+            <span className="rounded-xl bg-white/5 px-4 py-3 shadow-lg shadow-black/30">👨‍💻</span>
+            <span className="rounded-xl bg-white/5 px-4 py-3 shadow-lg shadow-black/30">👩‍💻</span>
+            <span className="rounded-xl bg-white/5 px-4 py-3 shadow-lg shadow-black/30">🔒</span>
           </div>
         </div>
       </section>

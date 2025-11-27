@@ -27,6 +27,19 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
+      const isDemoLogin = email === "demo@pandavpn.com" && password === "demo123"
+
+      if (isDemoLogin) {
+        localStorage.setItem("isAuthenticated", "true")
+        localStorage.setItem("userEmail", email)
+        setSuccess(true)
+        setIsLoading(false)
+        setTimeout(() => {
+          router.push("/dashboard")
+        }, 800)
+        return
+      }
+
       await apiClient.login({ email, password })
 
       localStorage.setItem("isAuthenticated", "true")
@@ -37,41 +50,37 @@ export default function LoginPage() {
         router.push("/dashboard")
       }, 1500)
     } catch (err: unknown) {
-      setIsLoading(false)
       const errorMessage = err instanceof Error ? err.message : "Ошибка входа"
       setError(errorMessage)
+      setIsLoading(false)
     }
   }
 
   return (
     <AuthBackground>
-      <div className="w-full max-w-md relative z-10">
-        <AuthLogo
-          title="Добро пожаловать обратно"
-          subtitle="Войдите в свой аккаунт"
-        />
+      <div className="relative z-10 w-full max-w-md space-y-6">
+        <AuthLogo title="Добро пожаловать обратно" subtitle="Войдите в свой аккаунт" />
 
-        {/* Demo credentials info */}
-        <div className="mb-8 p-4 bg-linear-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl border border-blue-500/30 backdrop-blur-xl hover:border-blue-500/50 transition-all duration-300">
-          <p className="text-sm font-bold text-white mb-3 flex items-center gap-2">
-            <span className="text-lg">🔑</span>
-            Тестовые учетные данные:
-          </p>
-          <div className="space-y-2 text-xs text-gray-200 ml-7">
+        <div className="rounded-xl border border-white/10 bg-white/10 p-5 shadow-lg shadow-black/30">
+          <div className="mb-3 flex items-center gap-2 text-sm font-bold text-white">
+            <span className="text-base">🔑</span>
+            Тестовые данные для входа
+          </div>
+          <div className="space-y-2 text-xs font-medium text-gray-200">
             <p className="flex items-center gap-2">
-              <span className="text-blue-400">📧</span>
-              <code className="bg-slate-800/50 px-2 py-1 rounded font-mono">demo@pandavpn.com</code>
+              <span className="text-emerald-300">📧</span>
+              <code className="rounded bg-slate-900/50 px-2 py-1 font-mono">demo@pandavpn.com</code>
             </p>
             <p className="flex items-center gap-2">
-              <span className="text-blue-400">🔐</span>
-              <code className="bg-slate-800/50 px-2 py-1 rounded font-mono">demo123</code>
+              <span className="text-emerald-300">🔐</span>
+              <code className="rounded bg-slate-900/50 px-2 py-1 font-mono">demo123</code>
             </p>
           </div>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-5 backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-7 shadow-2xl"
+          className="space-y-5 rounded-2xl border border-white/10 bg-white/10 p-7 shadow-xl shadow-black/30 backdrop-blur-xl"
         >
           <FormInput
             label="Email адрес"
@@ -106,7 +115,7 @@ export default function LoginPage() {
 
         <SocialAuthButtons mode="login" />
 
-        <p className="text-center text-sm text-gray-400 mt-6">
+        <p className="text-center text-sm font-medium text-gray-300">
           Нет аккаунта?{" "}
           <Link
             href="/auth/signup"
@@ -116,7 +125,7 @@ export default function LoginPage() {
           </Link>
         </p>
 
-        <p className="text-center text-xs text-gray-600 mt-4">
+        <p className="text-center text-xs font-medium text-gray-400">
           Нажимая &ldquo;Войти&rdquo;, вы согласны с нашими условиями обслуживания
         </p>
       </div>

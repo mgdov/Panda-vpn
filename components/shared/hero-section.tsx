@@ -7,43 +7,69 @@ interface HeroSectionProps {
 
 export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
     return (
-        <section className="py-12 md:py-16 container-wide relative z-10">
-            <div className="max-w-3xl mx-auto">
-                <div className="text-center">
-                    <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 bg-linear-to-r from-green-900/40 to-green-800/40 border border-green-600/50 rounded-full backdrop-blur-sm shadow-lg shadow-green-900/20 hover:scale-105 transition-transform duration-300">
-                        <span className="text-lg animate-pulse">✨</span>
-                        <span className="text-xs font-semibold text-green-400 uppercase tracking-wide">Премиум защита</span>
+        <section className="relative overflow-hidden py-16 sm:py-20">
+            <div className="absolute inset-0">
+                <div className="absolute -top-24 left-1/3 h-64 w-64 rounded-full bg-green-500/15 blur-3xl" />
+                <div className="absolute top-1/2 right-1/4 h-56 w-56 rounded-full bg-emerald-500/15 blur-3xl" />
+                <div className="absolute bottom-[-120px] left-1/5 h-72 w-72 rounded-full bg-teal-500/10 blur-3xl" />
+            </div>
+
+            <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center gap-8 px-4 text-center">
+                <div className="space-y-5">
+                    <div className="inline-flex items-center justify-center gap-2 rounded-full bg-white/5 px-4 py-2 text-xs font-bold text-gray-100 ring-1 ring-green-500/40">
+                        <span className="text-base">🐼</span>
+                        Panda VPN — надёжный доступ в любое время
                     </div>
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-3 leading-tight">
-                        <span className="text-white drop-shadow-lg">Защита вашей</span>
-                        <br />
-                        <span className="bg-linear-to-r from-green-400 via-green-500 to-green-600 text-transparent bg-clip-text drop-shadow-2xl">
-                            конфиденциальности
-                        </span>{" "}
-                        <span className="inline-block animate-pulse text-3xl md:text-4xl drop-shadow-lg">🔒</span>
+
+                    <h1 className="text-3xl font-extrabold leading-tight text-white sm:text-[40px]">
+                        Свобода интернета без блокировок и компромиссов
                     </h1>
-                    <p className="text-sm md:text-base text-gray-300 mb-5 leading-relaxed max-w-xl mx-auto">
-                        <span className="text-xl mr-1">🐼</span>
-                        <span className="font-semibold text-white">Panda VPN</span> — безопасное соединение и полная анонимность в интернете.
-                        <span className="block mt-1.5 text-green-400 font-medium text-sm">Защитите свои данные уже сегодня.</span>
+
+                    <p className="mx-auto max-w-2xl text-base font-medium leading-relaxed text-gray-200 sm:text-lg">
+                        Подключайтесь к премиальным VPN-серверам за секунды, защищайте данные и обходите ограничения в
+                        один клик на всех устройствах.
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                        {isAuthenticated ? (
-                            <Link href="/dashboard" className="btn-primary flex items-center gap-2 justify-center text-sm md:text-base px-6 py-3 shadow-xl shadow-green-900/30 hover:shadow-green-900/50 transform hover:scale-105 transition-all duration-300">
-                                <User size={18} />
-                                Личный кабинет
+                </div>
+
+                <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+                    {!isAuthenticated ? (
+                        <>
+                            <Link
+                                href="/auth/signup"
+                                className="group inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-green-500 to-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/35"
+                            >
+                                Начать бесплатно
+                                <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
                             </Link>
-                        ) : (
-                            <>
-                                <Link href="/auth/signup" className="btn-primary flex items-center gap-2 justify-center text-sm md:text-base px-6 py-3 shadow-xl shadow-green-900/30 hover:shadow-green-900/50 transform hover:scale-105 transition-all duration-300 group">
-                                    Начать сейчас 🚀 <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                </Link>
-                                <Link href="#pricing" className="btn-secondary text-sm md:text-base px-6 py-3 transform hover:scale-105 transition-all duration-300">
-                                    Узнать больше 👇
-                                </Link>
-                            </>
-                        )}
-                    </div>
+                            <Link
+                                href="/auth/login"
+                                className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-5 py-2.5 text-sm font-semibold text-gray-200 transition-all duration-300 hover:border-white/25 hover:text-white"
+                            >
+                                Уже есть аккаунт
+                            </Link>
+                        </>
+                    ) : (
+                        <Link
+                            href="/dashboard"
+                            className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-green-500 to-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/35"
+                        >
+                            <User size={16} />
+                            Открыть дашборд
+                        </Link>
+                    )}
+                </div>
+
+                <div className="grid w-full max-w-3xl grid-cols-1 gap-3 text-sm font-medium text-gray-200 sm:grid-cols-3">
+                    {[
+                        "⚡ Подключение за 30 секунд",
+                        "🔒 AES-256 и отсутствие логов",
+                        "🌍 40+ стран и стабильная скорость",
+                    ].map((item) => (
+                        <div key={item} className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+                            <span className="font-semibold text-white">{item.split(" ")[0]}</span>
+                            <span className="text-gray-100">{item.split(" ").slice(1).join(" ")}</span>
+                        </div>
+                    ))}
                 </div>
             </div>
         </section>
