@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import "./globals.css"
 import { Montserrat } from "next/font/google"
+import { Toaster } from "sonner"
 
 const montserrat = Montserrat({
   subsets: ["latin", "cyrillic"],
@@ -22,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={`${montserrat.className} font-montserrat`}>
+        <Toaster position="top-center" richColors />
         <main className="min-h-screen bg-background text-foreground">{children}</main>
       </body>
     </html>
