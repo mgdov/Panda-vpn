@@ -20,6 +20,7 @@ export type DashboardVPNKey = {
     status: 'active' | 'expired'
     expiresAt: string | null
     marzban_client_id?: string
+    protocol?: string
 }
 
 const getIconForDuration = (duration: number): string => {
@@ -146,6 +147,7 @@ export function useDashboardData() {
                     status: key.active ? 'active' : 'expired',
                     expiresAt: key.expires_at || null,
                     marzban_client_id: key.marzban_client_id,
+                    protocol: key.protocol || 'vless',
                 }))
                 setVpnKeys(formattedKeys)
             } else {

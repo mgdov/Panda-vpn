@@ -317,6 +317,10 @@ class APIClient {
         })
     }
 
+    async getPaymentStatus(paymentId: string): Promise<{ payment_id: string; status: string; amount: number; currency: string }> {
+        return this.request(`${API_CONFIG.ENDPOINTS.PAYMENTS_STATUS}/${paymentId}`)
+    }
+
     async getPayment(paymentId: string): Promise<PaymentDetails> {
         return this.request<PaymentDetails>(
             `${API_CONFIG.ENDPOINTS.PAYMENTS_GET}/${paymentId}`

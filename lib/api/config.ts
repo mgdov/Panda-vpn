@@ -28,6 +28,7 @@ export const API_CONFIG = {
     // Payments
     PAYMENTS_CREATE: "/api/payments/create",
     PAYMENTS_GET: "/api/payments",
+    PAYMENTS_STATUS: "/api/payments/status",
     PAYMENTS_WEBHOOK: "/api/payments/webhook",
 
     // Billing

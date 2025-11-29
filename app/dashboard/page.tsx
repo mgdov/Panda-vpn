@@ -23,12 +23,27 @@ export default function DashboardPage() {
 
     const [activeTab, setActiveTab] = useState<TabType>("plans")
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [paymentSuccess, setPaymentSuccess] = useState(false)
 
     useEffect(() => {
         if (isAuthenticated) {
             loadData()
         }
     }, [isAuthenticated, loadData])
+
+    useEffect(() => {
+        // Проверяем параметр payment=success в URL
+        const params = new URLSearchParams(window.location.search)
+        if (params.get("payment") === "success") {
+            setPaymentSuccess(true)
+            // Обновляем ключи после успешной оплаты
+            loadData()
+            // Убираем параметр из URL
+            window.history.replaceState({}, "", "/dashboard")
+            // Скрываем сообщение через 5 секунд
+            setTimeout(() => setPaymentSuccess(false), 5000)
+        }
+    }, [loadData])
 
     const handleLogout = async () => {
         try {
@@ -79,6 +94,24 @@ export default function DashboardPage() {
 
                 <StatsGrid keysCount={vpnKeys.length} />
 
+                {paymentSuccess && (
+                    <div className="mb-6 rounded-xl border border-emerald-500/50 bg-emerald-900/20 px-6 py-4 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <span className="text-2xl">✅</span>
+                            <div>
+                                <p className="text-base font-semibold text-emerald-400">Оплата успешно выполнена!</p>
+                                <p className="text-sm text-emerald-300/80">Ваш VLESS ключ создан или продлен. Проверьте вкладку "Ключи".</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setPaymentSuccess(false)}
+                            className="text-emerald-400 hover:text-emerald-300 transition-colors"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                )}
+
                 <div className="bg-white/5 backdrop-blur-xl border border-green-700/20 rounded-xl md:rounded-2xl shadow-xl p-4 sm:p-5 md:p-6 lg:p-8">
                     {activeTab === "plans" && <DashboardPlansTab plans={plans} />}
                     {activeTab === "keys" && (
@@ -86,6 +119,7 @@ export default function DashboardPage() {
                             vpnKeys={vpnKeys}
                             copiedKey={copiedText}
                             onCopyKey={copyToClipboard}
+                            onRefresh={loadData}
                         />
                     )}
                     {activeTab === "support" && <DashboardSupportTab />}

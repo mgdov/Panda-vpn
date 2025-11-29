@@ -73,17 +73,18 @@ export default function DashboardPlansTab({ plans }: DashboardPlansTabProps) {
                                 </div>
                             </div>
 
-                            <a
-                                href="https://yookassa.ru/"
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <button
+                                onClick={() => {
+                                    // Переход на страницу оплаты с выбранным тарифом
+                                    window.location.href = `/dashboard/buy?tariff=${plan.id}`
+                                }}
                                 className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all duration-300 sm:text-base ${plan.highlighted
                                         ? "bg-linear-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/40 hover:-translate-y-0.5 hover:shadow-xl"
                                         : "bg-white/10 text-white hover:-translate-y-0.5 hover:border-emerald-400/40 hover:bg-white/15"
                                     }`}
                             >
                                 {plan.highlighted ? "✨ Активировать тариф" : "Выбрать тариф"}
-                            </a>
+                            </button>
                         </div>
                     </article>
                 ))}

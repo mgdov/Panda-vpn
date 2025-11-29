@@ -100,10 +100,8 @@ export interface UsageStats {
 }
 
 export interface PaymentResponse {
-    invoice_id: string
     payment_id: string
-    provider_payment_id: string
-    payment_url: string
+    confirmation_url: string
     status: string
 }
 
@@ -193,8 +191,7 @@ export interface RegisterRequest {
 }
 
 export interface CreatePaymentRequest {
-    tariff_code: string
-    payment_method?: string
+    tariff_id: string
     return_url?: string
 }
 
