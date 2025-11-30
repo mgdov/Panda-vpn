@@ -100,7 +100,7 @@ export default function DashboardPage() {
                             <span className="text-2xl">✅</span>
                             <div>
                                 <p className="text-base font-semibold text-emerald-400">Оплата успешно выполнена!</p>
-                                <p className="text-sm text-emerald-300/80">Ваш VLESS ключ создан или продлен. Проверьте вкладку "Ключи".</p>
+                                <p className="text-sm text-emerald-300/80">Ваш VLESS ключ создан или продлен. Проверьте вкладку &quot;Ключи&quot;.</p>
                             </div>
                         </div>
                         <button

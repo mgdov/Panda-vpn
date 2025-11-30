@@ -30,7 +30,7 @@ export default function BuyPage() {
         if (isAuthenticated) {
             loadTariffs()
         }
-    }, [isAuthenticated, authLoading, router])
+    }, [isAuthenticated, authLoading, router, loadTariffs])
 
     useEffect(() => {
         const tariffId = searchParams.get("tariff")
@@ -85,7 +85,7 @@ export default function BuyPage() {
                 setError("Не удалось получить ссылку на оплату")
                 setIsProcessing(false)
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Payment creation failed:", error)
             setError(error.message || "Не удалось создать платеж. Попробуйте еще раз.")
             setIsProcessing(false)

@@ -5,16 +5,15 @@ import { useRouter } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
 
 interface PaymentButtonProps {
-  planName: string
+  planName?: string
   price: string
-  description: string
+  description?: string
   tariffId: string // ID тарифа для оплаты
 }
 
-export default function PaymentButton({ planName, price, description, tariffId }: PaymentButtonProps) {
+export default function PaymentButton({ price, tariffId }: PaymentButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
-  const router = useRouter()
 
   const handlePayment = async () => {
     setIsLoading(true)

@@ -46,7 +46,7 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
-      const result = await apiClient.register({ email, password })
+      await apiClient.register({ email, password })
 
       // После регистрации показываем форму верификации
       setShowVerification(true)
@@ -152,7 +152,7 @@ export default function SignupPage() {
           </form>
 
           <p className="text-center text-sm text-gray-400 mt-6">
-            Не получили письмо? Проверьте папку "Спам" или{" "}
+            Не получили письмо? Проверьте папку &quot;Спам&quot; или{" "}
             <button
               onClick={handleResendCode}
               className="text-green-400 hover:text-green-300 transition-colors font-bold underline"
