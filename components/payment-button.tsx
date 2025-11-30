@@ -1,44 +1,58 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { apiClient } from "@/lib/api/client"
 
 interface PaymentButtonProps {
   planName: string
   price: string
   description: string
+  tariffId: string // ID тарифа для оплаты
 }
 
-export default function PaymentButton({ planName, price, description }: PaymentButtonProps) {
+export default function PaymentButton({ planName, price, description, tariffId }: PaymentButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+  const router = useRouter()
 
   const handlePayment = async () => {
     setIsLoading(true)
+    setError("")
+    
     try {
-      const response = await fetch("/api/payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          planName,
-          amount: Number.parseFloat(price),
-          description,
-        }),
+      const result = await apiClient.createPayment({
+        tariff_id: tariffId,
+        return_url: `${window.location.origin}/dashboard?payment=success`
       })
 
-      if (response.ok) {
-        // Redirect to YuKassa payment page
-        // This will be configured after YuKassa integration
-        console.log("Payment initiated")
+      // Редирект на страницу оплаты YooKassa
+      if (result.confirmation_url || result.payment_url) {
+        window.location.href = result.confirmation_url || result.payment_url || ""
+      } else {
+        setError("Не удалось получить ссылку на оплату")
       }
-    } catch (error) {
-      console.error("Payment error:", error)
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Ошибка при создании платежа"
+      setError(errorMessage)
+      console.error("Payment error:", err)
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <button onClick={handlePayment} disabled={isLoading} className="btn-primary w-full">
+    <div className="w-full">
+      {error && (
+        <div className="mb-2 text-sm text-red-400">{error}</div>
+      )}
+      <button 
+        onClick={handlePayment} 
+        disabled={isLoading} 
+        className="btn-primary w-full"
+      >
       {isLoading ? "Обработка..." : `Выбрать: ${price}₽`}
     </button>
+    </div>
   )
 }

@@ -8,6 +8,8 @@ export const API_CONFIG = {
     AUTH_LOGIN: "/api/auth/login",
     AUTH_REFRESH: "/api/auth/refresh",
     AUTH_LOGOUT: "/api/auth/logout",
+    AUTH_VERIFY_EMAIL: "/api/auth/verify-email",
+    AUTH_RESEND_VERIFICATION: "/api/auth/resend-verification",
 
     // Public
     TARIFFS: "/api/tariffs",

@@ -17,14 +17,24 @@ export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefr
     const handleCreateKey = async () => {
         setIsCreating(true)
         try {
-            await apiClient.createClient({ protocol: "vless" })
+            // ВАЖНО: Всегда создаем только VLESS ключи
+            // apiClient.createClient() уже принудительно устанавливает protocol="vless"
+            await apiClient.createClient({ 
+                protocol: "vless",  // Явно указываем VLESS (на всякий случай)
+                transport: "ws",
+                flow: "",
+                node_id: null,
+                meta: null
+            })
             // Обновляем список ключей
             if (onRefresh) {
-                onRefresh()
+                // Небольшая задержка для обновления на бэкенде
+                setTimeout(() => onRefresh(), 1000)
             }
         } catch (error) {
             console.error("Failed to create key:", error)
-            alert("Не удалось создать ключ. Попробуйте еще раз.")
+            const errorMessage = error instanceof Error ? error.message : "Не удалось создать ключ"
+            alert(`Ошибка создания ключа: ${errorMessage}`)
         } finally {
             setIsCreating(false)
         }

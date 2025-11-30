@@ -22,7 +22,9 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
-  const [success, setSuccess] = useState(false)
+  const [showVerification, setShowVerification] = useState(false)
+  const [verificationCode, setVerificationCode] = useState("")
+  const [isVerifying, setIsVerifying] = useState(false)
 
   const strength = calculatePasswordStrength(password)
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0
@@ -44,15 +46,11 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
-      await apiClient.register({ email, password })
+      const result = await apiClient.register({ email, password })
 
-      localStorage.setItem("isAuthenticated", "true")
-      localStorage.setItem("userEmail", email)
-
-      setSuccess(true)
-      setTimeout(() => {
-        router.push("/dashboard")
-      }, 1500)
+      // После регистрации показываем форму верификации
+      setShowVerification(true)
+      setIsLoading(false)
     } catch (err: unknown) {
       setIsLoading(false)
       const errorMessage = err instanceof Error ? err.message : "Ошибка регистрации"
@@ -60,6 +58,114 @@ export default function SignupPage() {
     }
   }
 
+  const handleVerifyEmail = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+
+    if (verificationCode.length !== 6) {
+      setError("Код верификации должен содержать 6 цифр")
+      return
+    }
+
+    setIsVerifying(true)
+
+    try {
+      await apiClient.verifyEmail({ email, code: verificationCode })
+      
+      // Токены уже сохранены в apiClient.verifyEmail()
+      localStorage.setItem("isAuthenticated", "true")
+      localStorage.setItem("userEmail", email)
+
+      // Перенаправляем на dashboard
+      router.push("/dashboard")
+    } catch (err: unknown) {
+      setIsVerifying(false)
+      const errorMessage = err instanceof Error ? err.message : "Неверный код верификации"
+      setError(errorMessage)
+    }
+  }
+
+  const handleResendCode = async () => {
+    setError("")
+    try {
+      await apiClient.resendVerification({ email })
+      setError("") // Очищаем ошибки
+      // Можно показать успешное сообщение
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Не удалось отправить код повторно"
+      setError(errorMessage)
+    }
+  }
+
+  // Если показываем форму верификации
+  if (showVerification) {
+    return (
+      <AuthBackground>
+        <div className="w-full max-w-md relative z-10">
+          <AuthLogo
+            title="Подтвердите email"
+            subtitle="Мы отправили код на {email}"
+          />
+
+          <form
+            onSubmit={handleVerifyEmail}
+            className="space-y-5 backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-7 shadow-2xl"
+          >
+            <div className="text-center mb-4">
+              <p className="text-gray-300 text-sm mb-2">
+                Введите 6-значный код, который мы отправили на
+              </p>
+              <p className="text-green-400 font-semibold">{email}</p>
+            </div>
+
+            <FormInput
+              label="Код верификации"
+              icon="🔐"
+              type="text"
+              value={verificationCode}
+              onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              placeholder="000000"
+              maxLength={6}
+              required
+              className="text-center text-2xl tracking-widest font-mono"
+            />
+
+            {error && <FormAlert type="error" message={error} />}
+
+            <FormSubmitButton
+              isLoading={isVerifying}
+              loadingText="Проверка..."
+              disabled={verificationCode.length !== 6}
+            >
+              <span>✓ Подтвердить</span>
+            </FormSubmitButton>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={handleResendCode}
+                className="text-sm text-green-400 hover:text-green-300 transition-colors underline"
+              >
+                Отправить код повторно
+              </button>
+            </div>
+          </form>
+
+          <p className="text-center text-sm text-gray-400 mt-6">
+            Не получили письмо? Проверьте папку "Спам" или{" "}
+            <button
+              onClick={handleResendCode}
+              className="text-green-400 hover:text-green-300 transition-colors font-bold underline"
+            >
+              отправьте код повторно
+            </button>
+          </p>
+        </div>
+      </AuthBackground>
+    )
+  }
+
+  // Форма регистрации
   return (
     <AuthBackground>
       <div className="w-full max-w-md relative z-10">
@@ -105,7 +211,6 @@ export default function SignupPage() {
           />
 
           {error && <FormAlert type="error" message={error} />}
-          {success && <FormAlert type="success" message="✨ Регистрация выполнена! Перенаправление..." />}
 
           <FormSubmitButton
             isLoading={isLoading}

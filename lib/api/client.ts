@@ -16,7 +16,6 @@ import type {
     RenewRequest,
     CreateClientRequest,
     CreateClientResponse,
-    InternalClient,
     MeResponse,
 } from "./types"
 import { getErrorMessage } from "./errors"
@@ -165,16 +164,42 @@ class APIClient {
         return response
     }
 
-    async register(data: RegisterRequest): Promise<AuthResponse> {
-        const response = await this.request<AuthResponse>(
+    async register(data: RegisterRequest): Promise<{ message: string; email: string; email_sent: boolean }> {
+        // Регистрация возвращает сообщение о верификации, не токены
+        // Токены будут получены после верификации email
+        return this.request<{ message: string; email: string; email_sent: boolean }>(
             API_CONFIG.ENDPOINTS.AUTH_REGISTER,
             {
                 method: "POST",
                 body: JSON.stringify(data),
-            }
+            },
+            false // не пытаемся refresh токен при регистрации
+        )
+    }
+
+    async verifyEmail(data: { email: string; code: string }): Promise<AuthResponse> {
+        // После верификации email возвращаются токены
+        const response = await this.request<AuthResponse>(
+            API_CONFIG.ENDPOINTS.AUTH_VERIFY_EMAIL,
+            {
+                method: "POST",
+                body: JSON.stringify(data),
+            },
+            false
         )
         this.setTokens(response.access_token, response.refresh_token)
         return response
+    }
+
+    async resendVerification(data: { email: string }): Promise<{ message: string; email_sent: boolean }> {
+        return this.request<{ message: string; email_sent: boolean }>(
+            API_CONFIG.ENDPOINTS.AUTH_RESEND_VERIFICATION,
+            {
+                method: "POST",
+                body: JSON.stringify(data),
+            },
+            false
+        )
     }
 
     async refreshAccessToken(): Promise<boolean> {
@@ -274,26 +299,36 @@ class APIClient {
         }))
     }
 
-    // ВАЖНО: /me/clients возвращает InternalClient[] (из таблицы clients)
-    // Это НЕ то же самое, что /profile/keys (который возвращает VPNClient[] из marzban_clients)
-    async getMeClients(): Promise<InternalClient[]> {
-        const response = await this.request<{ clients: InternalClient[]; total: number }>(API_CONFIG.ENDPOINTS.ME_CLIENTS)
+    // ВАЖНО: /me/clients возвращает ClientResponse[] (из таблицы marzban_clients)
+    // Это то же самое, что /profile/keys (который возвращает VPNKey[] из marzban_clients)
+    async getMeClients(): Promise<VPNKey[]> {
+        const response = await this.request<{ clients: VPNKey[]; total: number }>(API_CONFIG.ENDPOINTS.ME_CLIENTS)
         // Защита от null/undefined
         return Array.isArray(response.clients) ? response.clients : []
     }
 
     async createClient(data: CreateClientRequest): Promise<CreateClientResponse> {
+        // ВАЖНО: Всегда создаем только VLESS ключи
+        // Принудительно устанавливаем protocol="vless", даже если передан другой
+        const vlessRequest: CreateClientRequest = {
+            protocol: "vless",  // СТРОГО VLESS
+            transport: "ws",    // WebSocket transport для VLESS
+            flow: "",           // Пустой flow
+            node_id: null,      // Используем дефолтный узел
+            meta: null
+        }
+        
         // ВАЖНО: client_id и uuid - это РАЗНЫЕ UUID
         // client_id - для revoke
         // uuid - для конфигурации VPN
         return this.request<CreateClientResponse>(API_CONFIG.ENDPOINTS.ME_CLIENTS, {
             method: "POST",
-            body: JSON.stringify(data),
+            body: JSON.stringify(vlessRequest),  // Всегда отправляем VLESS
         })
     }
 
-    // ВАЖНО: clientId здесь - это внутренний UUID из InternalClient.id (из таблицы clients)
-    // НЕ используйте marzban_client_id!
+    // ВАЖНО: clientId здесь - это внутренний UUID из MarzbanClient.id (из таблицы marzban_clients)
+    // Это id из VPNKey, НЕ marzban_client_id!
     async revokeClient(clientId: string): Promise<void> {
         return this.request(`${API_CONFIG.ENDPOINTS.ME_CLIENTS}/${clientId}/revoke`, {
             method: "POST",
@@ -311,10 +346,18 @@ class APIClient {
 
     // Payment endpoints
     async createPayment(data: CreatePaymentRequest): Promise<PaymentResponse> {
-        return this.request<PaymentResponse>(API_CONFIG.ENDPOINTS.PAYMENTS_CREATE, {
+        const response = await this.request<PaymentResponse>(API_CONFIG.ENDPOINTS.PAYMENTS_CREATE, {
             method: "POST",
             body: JSON.stringify(data),
         })
+        // Нормализуем ответ - backend возвращает { payment_id, confirmation_url, status }
+        // но может также вернуть { id, payment_url, ... }
+        return {
+            payment_id: response.payment_id || response.id,
+            confirmation_url: response.confirmation_url || response.payment_url,
+            status: response.status,
+            ...response
+        }
     }
 
     async getPaymentStatus(paymentId: string): Promise<{ payment_id: string; status: string; amount: number; currency: string }> {

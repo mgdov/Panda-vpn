@@ -43,16 +43,8 @@ export interface VPNClient {
     config_text: string | null
 }
 
-// InternalClient - клиенты из таблицы clients (используется в /me/clients)
-export interface InternalClient {
-    id: string
-    uuid_key: string
-    protocol: string
-    transport: string
-    flow: string | null
-    status: string
-    expires_at: string | null
-}
+// InternalClient удален - используем VPNKey для всех клиентов
+// Backend возвращает ClientResponse из marzban_clients, который соответствует VPNKey
 
 export interface User {
     id: string
@@ -60,11 +52,12 @@ export interface User {
     telegram_id: number | null
     roles: string[]
     marzban_username: string | null
-    marzban_id: string | null
+    marzban_id?: string | null // Опционально, может отсутствовать в UserResponse
     is_active: boolean
     is_admin: boolean
-    referral_code: string | null
-    referred_by: string | null
+    email_verified: boolean // Добавлено из UserResponse
+    referral_code: string
+    referred_by?: string | null // Опционально
     created_at: string
     updated_at: string
 }
@@ -88,6 +81,9 @@ export interface VPNKey {
     active: boolean
     subscription_url: string | null
     config_text: string | null
+    quota_bytes?: number | null // Опционально, может быть в ClientResponse
+    used_bytes?: number // Опционально, может быть в ClientResponse
+    updated_at?: string // Опционально, может быть в ClientResponse
 }
 
 // UsageStats - формат может отличаться в зависимости от Marzban API
@@ -100,8 +96,12 @@ export interface UsageStats {
 }
 
 export interface PaymentResponse {
-    payment_id: string
-    confirmation_url: string
+    payment_id?: string
+    id?: string // Backend возвращает id
+    invoice_id?: string
+    provider?: string
+    confirmation_url?: string
+    payment_url?: string // Backend может вернуть payment_url
     status: string
 }
 
@@ -190,9 +190,25 @@ export interface RegisterRequest {
     referral?: string
 }
 
+export interface RegisterResponse {
+    message: string
+    email: string
+    email_sent: boolean
+}
+
+export interface VerifyEmailRequest {
+    email: string
+    code: string
+}
+
+export interface ResendVerificationRequest {
+    email: string
+}
+
 export interface CreatePaymentRequest {
     tariff_id: string
     return_url?: string
+    amount?: number  // Опционально, если нужно передать сумму напрямую
 }
 
 export interface RenewRequest {
