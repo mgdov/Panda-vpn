@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
 import { useAuth } from "@/hooks/use-auth"
@@ -10,7 +10,7 @@ import MobileSidebarToggle from "@/components/shared/mobile-sidebar-toggle"
 import LoadingScreen from "@/components/shared/loading-screen"
 import type { Tariff } from "@/lib/api/types"
 
-export default function BuyPage() {
+function BuyPageContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const { isAuthenticated, userEmail, isLoading: authLoading, logout } = useAuth()
@@ -20,6 +20,27 @@ export default function BuyPage() {
     const [isLoading, setIsLoading] = useState(true)
     const [isProcessing, setIsProcessing] = useState(false)
     const [error, setError] = useState("")
+
+    const loadTariffs = useCallback(async () => {
+        try {
+            const data = await apiClient.getTariffs()
+            setTariffs(data)
+            
+            // Если есть tariff в URL, выбираем его
+            const tariffId = searchParams.get("tariff")
+            if (tariffId) {
+                const tariff = data.find(t => t.id === tariffId || t.code === tariffId)
+                if (tariff) {
+                    setSelectedTariff(tariff)
+                }
+            }
+        } catch (error) {
+            console.error("Failed to load tariffs:", error)
+            setError("Не удалось загрузить тарифы")
+        } finally {
+            setIsLoading(false)
+        }
+    }, [searchParams])
 
     useEffect(() => {
         if (!isAuthenticated && !authLoading) {
@@ -41,27 +62,6 @@ export default function BuyPage() {
             }
         }
     }, [searchParams, tariffs])
-
-    const loadTariffs = async () => {
-        try {
-            const data = await apiClient.getTariffs()
-            setTariffs(data)
-            
-            // Если есть tariff в URL, выбираем его
-            const tariffId = searchParams.get("tariff")
-            if (tariffId) {
-                const tariff = data.find(t => t.id === tariffId || t.code === tariffId)
-                if (tariff) {
-                    setSelectedTariff(tariff)
-                }
-            }
-        } catch (error) {
-            console.error("Failed to load tariffs:", error)
-            setError("Не удалось загрузить тарифы")
-        } finally {
-            setIsLoading(false)
-        }
-    }
 
     const handlePayment = async () => {
         if (!selectedTariff) {
@@ -87,7 +87,8 @@ export default function BuyPage() {
             }
         } catch (error: unknown) {
             console.error("Payment creation failed:", error)
-            setError(error.message || "Не удалось создать платеж. Попробуйте еще раз.")
+            const errorMessage = error instanceof Error ? error.message : "Не удалось создать платеж. Попробуйте еще раз."
+            setError(errorMessage)
             setIsProcessing(false)
         }
     }
@@ -247,6 +248,14 @@ export default function BuyPage() {
                 </div>
             </main>
         </DashboardLayout>
+    )
+}
+
+export default function BuyPage() {
+    return (
+        <Suspense fallback={<LoadingScreen />}>
+            <BuyPageContent />
+        </Suspense>
     )
 }
 
