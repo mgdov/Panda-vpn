@@ -47,72 +47,29 @@ const getDiscount = (duration: number): string | undefined => {
     return undefined
 }
 
-const STATIC_PLANS: DashboardPlan[] = [
-    {
-        id: '1month',
-        name: 'Тариф Бамбук',
-        icon: '🌿',
-        price: '149',
-        period: '1 месяц',
-        description: 'Лёгкий, как первый шаг Панды на путь воина.',
-        highlighted: false,
-    },
-    {
-        id: '3months',
-        name: 'Ученик Боевого Панды',
-        icon: '🥋',
-        price: '299',
-        period: '3 месяца',
-        description: 'Популярный тариф — баланс силы и выгоды.',
-        discount: '-33%',
-        highlighted: true,
-    },
-    {
-        id: '6months',
-        name: 'Воин Дракона',
-        icon: '🐉',
-        price: '549',
-        period: '6 месяцев',
-        description: 'Выбор тех, кто хочет стабильности.',
-        discount: '-38%',
-        highlighted: false,
-    },
-    {
-        id: '1year',
-        name: 'Легендарный Мастер',
-        icon: '👑',
-        price: '999',
-        period: '12 месяцев',
-        description: 'Год абсолютного спокойствия.',
-        discount: '-44%',
-        highlighted: false,
-    },
-]
+const extractErrorMessage = (error: unknown): string => {
+    if (!error) return 'Неизвестная ошибка'
+    if (error instanceof Error) return error.message
+    if (typeof error === 'string') return error
+    try {
+        return JSON.stringify(error)
+    } catch {
+        return 'Неизвестная ошибка'
+    }
+}
 
-const STATIC_KEYS: DashboardVPNKey[] = [
-    {
-        id: '1',
-        key: 'ss://YWVzLTI1Ni1nY206cGFuZGF2cG4xMjM=@server1.pandavpn.com:8388',
-        location: '🇺🇸 США (Нью-Йорк)',
-        status: 'active',
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-        id: '2',
-        key: 'ss://YWVzLTI1Ni1nY206cGFuZGF2cG4xMjM=@server2.pandavpn.com:8388',
-        location: '🇩🇪 Германия (Франкфурт)',
-        status: 'active',
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-]
 
 export function useDashboardData() {
     const [plans, setPlans] = useState<DashboardPlan[]>([])
     const [vpnKeys, setVpnKeys] = useState<DashboardVPNKey[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [plansError, setPlansError] = useState<string | null>(null)
+    const [keysError, setKeysError] = useState<string | null>(null)
 
     const loadData = useCallback(async () => {
         setIsLoading(true)
+        setPlansError(null)
+        setKeysError(null)
 
         try {
             const [tariffsResult, keysResult] = await Promise.allSettled([
@@ -133,9 +90,16 @@ export function useDashboardData() {
                     discount: getDiscount(tariff.duration_seconds),
                 }))
                 setPlans(formattedPlans)
+                if (formattedPlans.length === 0) {
+                    setPlansError('Сервер вернул пустой список тарифов')
+                }
             } else {
-                // Тихая загрузка статических данных при ошибке
-                setPlans(STATIC_PLANS)
+                setPlans([])
+                if (tariffsResult.status === 'rejected') {
+                    setPlansError(extractErrorMessage(tariffsResult.reason))
+                } else {
+                    setPlansError('Сервер вернул пустой список тарифов')
+                }
             }
 
             // Обработка ключей
@@ -151,17 +115,23 @@ export function useDashboardData() {
                 }))
                 setVpnKeys(formattedKeys)
             } else {
-                // Тихая загрузка статических данных при ошибке
-                setVpnKeys(STATIC_KEYS)
+                setVpnKeys([])
+                if (keysResult.status === 'rejected') {
+                    setKeysError(extractErrorMessage(keysResult.reason))
+                } else {
+                    setKeysError('Сервер вернул пустой список ключей')
+                }
             }
         } catch (error) {
-            // Резервная загрузка статических данных
-            setPlans(STATIC_PLANS)
-            setVpnKeys(STATIC_KEYS)
+            const message = extractErrorMessage(error)
+            setPlans([])
+            setVpnKeys([])
+            setPlansError(message)
+            setKeysError(message)
         } finally {
             setIsLoading(false)
         }
     }, [])
 
-    return { plans, vpnKeys, isLoading, loadData }
+    return { plans, vpnKeys, isLoading, loadData, plansError, keysError }
 }

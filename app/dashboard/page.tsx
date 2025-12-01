@@ -18,7 +18,7 @@ type TabType = "plans" | "keys" | "support"
 
 export default function DashboardPage() {
     const { isAuthenticated, userEmail, isLoading: authLoading, logout } = useAuth()
-    const { plans, vpnKeys, isLoading: dataLoading, loadData } = useDashboardData()
+    const { plans, vpnKeys, isLoading: dataLoading, loadData, plansError, keysError } = useDashboardData()
     const { copiedText, copyToClipboard } = useClipboard()
 
     const [activeTab, setActiveTab] = useState<TabType>("plans")
@@ -113,10 +113,11 @@ export default function DashboardPage() {
                 )}
 
                 <div className="bg-white/5 backdrop-blur-xl border border-green-700/20 rounded-xl md:rounded-2xl shadow-xl p-4 sm:p-5 md:p-6 lg:p-8">
-                    {activeTab === "plans" && <DashboardPlansTab plans={plans} />}
+                    {activeTab === "plans" && <DashboardPlansTab plans={plans} errorMessage={plansError} />}
                     {activeTab === "keys" && (
                         <DashboardKeysTab
                             vpnKeys={vpnKeys}
+                            errorMessage={keysError}
                             copiedKey={copiedText}
                             onCopyKey={copyToClipboard}
                             onRefresh={loadData}

@@ -42,12 +42,15 @@ const getDiscount = (duration: number): string | undefined => {
 export default function PricingSection() {
     const [plans, setPlans] = useState<Plan[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
         loadTariffs()
     }, [])
 
     const loadTariffs = async () => {
+        setIsLoading(true)
+        setError(null)
         try {
             const tariffs = await apiClient.getTariffs()
             const formattedPlans: Plan[] = tariffs.map((tariff: Tariff) => ({
@@ -61,49 +64,13 @@ export default function PricingSection() {
                 discount: getDiscount(tariff.duration_seconds),
             }))
             setPlans(formattedPlans)
+            if (formattedPlans.length === 0) {
+                setError("Сервер вернул пустой список тарифов")
+            }
         } catch (err) {
-            // Fallback to static data
-            setPlans([
-                {
-                    id: "1month",
-                    name: "Тариф Бамбук",
-                    icon: "🌿",
-                    price: "149",
-                    period: "1 месяц",
-                    description: "Идеально для начала знакомства с сервисом",
-                    highlighted: false,
-                },
-                {
-                    id: "3months",
-                    name: "Ученик Панды",
-                    icon: "🥋",
-                    price: "299",
-                    period: "3 месяца",
-                    description: "Самый популярный выбор наших клиентов",
-                    discount: "-33%",
-                    highlighted: true,
-                },
-                {
-                    id: "6months",
-                    name: "Воин Дракона",
-                    icon: "🐉",
-                    price: "549",
-                    period: "6 месяцев",
-                    description: "Стабильность и надежность на полгода",
-                    discount: "-38%",
-                    highlighted: false,
-                },
-                {
-                    id: "1year",
-                    name: "Мастер",
-                    icon: "👑",
-                    price: "999",
-                    period: "12 месяцев",
-                    description: "Максимальная выгода на целый год",
-                    discount: "-44%",
-                    highlighted: false,
-                },
-            ])
+            const errorMessage = err instanceof Error ? err.message : "Не удалось загрузить тарифы"
+            setPlans([])
+            setError(errorMessage)
         } finally {
             setIsLoading(false)
         }
@@ -136,6 +103,25 @@ export default function PricingSection() {
                     <div className="py-16 text-center">
                         <div className="inline-block text-5xl animate-bounce">🐼</div>
                         <p className="text-gray-400 mt-4">Загрузка тарифов...</p>
+                    </div>
+                ) : error ? (
+                    <div className="py-12 text-center">
+                        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-red-500/40 bg-red-500/10 text-2xl">
+                            ⚠️
+                        </div>
+                        <p className="text-base text-red-200 mb-2">Не удалось загрузить тарифы</p>
+                        <p className="text-sm text-red-300/80">{error}</p>
+                        <button
+                            onClick={loadTariffs}
+                            className="mt-6 inline-flex items-center gap-2 rounded-lg border border-red-400/40 px-4 py-2 text-sm font-semibold text-red-100 transition-colors hover:border-red-300/60 hover:text-red-50"
+                        >
+                            Повторить попытку
+                        </button>
+                    </div>
+                ) : plans.length === 0 ? (
+                    <div className="py-12 text-center text-yellow-100">
+                        <p className="text-base mb-2">Сервер не вернул доступные тарифы.</p>
+                        <p className="text-sm text-yellow-50/80">Попробуйте обновить страницу позже.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

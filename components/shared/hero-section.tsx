@@ -38,7 +38,7 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                                 href="/auth/signup"
                                 className="group inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-green-500 to-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/35"
                             >
-                                Начать бесплатно
+                                Попробовать бесплатно
                                 <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
                             </Link>
                             <Link
@@ -54,7 +54,7 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                             className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-green-500 to-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/35"
                         >
                             <User size={16} />
-                            Открыть дашборд
+                            Войти в личный кабинет
                         </Link>
                     )}
                 </div>
