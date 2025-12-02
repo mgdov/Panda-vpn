@@ -19,7 +19,6 @@ import type {
     MeResponse,
 } from "./types"
 import { getErrorMessage } from "./errors"
-import { adaptUsageStats, adaptVPNConfig } from "./adapters"
 
 class APIClient {
     private baseUrl: string
@@ -328,7 +327,7 @@ class APIClient {
         return Array.isArray(response.clients) ? response.clients : []
     }
 
-    async createClient(data: CreateClientRequest): Promise<CreateClientResponse> {
+    async createClient(_data: CreateClientRequest): Promise<CreateClientResponse> {
         // ВАЖНО: Всегда создаем только VLESS ключи
         // Принудительно устанавливаем protocol="vless", даже если передан другой
         const vlessRequest: CreateClientRequest = {

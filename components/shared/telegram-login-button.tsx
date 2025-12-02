@@ -104,21 +104,21 @@ export default function TelegramLoginButton({
         script.async = true
 
         // Добавляем скрипт в контейнер
-        if (containerRef.current) {
-            containerRef.current.appendChild(script)
+        const container = containerRef.current
+        if (container) {
+            container.appendChild(script)
             scriptLoadedRef.current = true
         }
 
         // Cleanup - не удаляем глобальный callback, так как он может использоваться другими компонентами
         return () => {
             // Очищаем только локальный скрипт, если компонент размонтируется
-            if (containerRef.current && script.parentNode) {
-                script.parentNode.removeChild(script)
+            // Используем сохраненную ссылку на контейнер
+            if (container && script.parentNode === container) {
+                container.removeChild(script)
             }
         }
     }, [botName, router, onSuccess, onError])
-
-    const text = mode === 'login' ? 'Войти' : 'Зарегистрироваться'
 
     return (
         <div className="mt-6 space-y-4">
