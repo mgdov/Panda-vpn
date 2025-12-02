@@ -93,6 +93,9 @@ export default function TelegramLoginButton({
             }
         }
 
+        // Определяем, мобильное ли устройство
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+        
         // Загружаем скрипт Telegram Login Widget
         const script = document.createElement('script')
         script.src = 'https://telegram.org/js/telegram-widget.js?22'
@@ -101,6 +104,15 @@ export default function TelegramLoginButton({
         script.setAttribute('data-onauth', 'onTelegramAuth(user)')
         script.setAttribute('data-request-access', 'write')
         script.setAttribute('data-userpic', 'true')
+        
+        // Для мобильных устройств: открывать в приложении Telegram
+        if (isMobile) {
+            // Используем deep link для открытия в приложении
+            script.setAttribute('data-auth-url', window.location.origin + '/auth/telegram-callback')
+            // Добавляем параметр для открытия в приложении
+            script.setAttribute('data-embed', 'false')
+        }
+        
         script.async = true
 
         // Добавляем скрипт в контейнер
