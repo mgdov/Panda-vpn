@@ -247,6 +247,27 @@ class APIClient {
         this.clearTokens()
     }
 
+    async telegramLogin(data: {
+        id: number
+        first_name: string
+        last_name?: string | null
+        username?: string | null
+        photo_url?: string | null
+        auth_date: number
+        hash: string
+    }): Promise<AuthResponse> {
+        const response = await this.request<AuthResponse>(
+            API_CONFIG.ENDPOINTS.AUTH_TELEGRAM,
+            {
+                method: "POST",
+                body: JSON.stringify(data),
+            },
+            false // не пытаемся refresh токен при Telegram логине
+        )
+        this.setTokens(response.access_token, response.refresh_token)
+        return response
+    }
+
     // Public endpoints
     async getTariffs(): Promise<Tariff[]> {
         const response = await this.request<{ tariffs: Tariff[]; total: number }>(API_CONFIG.ENDPOINTS.TARIFFS)
