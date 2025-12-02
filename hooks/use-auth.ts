@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface AuthState {
@@ -15,11 +15,7 @@ export function useAuth() {
         isLoading: true,
     })
 
-    useEffect(() => {
-        checkAuth()
-    }, [])
-
-    const checkAuth = () => {
+    const checkAuth = useCallback(() => {
         const auth = localStorage.getItem('isAuthenticated')
         const email = localStorage.getItem('userEmail')
 
@@ -30,15 +26,26 @@ export function useAuth() {
                 isLoading: false,
             })
         } else {
-            router.push('/auth/login')
+            setAuthState(prev => ({ ...prev, isLoading: false }))
         }
-    }
+    }, [])
 
-    const logout = () => {
+    useEffect(() => {
+        checkAuth()
+    }, [checkAuth])
+
+    const logout = useCallback(() => {
         localStorage.removeItem('isAuthenticated')
         localStorage.removeItem('userEmail')
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
+        setAuthState({
+            isAuthenticated: false,
+            userEmail: '',
+            isLoading: false,
+        })
         router.push('/')
-    }
+    }, [router])
 
     return { ...authState, logout }
 }

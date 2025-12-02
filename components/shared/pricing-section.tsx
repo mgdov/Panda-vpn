@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { apiClient } from "@/lib/api/client"
 import type { Tariff } from "@/lib/api/types"
 
@@ -44,11 +44,7 @@ export default function PricingSection() {
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
-    useEffect(() => {
-        loadTariffs()
-    }, [])
-
-    const loadTariffs = async () => {
+    const loadTariffs = useCallback(async () => {
         setIsLoading(true)
         setError(null)
         try {
@@ -74,7 +70,11 @@ export default function PricingSection() {
         } finally {
             setIsLoading(false)
         }
-    }
+    }, [])
+
+    useEffect(() => {
+        loadTariffs()
+    }, [loadTariffs])
 
     return (
         <section className="relative py-16 sm:py-20 px-4" id="pricing">
@@ -86,15 +86,15 @@ export default function PricingSection() {
 
             <div className="relative z-10 max-w-7xl mx-auto">
                 {/* Section Header */}
-                <div className="mb-12 text-center space-y-3">
-                    <div className="inline-flex items-center gap-2 glass-effect px-4 py-2 rounded-full mb-4">
-                        <span>💎</span>
-                        <span className="text-sm font-semibold gradient-text">Прозрачные цены</span>
+                <div className="mb-10 text-center space-y-2">
+                    <div className="inline-flex items-center gap-2 glass-effect px-3 py-1.5 rounded-full mb-3">
+                        <span className="text-sm">💎</span>
+                        <span className="text-xs font-medium gradient-text">Прозрачные цены</span>
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-bold">
+                    <h2 className="text-2xl md:text-3xl font-bold">
                         <span className="gradient-text">Выберите свой план</span>
                     </h2>
-                    <p className="text-base text-gray-400 max-w-2xl mx-auto leading-snug">
+                    <p className="text-sm text-gray-400 max-w-2xl mx-auto">
                         Никаких скрытых платежей. Отменить можно в любой момент.
                     </p>
                 </div>
@@ -124,11 +124,11 @@ export default function PricingSection() {
                         <p className="text-sm text-yellow-50/80">Попробуйте обновить страницу позже.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                         {plans.map((plan, index) => (
                             <div
                                 key={plan.id}
-                                className={`group relative glass-effect rounded-3xl p-8 transition-all duration-500 hover:scale-105 cursor-pointer ${plan.highlighted
+                                className={`group relative glass-effect rounded-2xl p-5 transition-all duration-500 hover:scale-105 cursor-pointer flex flex-col ${plan.highlighted
                                     ? "ring-2 ring-green-500 shadow-2xl shadow-green-500/30"
                                     : "hover:shadow-xl hover:shadow-green-500/20"
                                     }`}
@@ -136,8 +136,8 @@ export default function PricingSection() {
                             >
                                 {/* Popular badge */}
                                 {plan.highlighted && (
-                                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                                        <div className="bg-linear-to-r from-green-500 to-emerald-500 px-6 py-2 rounded-full text-white text-sm font-bold shadow-lg">
+                                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                                        <div className="bg-linear-to-r from-green-500 to-emerald-500 px-4 py-1 rounded-full text-white text-xs font-semibold shadow-lg">
                                             ⭐ Популярный
                                         </div>
                                     </div>
@@ -145,41 +145,41 @@ export default function PricingSection() {
 
                                 {/* Discount badge */}
                                 {plan.discount && (
-                                    <div className="absolute top-4 right-4">
-                                        <div className="bg-red-500/20 border border-red-500/50 px-3 py-1 rounded-full text-red-400 text-xs font-bold">
+                                    <div className="absolute top-3 right-3">
+                                        <div className="bg-red-500/20 border border-red-500/50 px-2 py-0.5 rounded-full text-red-400 text-xs font-semibold">
                                             {plan.discount}
                                         </div>
                                     </div>
                                 )}
 
-                                <div className="space-y-6">
+                                <div className="space-y-4 flex flex-col flex-1">
                                     {/* Icon */}
-                                    <div className="text-6xl group-hover:scale-110 transition-transform duration-300">
+                                    <div className="text-4xl group-hover:scale-110 transition-transform duration-300">
                                         {plan.icon}
                                     </div>
 
                                     {/* Plan name */}
-                                    <h3 className="text-2xl font-bold text-white group-hover:gradient-text transition-all duration-300">
+                                    <h3 className="text-lg font-semibold text-white group-hover:gradient-text transition-all duration-300">
                                         {plan.name}
                                     </h3>
 
                                     {/* Price */}
-                                    <div className="space-y-1">
-                                        <div className="flex items-baseline gap-2">
-                                            <span className="text-5xl font-black gradient-text">{plan.price}</span>
-                                            <span className="text-gray-400 text-lg">₽</span>
+                                    <div className="space-y-0.5">
+                                        <div className="flex items-baseline gap-1.5">
+                                            <span className="text-3xl font-bold gradient-text">{plan.price}</span>
+                                            <span className="text-gray-400 text-base">₽</span>
                                         </div>
-                                        <p className="text-gray-400 text-sm">{plan.period}</p>
+                                        <p className="text-gray-400 text-xs">{plan.period}</p>
                                     </div>
 
                                     {/* Description */}
-                                    <p className="text-gray-400 leading-relaxed min-h-16">
+                                    <p className="text-gray-400 text-xs leading-relaxed flex-1">
                                         {plan.description}
                                     </p>
 
                                     {/* CTA Button */}
                                     <button
-                                        className={`w-full py-4 rounded-xl font-semibold transition-all duration-300 ${plan.highlighted
+                                        className={`w-full py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ${plan.highlighted
                                             ? "bg-linear-to-r from-green-500 to-emerald-500 text-white hover:shadow-lg hover:shadow-green-500/50 hover:scale-105"
                                             : "glass-effect text-white hover:bg-white/10"
                                             }`}
@@ -196,11 +196,11 @@ export default function PricingSection() {
                 )}
 
                 {/* Features list */}
-                <div className="mt-16 glass-effect rounded-2xl p-8 max-w-4xl mx-auto">
-                    <h3 className="text-2xl font-bold gradient-text text-center mb-8">
+                <div className="mt-12 glass-effect rounded-xl p-6 max-w-4xl mx-auto">
+                    <h3 className="text-lg font-semibold gradient-text text-center mb-6">
                         Все планы включают:
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[
                             "⚡ Безлимитная скорость",
                             "🌍 Доступ ко всем серверам",
@@ -211,9 +211,9 @@ export default function PricingSection() {
                         ].map((feature, index) => (
                             <div
                                 key={index}
-                                className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors duration-300"
+                                className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-colors duration-300"
                             >
-                                <span className="text-xl">{feature.split(" ")[0]}</span>
+                                <span className="text-base">{feature.split(" ")[0]}</span>
                                 <span>{feature.split(" ").slice(1).join(" ")}</span>
                             </div>
                         ))}

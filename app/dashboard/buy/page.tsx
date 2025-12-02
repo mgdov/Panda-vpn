@@ -14,18 +14,18 @@ function BuyPageContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const { isAuthenticated, userEmail, isLoading: authLoading, logout } = useAuth()
-    
+
     const [tariffs, setTariffs] = useState<Tariff[]>([])
     const [selectedTariff, setSelectedTariff] = useState<Tariff | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
     const [isProcessing, setIsProcessing] = useState(false)
     const [error, setError] = useState("")
+    const [sidebarOpen, setSidebarOpen] = useState(false)
 
     const loadTariffs = useCallback(async () => {
         try {
             const data = await apiClient.getTariffs()
             setTariffs(data)
-            
+
             // Если есть tariff в URL, выбираем его
             const tariffId = searchParams.get("tariff")
             if (tariffId) {
@@ -37,8 +37,6 @@ function BuyPageContent() {
         } catch (error) {
             console.error("Failed to load tariffs:", error)
             setError("Не удалось загрузить тарифы")
-        } finally {
-            setIsLoading(false)
         }
     }, [searchParams])
 
@@ -102,7 +100,7 @@ function BuyPageContent() {
         logout()
     }
 
-    if (authLoading || isLoading) {
+    if (authLoading) {
         return <LoadingScreen />
     }
 
@@ -114,16 +112,20 @@ function BuyPageContent() {
         <DashboardLayout>
             <DashboardSidebar
                 activeTab="plans"
-                setActiveTab={() => {}}
-                sidebarOpen={false}
-                setSidebarOpen={() => {}}
+                setActiveTab={(tab) => {
+                    if (tab === "plans") {
+                        router.push("/dashboard")
+                    }
+                }}
+                sidebarOpen={sidebarOpen}
+                setSidebarOpen={setSidebarOpen}
                 userEmail={userEmail}
                 onLogout={handleLogout}
             />
 
             <MobileSidebarToggle
-                sidebarOpen={false}
-                setSidebarOpen={() => {}}
+                sidebarOpen={sidebarOpen}
+                setSidebarOpen={setSidebarOpen}
             />
 
             <main className="relative flex-1 w-full ml-0 md:ml-64 px-4 sm:px-6 md:px-10 lg:px-12 py-6 md:py-8 lg:py-10 transition-all z-10 overflow-x-hidden">
@@ -162,11 +164,10 @@ function BuyPageContent() {
                                     <div
                                         key={tariff.id}
                                         onClick={() => setSelectedTariff(tariff)}
-                                        className={`relative flex h-full flex-col overflow-hidden rounded-3xl border transition-all duration-300 cursor-pointer ${
-                                            isSelected
-                                                ? "border-emerald-400/60 bg-linear-to-br from-emerald-900/40 via-slate-900/70 to-slate-950/80 shadow-2xl shadow-emerald-500/30"
-                                                : "border-white/10 bg-slate-900/70 hover:border-emerald-400/30 hover:shadow-xl hover:shadow-black/30"
-                                        }`}
+                                        className={`relative flex h-full flex-col overflow-hidden rounded-3xl border transition-all duration-300 cursor-pointer ${isSelected
+                                            ? "border-emerald-400/60 bg-linear-to-br from-emerald-900/40 via-slate-900/70 to-slate-950/80 shadow-2xl shadow-emerald-500/30"
+                                            : "border-white/10 bg-slate-900/70 hover:border-emerald-400/30 hover:shadow-xl hover:shadow-black/30"
+                                            }`}
                                     >
                                         {isSelected && (
                                             <div className="absolute right-5 top-5 inline-flex items-center gap-2 rounded-full bg-linear-to-r from-emerald-500 to-emerald-600 px-4 py-1.5 text-xs font-bold text-white shadow-lg">
@@ -235,19 +236,19 @@ function BuyPageContent() {
                                 ) : (
                                     <>
                                         <span>💳</span>
-                                        Оплатить через YooKassa
+                                        Оплатить
                                     </>
                                 )}
                             </button>
 
                             <p className="text-xs text-gray-400 text-center">
-                                После нажатия вы будете перенаправлены на страницу оплаты YooKassa
+                                После нажатия вы будете перенаправлены на страницу оплаты
                             </p>
                         </div>
                     )}
                 </div>
             </main>
-        </DashboardLayout>
+        </DashboardLayout >
     )
 }
 

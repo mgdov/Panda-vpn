@@ -2,7 +2,7 @@
 
 import type React from "react"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
 import AuthBackground from "@/components/shared/auth-background"
@@ -29,7 +29,7 @@ export default function SignupPage() {
   const strength = calculatePasswordStrength(password)
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
 
@@ -56,9 +56,9 @@ export default function SignupPage() {
       const errorMessage = err instanceof Error ? err.message : "Ошибка регистрации"
       setError(errorMessage)
     }
-  }
+  }, [email, password, passwordsMatch, strength.score])
 
-  const handleVerifyEmail = async (e: React.FormEvent) => {
+  const handleVerifyEmail = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
 
@@ -71,7 +71,7 @@ export default function SignupPage() {
 
     try {
       await apiClient.verifyEmail({ email, code: verificationCode })
-      
+
       // Токены уже сохранены в apiClient.verifyEmail()
       localStorage.setItem("isAuthenticated", "true")
       localStorage.setItem("userEmail", email)
@@ -83,9 +83,9 @@ export default function SignupPage() {
       const errorMessage = err instanceof Error ? err.message : "Неверный код верификации"
       setError(errorMessage)
     }
-  }
+  }, [email, verificationCode, router])
 
-  const handleResendCode = async () => {
+  const handleResendCode = useCallback(async () => {
     setError("")
     try {
       await apiClient.resendVerification({ email })
@@ -95,7 +95,7 @@ export default function SignupPage() {
       const errorMessage = err instanceof Error ? err.message : "Не удалось отправить код повторно"
       setError(errorMessage)
     }
-  }
+  }, [email])
 
   // Если показываем форму верификации
   if (showVerification) {

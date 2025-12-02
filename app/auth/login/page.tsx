@@ -2,7 +2,7 @@
 
 import type React from "react"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
 import AuthBackground from "@/components/shared/auth-background"
@@ -21,25 +21,12 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setIsLoading(true)
 
     try {
-      const isDemoLogin = email === "demo@pandavpn.com" && password === "demo123"
-
-      if (isDemoLogin) {
-        localStorage.setItem("isAuthenticated", "true")
-        localStorage.setItem("userEmail", email)
-        setSuccess(true)
-        setIsLoading(false)
-        setTimeout(() => {
-          router.push("/dashboard")
-        }, 800)
-        return
-      }
-
       await apiClient.login({ email, password })
 
       localStorage.setItem("isAuthenticated", "true")
@@ -54,29 +41,12 @@ export default function LoginPage() {
       setError(errorMessage)
       setIsLoading(false)
     }
-  }
+  }, [email, password, router])
 
   return (
     <AuthBackground>
       <div className="relative z-10 w-full max-w-md space-y-6">
         <AuthLogo title="Добро пожаловать обратно" subtitle="Войдите в свой аккаунт" />
-
-        <div className="rounded-xl border border-white/10 bg-white/10 p-5 shadow-lg shadow-black/30">
-          <div className="mb-3 flex items-center gap-2 text-sm font-bold text-white">
-            <span className="text-base">🔑</span>
-            Тестовые данные для входа
-          </div>
-          <div className="space-y-2 text-xs font-medium text-gray-200">
-            <p className="flex items-center gap-2">
-              <span className="text-emerald-300">📧</span>
-              <code className="rounded bg-slate-900/50 px-2 py-1 font-mono">demo@pandavpn.com</code>
-            </p>
-            <p className="flex items-center gap-2">
-              <span className="text-emerald-300">🔐</span>
-              <code className="rounded bg-slate-900/50 px-2 py-1 font-mono">demo123</code>
-            </p>
-          </div>
-        </div>
 
         <form
           onSubmit={handleSubmit}
@@ -88,7 +58,7 @@ export default function LoginPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="demo@pandavpn.com"
+            placeholder="your@email.com"
             showCheck
             required
           />

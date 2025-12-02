@@ -1,3 +1,8 @@
+"use client"
+
+import { useRouter } from "next/navigation"
+import { memo, useCallback } from "react"
+
 export interface Plan {
     id: string
     name: string
@@ -14,7 +19,13 @@ interface DashboardPlansTabProps {
     errorMessage?: string | null
 }
 
-export default function DashboardPlansTab({ plans, errorMessage }: DashboardPlansTabProps) {
+const DashboardPlansTab = memo(function DashboardPlansTab({ plans, errorMessage }: DashboardPlansTabProps) {
+    const router = useRouter()
+
+    const handlePlanSelection = useCallback((planId: string) => {
+        router.push(`/dashboard/buy?tariff=${encodeURIComponent(planId)}`)
+    }, [router])
+
     return (
         <div>
             <h2 className="mb-2 text-2xl font-bold text-white sm:text-[28px]">Выберите тариф</h2>
@@ -88,10 +99,8 @@ export default function DashboardPlansTab({ plans, errorMessage }: DashboardPlan
                                 </div>
 
                                 <button
-                                    onClick={() => {
-                                        // Переход на страницу оплаты с выбранным тарифом
-                                        window.location.href = `/dashboard/buy?tariff=${plan.id}`
-                                    }}
+                                    type="button"
+                                    onClick={() => handlePlanSelection(plan.id)}
                                     className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all duration-300 sm:text-base ${plan.highlighted
                                         ? "bg-linear-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/40 hover:-translate-y-0.5 hover:shadow-xl"
                                         : "bg-white/10 text-white hover:-translate-y-0.5 hover:border-emerald-400/40 hover:bg-white/15"
@@ -112,4 +121,6 @@ export default function DashboardPlansTab({ plans, errorMessage }: DashboardPlan
             )}
         </div>
     )
-}
+})
+
+export default DashboardPlansTab

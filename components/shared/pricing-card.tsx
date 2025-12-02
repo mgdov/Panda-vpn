@@ -22,8 +22,8 @@ export default function PricingCard({
   return (
     <div
       className={`relative rounded-xl overflow-hidden transition-all ${highlighted
-          ? "border-2 border-accent bg-linear-to-br from-green-950/30 to-black transform md:scale-105 shadow-2xl shadow-green-900/40"
-          : "border border-accent/30 bg-black/40 hover:border-accent/70 shadow-lg hover:shadow-green-900/20"
+        ? "border-2 border-accent bg-linear-to-br from-green-950/30 to-black transform md:scale-105 shadow-2xl shadow-green-900/40"
+        : "border border-accent/30 bg-black/40 hover:border-accent/70 shadow-lg hover:shadow-green-900/20"
         }`}
     >
       {highlighted && (
@@ -59,7 +59,7 @@ export default function PricingCard({
         <ul className="space-y-2 md:space-y-3">
           {features.map((feature, i) => (
             <li key={i} className="flex items-start gap-2 md:gap-3">
-              <span className="text-green-400 mt-0.5 flex-shrink-0 text-base md:text-lg">✓</span>
+              <span className="text-green-400 mt-0.5 shrink-0 text-base md:text-lg">✓</span>
               <span className="text-xs md:text-sm text-white">{feature}</span>
             </li>
           ))}

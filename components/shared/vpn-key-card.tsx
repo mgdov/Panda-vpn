@@ -1,4 +1,5 @@
 import { Copy, Check } from "lucide-react"
+import { memo } from "react"
 
 export interface VPNKey {
     id: string
@@ -16,14 +17,14 @@ interface VPNKeyCardProps {
     onRevoke?: (keyId: string) => void
 }
 
-export default function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevoke }: VPNKeyCardProps) {
+const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevoke }: VPNKeyCardProps) {
     const formatExpiresAt = (expiresAt: string | null) => {
         if (!expiresAt) return 'Без ограничений'
         try {
             const date = new Date(expiresAt)
-            return date.toLocaleDateString('ru-RU', { 
-                day: '2-digit', 
-                month: '2-digit', 
+            return date.toLocaleDateString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
                 year: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
@@ -61,11 +62,10 @@ export default function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevoke }: VPNK
                         <p className="text-xs md:text-sm text-gray-400">{vpnKey.location}</p>
                     </div>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    vpnKey.status === 'active' 
-                        ? 'bg-green-900/40 border border-green-500/50 text-green-400 animate-pulse-glow'
-                        : 'bg-red-900/40 border border-red-500/50 text-red-400'
-                }`}>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${vpnKey.status === 'active'
+                    ? 'bg-green-900/40 border border-green-500/50 text-green-400 animate-pulse-glow'
+                    : 'bg-red-900/40 border border-red-500/50 text-red-400'
+                    }`}>
                     {vpnKey.status === 'active' ? 'Активен' : 'Истек'}
                 </span>
             </div>
@@ -102,7 +102,7 @@ export default function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevoke }: VPNK
                 </span>
                 <div className="flex gap-2.5">
                     {onRevoke && (
-                        <button 
+                        <button
                             onClick={() => onRevoke(vpnKey.id)}
                             className="text-red-400 hover:text-red-300 transition-colors duration-300 font-semibold hover:scale-105"
                         >
@@ -113,4 +113,6 @@ export default function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevoke }: VPNK
             </div>
         </div>
     )
-}
+})
+
+export default VPNKeyCard

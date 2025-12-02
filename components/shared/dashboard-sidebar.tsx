@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { CreditCard, Key, MessageSquare, LogOut, User } from "lucide-react"
+import { memo, useCallback } from "react"
 
 interface DashboardSidebarProps {
     activeTab: "plans" | "keys" | "support"
@@ -10,7 +11,7 @@ interface DashboardSidebarProps {
     onLogout: () => void
 }
 
-export default function DashboardSidebar({
+const DashboardSidebar = memo(function DashboardSidebar({
     activeTab,
     setActiveTab,
     sidebarOpen,
@@ -18,13 +19,22 @@ export default function DashboardSidebar({
     userEmail,
     onLogout,
 }: DashboardSidebarProps) {
+    const handleTabChange = useCallback((tab: "plans" | "keys" | "support") => {
+        setActiveTab(tab)
+        setSidebarOpen(false)
+    }, [setActiveTab, setSidebarOpen])
+
+    const handleOverlayClick = useCallback(() => {
+        setSidebarOpen(false)
+    }, [setSidebarOpen])
+
     return (
         <>
             {/* Overlay для мобильных устройств */}
             {sidebarOpen && (
                 <div
                     className="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 md:hidden transition-opacity"
-                    onClick={() => setSidebarOpen(false)}
+                    onClick={handleOverlayClick}
                 />
             )}
 
@@ -36,7 +46,7 @@ export default function DashboardSidebar({
 
                 <nav className="flex-1 flex flex-col gap-1.5 mt-5 w-full items-center px-3">
                     <button
-                        onClick={() => { setActiveTab('plans'); setSidebarOpen(false); }}
+                        onClick={() => handleTabChange('plans')}
                         className={`flex items-center gap-2.5 w-full py-2.5 px-3 rounded-lg transition-all duration-300 font-medium text-sm ${activeTab === 'plans' ? 'bg-linear-to-br from-green-600 to-green-700 text-white shadow-lg shadow-green-900/40' : 'text-gray-300 hover:text-white hover:bg-green-700/20'}`}
                         title="Тарифы"
                     >
@@ -45,7 +55,7 @@ export default function DashboardSidebar({
                     </button>
 
                     <button
-                        onClick={() => { setActiveTab('keys'); setSidebarOpen(false); }}
+                        onClick={() => handleTabChange('keys')}
                         className={`flex items-center gap-2.5 w-full py-2.5 px-3 rounded-lg transition-all duration-300 font-medium text-sm ${activeTab === 'keys' ? 'bg-linear-to-br from-green-600 to-green-700 text-white shadow-lg shadow-green-900/40' : 'text-gray-300 hover:text-white hover:bg-green-700/20'}`}
                         title="Мои ключи"
                     >
@@ -54,7 +64,7 @@ export default function DashboardSidebar({
                     </button>
 
                     <button
-                        onClick={() => { setActiveTab('support'); setSidebarOpen(false); }}
+                        onClick={() => handleTabChange('support')}
                         className={`flex items-center gap-2.5 w-full py-2.5 px-3 rounded-lg transition-all duration-300 font-medium text-sm ${activeTab === 'support' ? 'bg-linear-to-br from-green-600 to-green-700 text-white shadow-lg shadow-green-900/40' : 'text-gray-300 hover:text-white hover:bg-green-700/20'}`}
                         title="Поддержка"
                     >
@@ -66,7 +76,7 @@ export default function DashboardSidebar({
                 <div className="mt-auto w-full flex flex-col items-center gap-2.5 py-5 px-3 border-t border-green-800/20">
                     <div className="flex items-center gap-2 text-xs text-gray-400 bg-slate-900/50 px-2.5 py-1.5 rounded-lg w-full justify-center">
                         <User size={12} />
-                        <span className="truncate max-w-[160px]">{userEmail}</span>
+                        <span className="truncate max-w-40">{userEmail}</span>
                     </div>
                     <button
                         onClick={onLogout}
@@ -79,4 +89,6 @@ export default function DashboardSidebar({
             </aside>
         </>
     )
-}
+})
+
+export default DashboardSidebar

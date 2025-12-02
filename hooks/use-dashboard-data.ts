@@ -62,7 +62,7 @@ const extractErrorMessage = (error: unknown): string => {
 export function useDashboardData() {
     const [plans, setPlans] = useState<DashboardPlan[]>([])
     const [vpnKeys, setVpnKeys] = useState<DashboardVPNKey[]>([])
-    const [isLoading, setIsLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(false)
     const [plansError, setPlansError] = useState<string | null>(null)
     const [keysError, setKeysError] = useState<string | null>(null)
 

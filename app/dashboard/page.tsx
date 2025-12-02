@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { apiClient } from "@/lib/api/client"
 import { useAuth } from "@/hooks/use-auth"
 import { useDashboardData } from "@/hooks/use-dashboard-data"
@@ -18,12 +18,20 @@ type TabType = "plans" | "keys" | "support"
 
 export default function DashboardPage() {
     const { isAuthenticated, userEmail, isLoading: authLoading, logout } = useAuth()
-    const { plans, vpnKeys, isLoading: dataLoading, loadData, plansError, keysError } = useDashboardData()
+    const { plans, vpnKeys, loadData, plansError, keysError } = useDashboardData()
     const { copiedText, copyToClipboard } = useClipboard()
 
     const [activeTab, setActiveTab] = useState<TabType>("plans")
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [paymentSuccess, setPaymentSuccess] = useState(false)
+
+    const handleTabChange = useCallback((tab: TabType) => {
+        setActiveTab(tab)
+    }, [])
+
+    const handleSidebarToggle = useCallback((open: boolean) => {
+        setSidebarOpen(open)
+    }, [])
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -45,16 +53,16 @@ export default function DashboardPage() {
         }
     }, [loadData])
 
-    const handleLogout = async () => {
+    const handleLogout = useCallback(async () => {
         try {
             await apiClient.logout()
         } catch (error) {
             console.error("Logout error:", error)
         }
         logout()
-    }
+    }, [logout])
 
-    if (authLoading || dataLoading) {
+    if (authLoading) {
         return <LoadingScreen />
     }
 
@@ -66,16 +74,16 @@ export default function DashboardPage() {
         <DashboardLayout>
             <DashboardSidebar
                 activeTab={activeTab}
-                setActiveTab={setActiveTab}
+                setActiveTab={handleTabChange}
                 sidebarOpen={sidebarOpen}
-                setSidebarOpen={setSidebarOpen}
+                setSidebarOpen={handleSidebarToggle}
                 userEmail={userEmail}
                 onLogout={handleLogout}
             />
 
             <MobileSidebarToggle
                 sidebarOpen={sidebarOpen}
-                setSidebarOpen={setSidebarOpen}
+                setSidebarOpen={handleSidebarToggle}
             />
 
             <main className="relative flex-1 w-full ml-0 md:ml-64 px-4 sm:px-6 md:px-10 lg:px-12 py-6 md:py-8 lg:py-10 transition-all z-10 overflow-x-hidden">
