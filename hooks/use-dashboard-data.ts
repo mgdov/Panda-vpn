@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { apiClient } from '@/lib/api/client'
+import { isAuthError } from '@/lib/api/errors'
 import type { Tariff, VPNKey as ApiVPNKey } from '@/lib/api/types'
 
 export type DashboardPlan = {
@@ -117,13 +118,32 @@ export function useDashboardData() {
             } else {
                 setVpnKeys([])
                 if (keysResult.status === 'rejected') {
-                    setKeysError(extractErrorMessage(keysResult.reason))
+                    const error = keysResult.reason
+                    // Если это ошибка авторизации, очищаем токены и редиректим
+                    if (isAuthError(error)) {
+                        localStorage.removeItem('isAuthenticated')
+                        localStorage.removeItem('userEmail')
+                        localStorage.removeItem('accessToken')
+                        localStorage.removeItem('refreshToken')
+                        window.location.href = '/auth/login'
+                        return
+                    }
+                    setKeysError(extractErrorMessage(error))
                 } else {
                     setKeysError('Сервер вернул пустой список ключей')
                 }
             }
         } catch (error) {
             const message = extractErrorMessage(error)
+            // Если это ошибка авторизации, очищаем токены и редиректим
+            if (isAuthError(error)) {
+                localStorage.removeItem('isAuthenticated')
+                localStorage.removeItem('userEmail')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('refreshToken')
+                window.location.href = '/auth/login'
+                return
+            }
             setPlans([])
             setVpnKeys([])
             setPlansError(message)

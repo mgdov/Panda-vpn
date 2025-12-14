@@ -40,6 +40,13 @@ export default function DashboardPage() {
     }, [isAuthenticated, loadData])
 
     useEffect(() => {
+        // Редирект на логин если не авторизован (после загрузки)
+        if (!authLoading && !isAuthenticated) {
+            window.location.href = '/auth/login'
+        }
+    }, [authLoading, isAuthenticated])
+
+    useEffect(() => {
         // Проверяем параметр payment=success в URL
         const params = new URLSearchParams(window.location.search)
         if (params.get("payment") === "success") {
@@ -62,12 +69,8 @@ export default function DashboardPage() {
         logout()
     }, [logout])
 
-    if (authLoading) {
+    if (authLoading || !isAuthenticated) {
         return <LoadingScreen />
-    }
-
-    if (!isAuthenticated) {
-        return null
     }
 
     return (
