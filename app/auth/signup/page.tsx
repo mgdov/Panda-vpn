@@ -140,15 +140,7 @@ export default function SignupPage() {
               <span>✓ Подтвердить</span>
             </FormSubmitButton>
 
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={handleResendCode}
-                className="text-sm text-green-400 hover:text-green-300 transition-colors underline"
-              >
-                Отправить код повторно
-              </button>
-            </div>
+
           </form>
 
           <p className="text-center text-sm text-gray-400 mt-6">
