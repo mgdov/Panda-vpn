@@ -79,14 +79,14 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                 </span>
             </div>
 
-            {/* Предупреждение о лимите устройств */}
-            {vpnKey.device_limit_reached && vpnKey.limit_message && (
-                <div className="p-3 bg-yellow-900/30 border border-yellow-500/50 rounded-lg">
-                    <p className="text-xs text-yellow-400 font-medium">
-                        ⚠️ {vpnKey.limit_message}
+            {/* Информация об активных устройствах (показывается только если есть активные устройства) */}
+            {vpnKey.active_devices_count !== undefined && vpnKey.active_devices_count > 0 && (
+                <div className="p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
+                    <p className="text-xs text-blue-400 font-medium">
+                        ✅ Ключ активирован на устройстве
                     </p>
-                    <p className="text-xs text-yellow-300/70 mt-1">
-                        Активных устройств: {vpnKey.active_devices_count || 0} / {vpnKey.max_devices || 1}
+                    <p className="text-xs text-blue-300/70 mt-1">
+                        Активных устройств: {vpnKey.active_devices_count} / {vpnKey.max_devices || 1}
                     </p>
                 </div>
             )}

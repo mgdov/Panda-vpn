@@ -53,12 +53,11 @@ export function useClipboard(resetDelay = 2000, onDeviceRegistered?: RefreshCall
                         setTimeout(() => onDeviceRegistered(), 500)
                     }
                 } catch (error: any) {
-                    // Если превышен лимит устройств, показываем предупреждение
+                    // Если превышен лимит устройств, просто логируем (не показываем alert при копировании)
                     if (error?.response?.status === 403 || error?.status === 403) {
                         const errorMessage = error?.response?.data?.detail || error?.data?.detail || 'Достигнут лимит устройств для этого ключа'
                         console.warn('Device limit reached:', errorMessage)
-                        // Показываем уведомление пользователю
-                        alert(`⚠️ ${errorMessage}\n\nДля использования на другом устройстве купите новый тариф.`)
+                        // НЕ показываем alert при копировании - информация об устройствах показывается в карточке ключа
                     } else {
                         console.error('Failed to register device:', error)
                         // Не блокируем копирование, если регистрация не удалась
