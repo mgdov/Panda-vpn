@@ -32,11 +32,11 @@ export function useClipboard(resetDelay = 2000, onDeviceRegistered?: RefreshCall
         // Копируем текст в буфер обмена
         try {
             await navigator.clipboard.writeText(text)
-            setCopiedText(id)
+        setCopiedText(id)
 
-            setTimeout(() => {
-                setCopiedText(null)
-            }, resetDelay)
+        setTimeout(() => {
+            setCopiedText(null)
+        }, resetDelay)
             
             // Регистрируем устройство при использовании конфига
             // Только если это валидный VLESS конфиг

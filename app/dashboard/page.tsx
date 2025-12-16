@@ -91,7 +91,7 @@ export default function DashboardPage() {
                     
                     // Если платеж обработан, показываем успех
                     if (syncResult && (syncResult.status === "success" || syncResult.status === "already_processed")) {
-                        setPaymentSuccess(true)
+            setPaymentSuccess(true)
                         // Скрываем сообщение через 5 секунд
                         setTimeout(() => setPaymentSuccess(false), 5000)
                     }
