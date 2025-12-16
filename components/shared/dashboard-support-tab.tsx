@@ -10,7 +10,7 @@ export default function DashboardSupportTab() {
             </div>
 
             <a
-                href="https://web.telegram.org/@mgdov"
+                href=" https://t.me/pandavpn_help "
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-linear-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white flex items-center justify-center gap-2.5 px-6 py-3 text-sm md:text-base font-semibold shadow-lg shadow-green-600/40 hover:shadow-xl hover:shadow-green-600/60 hover:scale-105 transition-all duration-300 rounded-lg w-full max-w-sm group"

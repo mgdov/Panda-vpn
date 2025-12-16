@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { CreditCard, Key, MessageSquare, LogOut, User } from "lucide-react"
+import { ArrowLeft, CreditCard, Key, MessageSquare, LogOut, User } from "lucide-react"
 import { memo, useCallback } from "react"
 
 interface DashboardSidebarProps {
@@ -39,9 +39,20 @@ const DashboardSidebar = memo(function DashboardSidebar({
             )}
 
             <aside className={`fixed z-30 top-0 left-0 h-screen w-64 bg-white/5 backdrop-blur-2xl border-r border-green-700/20 shadow-2xl shadow-green-900/30 flex flex-col items-center transition-transform duration-200 ease-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
-                <Link href="/" className="flex flex-col items-center gap-1.5 py-6 w-full border-b border-green-800/20 hover:bg-green-900/10 transition-all group">
-                    <span className="text-3xl drop-shadow-lg group-hover:scale-110 transition-transform duration-300">🐼</span>
-                    <span className="font-extrabold text-lg text-white tracking-wide group-hover:text-green-400 transition-colors">Panda VPN</span>
+                <Link
+                    href="/"
+                    className="relative w-full border-b border-green-800/20 px-5 py-6 overflow-hidden transition-all duration-300 group"
+                >
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-linear-to-r from-emerald-500/15 via-emerald-400/10 to-transparent pointer-events-none transition-opacity" />
+                    <div className="relative flex items-center justify-between">
+                        <div className="flex flex-col text-left">
+                            <span className="text-[11px] uppercase tracking-[0.2em] text-emerald-200/80">Вернуться</span>
+                            <span className="text-lg font-semibold text-white group-hover:text-emerald-50 transition-colors">На главную</span>
+                        </div>
+                        <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-white/5 text-white transition-all duration-300 group-hover:border-emerald-200/70 group-hover:bg-emerald-500/20">
+                            <ArrowLeft size={18} className="transition-transform duration-300 group-hover:-translate-x-1" />
+                        </span>
+                    </div>
                 </Link>
 
                 <nav className="flex-1 flex flex-col gap-1.5 mt-5 w-full items-center px-3">

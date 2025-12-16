@@ -61,10 +61,10 @@ export default function PricingSection() {
             }))
             setPlans(formattedPlans)
             if (formattedPlans.length === 0) {
-                setError("Сервер вернул пустой список тарифов")
+                setError("Тарифы временно недоступны")
             }
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : "Не удалось загрузить тарифы"
+            const errorMessage = err instanceof Error ? err.message : "Тарифы временно недоступны"
             setPlans([])
             setError(errorMessage)
         } finally {
@@ -109,7 +109,7 @@ export default function PricingSection() {
                         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-red-500/40 bg-red-500/10 text-2xl">
                             ⚠️
                         </div>
-                        <p className="text-base text-red-200 mb-2">Не удалось загрузить тарифы</p>
+                        <p className="text-base text-red-200 mb-2">Тарифы временно недоступны</p>
                         <p className="text-sm text-red-300/80">{error}</p>
                         <button
                             onClick={loadTariffs}
@@ -120,7 +120,7 @@ export default function PricingSection() {
                     </div>
                 ) : plans.length === 0 ? (
                     <div className="py-12 text-center text-yellow-100">
-                        <p className="text-base mb-2">Сервер не вернул доступные тарифы.</p>
+                        <p className="text-base mb-2">Тарифы временно недоступны</p>
                         <p className="text-sm text-yellow-50/80">Попробуйте обновить страницу позже.</p>
                     </div>
                 ) : (

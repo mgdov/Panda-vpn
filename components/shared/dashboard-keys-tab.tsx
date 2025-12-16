@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import VPNKeyCard, { type VPNKey } from "./vpn-key-card"
 import { apiClient } from "@/lib/api/client"
 
@@ -10,36 +9,12 @@ interface DashboardKeysTabProps {
     onCopyKey: (text: string, keyId: string) => void
     onRefresh?: () => void
     errorMessage?: string | null
+    onGoToPlans?: () => void
 }
 
-export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefresh, errorMessage }: DashboardKeysTabProps) {
-    const [isCreating, setIsCreating] = useState(false)
+export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefresh, errorMessage, onGoToPlans }: DashboardKeysTabProps) {
 
-    const handleCreateKey = async () => {
-        setIsCreating(true)
-        try {
-            // ВАЖНО: Всегда создаем только VLESS ключи
-            // apiClient.createClient() уже принудительно устанавливает protocol="vless"
-            await apiClient.createClient({
-                protocol: "vless",  // Явно указываем VLESS (на всякий случай)
-                transport: "ws",
-                flow: "",
-                node_id: null,
-                meta: null
-            })
-            // Обновляем список ключей
-            if (onRefresh) {
-                // Небольшая задержка для обновления на бэкенде
-                setTimeout(() => onRefresh(), 1000)
-            }
-        } catch (error) {
-            console.error("Failed to create key:", error)
-            const errorMessage = error instanceof Error ? error.message : "Не удалось создать ключ"
-            alert(`Ошибка создания ключа: ${errorMessage}`)
-        } finally {
-            setIsCreating(false)
-        }
-    }
+
 
     const handleRevokeKey = async (keyId: string) => {
         if (!confirm("Вы уверены, что хотите удалить этот ключ? Это действие нельзя отменить.")) {
@@ -47,11 +22,9 @@ export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefr
         }
 
         try {
-            // Используем client_id из ключа (это id из таблицы clients)
             await apiClient.revokeClient(keyId)
-            // Обновляем список ключей
             if (onRefresh) {
-                setTimeout(() => onRefresh(), 500) // Небольшая задержка для обновления на бэкенде
+                setTimeout(() => onRefresh(), 500)
             }
         } catch (error) {
             console.error("Failed to revoke key:", error)
@@ -66,45 +39,23 @@ export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefr
                     <h2 className="text-xl md:text-2xl font-bold text-white mb-1">Мои VPN ключи</h2>
                     <p className="text-gray-400 text-xs md:text-sm">Управляйте вашими подключениями VLESS</p>
                 </div>
-                <button
-                    onClick={handleCreateKey}
-                    disabled={isCreating}
-                    className="bg-linear-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 font-semibold text-sm group"
-                >
-                    <span className="inline-flex items-center gap-2">
-                        {isCreating ? (
-                            <>
-                                <span className="animate-spin">⏳</span>
-                                Создание...
-                            </>
-                        ) : (
-                            <>
-                                <span className="text-lg group-hover:rotate-90 transition-transform duration-300">+</span>
-                                Создать ключ
-                            </>
-                        )}
-                    </span>
-                </button>
+
             </div>
 
-            {errorMessage && (
-                <div className="mb-6 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-                    Не удалось загрузить ключи: {errorMessage}
-                    {onRefresh && (
+
+
+            {vpnKeys.length === 0 ? (
+                <div className="text-center text-[14px] py-12 text-gray-500">
+                    <p>У вас пока нет ключей, приобретите их у нас</p>
+                    {onGoToPlans && (
                         <button
-                            onClick={onRefresh}
-                            className="ml-3 inline-flex items-center rounded-lg border border-red-400/40 px-3 py-1 text-xs font-semibold text-red-100 transition-colors hover:border-red-300/60 hover:text-red-50"
+                            type="button"
+                            onClick={onGoToPlans}
+                            className="mt-5 inline-flex items-center justify-center rounded-lg bg-linear-to-r from-emerald-500 to-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-900/30 transition-all duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70"
                         >
-                            Повторить попытку
+                            Приобрести VPN
                         </button>
                     )}
-                </div>
-            )}
-
-            {!errorMessage && vpnKeys.length === 0 ? (
-                <div className="text-center py-12">
-                    <p className="text-gray-400 mb-4">У вас пока нет VPN ключей</p>
-                    <p className="text-sm text-gray-500">Создайте первый ключ, нажав кнопку выше</p>
                 </div>
             ) : !errorMessage ? (
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-5">

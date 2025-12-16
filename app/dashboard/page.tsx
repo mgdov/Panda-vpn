@@ -29,6 +29,10 @@ export default function DashboardPage() {
         setActiveTab(tab)
     }, [])
 
+    const handleGoToPlans = useCallback(() => {
+        handleTabChange("plans")
+    }, [handleTabChange])
+
     const handleSidebarToggle = useCallback((open: boolean) => {
         setSidebarOpen(open)
     }, [])
@@ -132,6 +136,7 @@ export default function DashboardPage() {
                             copiedKey={copiedText}
                             onCopyKey={copyToClipboard}
                             onRefresh={loadData}
+                            onGoToPlans={handleGoToPlans}
                         />
                     )}
                     {activeTab === "support" && <DashboardSupportTab />}
