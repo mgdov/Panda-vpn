@@ -25,10 +25,22 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-12">
             <Link href="/about" className="relative text-gray-300 hover:text-green-400 transition-all duration-300 text-sm font-medium group">
               <span className="flex items-center gap-2">
                 📚 О нас
+              </span>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-green-400 to-emerald-400 group-hover:w-full transition-all duration-300"></span>
+            </Link>
+            <Link href="" className="relative text-gray-300 hover:text-green-400 transition-all duration-300 text-sm font-medium group">
+              <span className="flex items-center gap-2">
+                📰 Статьи и блог
+              </span>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-green-400 to-emerald-400 group-hover:w-full transition-all duration-300"></span>
+            </Link>
+            <Link href="" className="relative text-gray-300 hover:text-green-400 transition-all duration-300 text-sm font-medium group">
+              <span className="flex items-center gap-2">
+                🤝 Отзывы
               </span>
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-green-400 to-emerald-400 group-hover:w-full transition-all duration-300"></span>
             </Link>
