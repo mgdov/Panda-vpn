@@ -1,5 +1,6 @@
-import { Copy, Check } from "lucide-react"
-import { memo } from "react"
+import { Copy, Check, ChevronDown, ChevronUp } from "lucide-react"
+import { memo, useState } from "react"
+import KeyDevicesList from "./key-devices-list"
 
 export interface VPNKey {
     id: string
@@ -8,6 +9,11 @@ export interface VPNKey {
     status: 'active' | 'expired'
     expiresAt: string | null
     protocol?: string
+    // Новые поля для ограничения устройств
+    device_limit_reached?: boolean
+    active_devices_count?: number
+    max_devices?: number
+    limit_message?: string | null
 }
 
 interface VPNKeyCardProps {
@@ -15,9 +21,12 @@ interface VPNKeyCardProps {
     copiedKey: string | null
     onCopy: (text: string, keyId: string) => void
     onRevoke?: (keyId: string) => void
+    onRefresh?: () => void // Callback для обновления данных после изменений
 }
 
-const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevoke }: VPNKeyCardProps) {
+const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevoke, onRefresh }: VPNKeyCardProps) {
+    const [showDevices, setShowDevices] = useState(false)
+
     const formatExpiresAt = (expiresAt: string | null) => {
         if (!expiresAt) return 'Без ограничений'
         try {
@@ -70,12 +79,24 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                 </span>
             </div>
 
+            {/* Предупреждение о лимите устройств */}
+            {vpnKey.device_limit_reached && vpnKey.limit_message && (
+                <div className="p-3 bg-yellow-900/30 border border-yellow-500/50 rounded-lg">
+                    <p className="text-xs text-yellow-400 font-medium">
+                        ⚠️ {vpnKey.limit_message}
+                    </p>
+                    <p className="text-xs text-yellow-300/70 mt-1">
+                        Активных устройств: {vpnKey.active_devices_count || 0} / {vpnKey.max_devices || 1}
+                    </p>
+                </div>
+            )}
+
             <div className="p-3 bg-black/60 rounded-lg border border-green-700/20 hover:border-green-600/40 transition-colors duration-300">
                 <div className="flex items-center justify-between gap-2">
                     <code className="text-xs text-gray-400 break-all flex-1 font-mono">
                         {keyText}
                     </code>
-                    {keyText !== 'Генерация ключа...' && (
+                    {keyText !== 'Генерация ключа...' && !vpnKey.device_limit_reached && (
                         <button
                             onClick={() => onCopy(keyText, vpnKey.id)}
                             className="shrink-0 p-2 hover:bg-green-600/30 rounded-lg transition-all duration-300 hover:scale-110 group/btn"
@@ -94,6 +115,12 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                         🔒 VLESS протокол — безопасное подключение
                     </p>
                 )}
+                {/* Информация об устройствах */}
+                {vpnKey.active_devices_count !== undefined && vpnKey.max_devices !== undefined && (
+                    <p className="text-xs text-gray-500 mt-2">
+                        Устройств: {vpnKey.active_devices_count} / {vpnKey.max_devices}
+                    </p>
+                )}
             </div>
 
             <div className="flex items-center justify-between text-xs md:text-sm flex-wrap gap-2">
@@ -101,6 +128,26 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                     Истекает: <span className="text-white">{formatExpiresAt(vpnKey.expiresAt)}</span>
                 </span>
                 <div className="flex gap-2.5">
+                    {/* Кнопка показа устройств */}
+                    {vpnKey.active_devices_count !== undefined && vpnKey.active_devices_count > 0 && (
+                        <button
+                            onClick={() => setShowDevices(!showDevices)}
+                            className="text-blue-400 hover:text-blue-300 transition-colors duration-300 font-semibold hover:scale-105 flex items-center gap-1"
+                            title="Показать устройства"
+                        >
+                            {showDevices ? (
+                                <>
+                                    <ChevronUp size={14} />
+                                    Скрыть устройства
+                                </>
+                            ) : (
+                                <>
+                                    <ChevronDown size={14} />
+                                    Устройства ({vpnKey.active_devices_count})
+                                </>
+                            )}
+                        </button>
+                    )}
                     {onRevoke && (
                         <button
                             onClick={() => onRevoke(vpnKey.id)}
@@ -111,6 +158,23 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                     )}
                 </div>
             </div>
+
+            {/* Список устройств */}
+            {showDevices && (
+                <KeyDevicesList
+                    clientId={vpnKey.id}
+                    onDeviceRemoved={() => {
+                        // Обновляем счетчик устройств локально
+                        if (vpnKey.active_devices_count !== undefined) {
+                            vpnKey.active_devices_count = Math.max(0, vpnKey.active_devices_count - 1)
+                        }
+                        // Обновляем данные с сервера
+                        if (onRefresh) {
+                            setTimeout(() => onRefresh(), 500)
+                        }
+                    }}
+                />
+            )}
         </div>
     )
 })

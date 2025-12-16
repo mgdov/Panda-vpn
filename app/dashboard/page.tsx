@@ -19,7 +19,7 @@ type TabType = "plans" | "keys" | "support"
 export default function DashboardPage() {
     const { isAuthenticated, userEmail, isLoading: authLoading, logout } = useAuth()
     const { plans, vpnKeys, loadData, plansError, keysError } = useDashboardData()
-    const { copiedText, copyToClipboard } = useClipboard()
+    const { copiedText, copyToClipboard } = useClipboard(2000, loadData)
 
     const [activeTab, setActiveTab] = useState<TabType>("plans")
     const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -115,7 +115,7 @@ export default function DashboardPage() {
                             <span className="text-2xl">✅</span>
                             <div>
                                 <p className="text-base font-semibold text-emerald-400">Оплата успешно выполнена!</p>
-                                <p className="text-sm text-emerald-300/80">Ваш VLESS ключ создан или продлен. Проверьте вкладку &quot;Ключи&quot;.</p>
+                                <p className="text-sm text-emerald-300/80">Ваш новый VLESS ключ создан. Проверьте вкладку &quot;Ключи&quot;.</p>
                             </div>
                         </div>
                         <button

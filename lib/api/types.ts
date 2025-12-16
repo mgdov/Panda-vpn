@@ -84,6 +84,11 @@ export interface VPNKey {
     quota_bytes?: number | null // Опционально, может быть в ClientResponse
     used_bytes?: number // Опционально, может быть в ClientResponse
     updated_at?: string // Опционально, может быть в ClientResponse
+    // Новые поля для ограничения устройств
+    device_limit_reached?: boolean // Достигнут лимит устройств для этого ключа
+    active_devices_count?: number // Количество активных устройств для этого ключа
+    max_devices?: number // Максимальное количество устройств (обычно 1)
+    limit_message?: string | null // Сообщение об ошибке если превышен лимит
 }
 
 // UsageStats - формат может отличаться в зависимости от Marzban API
@@ -229,4 +234,34 @@ export interface CreateClientRequest {
 export interface CreateClientResponse {
     client_id: string // UUID из таблицы clients (для revoke)
     uuid: string // UUID ключ для VPN конфигурации (другой UUID!)
+}
+
+// Device registration
+export interface DeviceRegisterRequest {
+    client_id: string
+    device_name?: string
+    config_text: string
+}
+
+export interface DeviceRegisterResponse {
+    success: boolean
+    message: string
+    device_id?: string
+    active_devices_count: number
+    max_devices: number
+}
+
+export interface DeviceInfo {
+    id: string
+    device_name: string | null
+    last_activity_at: string
+    bytes_sent: number
+    bytes_received: number
+    is_active: boolean
+}
+
+export interface DeviceListResponse {
+    devices: DeviceInfo[]
+    active_count: number
+    max_devices: number
 }

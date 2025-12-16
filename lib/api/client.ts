@@ -17,6 +17,9 @@ import type {
     CreateClientRequest,
     CreateClientResponse,
     MeResponse,
+    DeviceRegisterRequest,
+    DeviceRegisterResponse,
+    DeviceListResponse,
 } from "./types"
 import { getErrorMessage } from "./errors"
 
@@ -115,7 +118,7 @@ class APIClient {
                     detail: `HTTP ${response.status}`
                 }))
 
-                // FastAPI возвращает ошибки в формате { "detail": "..." } или { "detail": [...] }
+                // FastAPI возвращает ошибки в формате { "detail": "..." } или { "detail": [] }
                 let errorMessage: string
 
                 if (Array.isArray(error.detail)) {
@@ -131,7 +134,11 @@ class APIClient {
                 }
 
                 const translatedMessage = getErrorMessage(errorMessage)
-                throw new Error(translatedMessage)
+                // Создаем объект ошибки с дополнительной информацией для обработки
+                const apiError: any = new Error(translatedMessage)
+                apiError.status = response.status
+                apiError.response = { status: response.status, data: error }
+                throw apiError
             }
 
             if (response.status === 204) {
@@ -417,6 +424,25 @@ class APIClient {
         return this.request<BillingHistory>(
             `${API_CONFIG.ENDPOINTS.BILLING_HISTORY}?page=${page}&limit=${limit}`
         )
+    }
+
+    // Device endpoints
+    async registerDevice(data: DeviceRegisterRequest): Promise<DeviceRegisterResponse> {
+        return this.request<DeviceRegisterResponse>(API_CONFIG.ENDPOINTS.DEVICES_REGISTER, {
+            method: "POST",
+            body: JSON.stringify(data),
+        })
+    }
+
+    async getDevices(clientId?: string): Promise<DeviceListResponse> {
+        const query = clientId ? `?client_id=${clientId}` : ""
+        return this.request<DeviceListResponse>(`${API_CONFIG.ENDPOINTS.DEVICES_LIST}${query}`)
+    }
+
+    async removeDevice(deviceId: string): Promise<void> {
+        return this.request(`${API_CONFIG.ENDPOINTS.DEVICES_REMOVE}/${deviceId}`, {
+            method: "DELETE",
+        })
     }
 }
 

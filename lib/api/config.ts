@@ -21,6 +21,11 @@ export const API_CONFIG = {
     PROFILE: "/api/profile",
     PROFILE_KEYS: "/api/profile/keys",
     PROFILE_USAGE: "/api/profile/usage",
+    
+    // Devices
+    DEVICES_REGISTER: "/api/devices/auto-register",
+    DEVICES_LIST: "/api/devices/list",
+    DEVICES_REMOVE: "/api/devices",
 
     // VPN
     VPN_CONFIG: "/api/me/vpn/config",

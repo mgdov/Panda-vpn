@@ -22,6 +22,11 @@ export type DashboardVPNKey = {
     expiresAt: string | null
     marzban_client_id?: string
     protocol?: string
+    // Новые поля для ограничения устройств
+    device_limit_reached?: boolean
+    active_devices_count?: number
+    max_devices?: number
+    limit_message?: string | null
 }
 
 const getIconForDuration = (duration: number): string => {
@@ -113,6 +118,11 @@ export function useDashboardData() {
                     expiresAt: key.expires_at || null,
                     marzban_client_id: key.marzban_client_id,
                     protocol: key.protocol || 'vless',
+                    // Новые поля для ограничения устройств
+                    device_limit_reached: key.device_limit_reached || false,
+                    active_devices_count: key.active_devices_count || 0,
+                    max_devices: key.max_devices || 1,
+                    limit_message: key.limit_message || null,
                 }))
                 setVpnKeys(formattedKeys)
             } else {

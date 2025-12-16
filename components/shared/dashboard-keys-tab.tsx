@@ -66,6 +66,7 @@ export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefr
                             copiedKey={copiedKey}
                             onCopy={onCopyKey}
                             onRevoke={handleRevokeKey}
+                            onRefresh={onRefresh}
                         />
                     ))}
                 </div>
@@ -81,6 +82,13 @@ export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefr
                     <li>Откройте приложение v2rayN / v2rayNG / Shadowrocket / Clash</li>
                     <li>Добавьте сервер через буфер обмена (автоматически определится VLESS)</li>
                 </ol>
+                <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
+                    <p className="text-xs text-yellow-400 font-semibold mb-1">⚠️ Важно:</p>
+                    <p className="text-xs text-yellow-300/80">
+                        Каждый ключ можно использовать только на <strong>1 устройстве</strong>. 
+                        Для подключения нескольких устройств купите дополнительные тарифы.
+                    </p>
+                </div>
             </div>
         </div>
     )
