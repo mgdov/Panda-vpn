@@ -37,6 +37,7 @@ export const API_CONFIG = {
     PAYMENTS_GET: "/api/payments",
     PAYMENTS_STATUS: "/api/payments/status",
     PAYMENTS_WEBHOOK: "/api/payments/webhook",
+    PAYMENTS_SYNC_LATEST: "/api/payments/sync-latest",
 
     // Billing
     BILLING_STATE: "/api/billing/state",

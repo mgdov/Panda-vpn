@@ -391,6 +391,12 @@ class APIClient {
         return this.request(`${API_CONFIG.ENDPOINTS.PAYMENTS_STATUS}/${paymentId}`)
     }
 
+    async syncLatestPayment(): Promise<{ status: string; message: string; payment_id?: string }> {
+        return this.request(API_CONFIG.ENDPOINTS.PAYMENTS_SYNC_LATEST, {
+            method: "POST",
+        })
+    }
+
     async getPayment(paymentId: string): Promise<PaymentDetails> {
         return this.request<PaymentDetails>(
             `${API_CONFIG.ENDPOINTS.PAYMENTS_GET}/${paymentId}`

@@ -54,13 +54,57 @@ export default function DashboardPage() {
         // Проверяем параметр payment=success в URL
         const params = new URLSearchParams(window.location.search)
         if (params.get("payment") === "success") {
-            setPaymentSuccess(true)
-            // Обновляем ключи после успешной оплаты
-            loadData()
+            // Синхронизируем последний платеж и обрабатываем его
+            const syncAndLoad = async () => {
+                try {
+                    // Небольшая задержка для того чтобы платеж успел обработаться на сервере
+                    await new Promise(resolve => setTimeout(resolve, 1000))
+                    
+                    // Синхронизируем статус последнего платежа (до 3 попыток)
+                    let syncResult = null
+                    for (let attempt = 0; attempt < 3; attempt++) {
+                        try {
+                            syncResult = await apiClient.syncLatestPayment()
+                            console.log(`Payment sync attempt ${attempt + 1} result:`, syncResult)
+                            
+                            // Если платеж обработан или уже обработан - выходим
+                            if (syncResult.status === "success" || syncResult.status === "already_processed") {
+                                break
+                            }
+                            
+                            // Если платеж еще pending, ждем и пробуем еще раз
+                            if (attempt < 2 && syncResult.status === "pending") {
+                                await new Promise(resolve => setTimeout(resolve, 2000))
+                                continue
+                            }
+                        } catch (error) {
+                            console.error(`Payment sync attempt ${attempt + 1} failed:`, error)
+                            if (attempt < 2) {
+                                await new Promise(resolve => setTimeout(resolve, 2000))
+                                continue
+                            }
+                        }
+                    }
+                    
+                    // Обновляем ключи после синхронизации
+                    await loadData()
+                    
+                    // Если платеж обработан, показываем успех
+                    if (syncResult && (syncResult.status === "success" || syncResult.status === "already_processed")) {
+                        setPaymentSuccess(true)
+                        // Скрываем сообщение через 5 секунд
+                        setTimeout(() => setPaymentSuccess(false), 5000)
+                    }
+                } catch (error) {
+                    console.error("Failed to sync payment:", error)
+                    // В любом случае обновляем данные
+                    await loadData()
+                }
+            }
+            
+            syncAndLoad()
             // Убираем параметр из URL
             window.history.replaceState({}, "", "/dashboard")
-            // Скрываем сообщение через 5 секунд
-            setTimeout(() => setPaymentSuccess(false), 5000)
         }
     }, [loadData])
 
