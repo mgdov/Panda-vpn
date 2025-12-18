@@ -111,6 +111,7 @@ export function useDashboardData() {
             // Обработка ключей
             if (keysResult.status === 'fulfilled' && keysResult.value) {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 const formattedKeys: DashboardVPNKey[] = keysResult.value.map((key: ApiVPNKey) => ({
                     id: key.id,
                     key: key.subscription_url || key.config_text || 'Generating...',
@@ -133,13 +134,14 @@ export function useDashboardData() {
                         key: 'https://example.com/vless-subscription/test-key',
                         location: '🌍 Auto-select',
 =======
+=======
+>>>>>>> aea01da (обновление по правкам Мухаммада)
                 const formattedKeys: DashboardVPNKey[] = keysResult.value.map((key: ApiVPNKey) => {
-                    // Определяем ключ для отображения в зависимости от preferred_method:
-                    // subscription_url имеет приоритет, если явно выбрано, иначе берём config_text.
-                    const displayKey = key.preferred_method === 'subscription'
+                    // Определяем ключ для отображения: приоритет subscription_url > config_text
+                    const displayKey = key.preferred_method === 'subscription' 
                         ? (key.subscription_url || key.config_text || 'Generating...')
                         : (key.config_text || key.subscription_url || 'Generating...')
-
+                    
                     return {
                         id: key.id,
                         key: displayKey,
@@ -158,6 +160,21 @@ export function useDashboardData() {
                         limit_message: key.limit_message || null,
                     }
                 })
+=======
+                const formattedKeys: DashboardVPNKey[] = keysResult.value.map((key: ApiVPNKey) => ({
+                    id: key.id,
+                    key: key.subscription_url || key.config_text || 'Generating...',
+                    location: '🌍 Auto-select',
+                    status: key.active ? 'active' : 'expired',
+                    expiresAt: key.expires_at || null,
+                    marzban_client_id: key.marzban_client_id,
+                    protocol: key.protocol || 'vless',
+                    // Новые поля для ограничения устройств
+                    device_limit_reached: key.device_limit_reached || false,
+                    active_devices_count: key.active_devices_count || 0,
+                    max_devices: key.max_devices || 1,
+                    limit_message: key.limit_message || null,
+                }))
 
                 // Тестовый ключ для дев-среды (добавляем к реальным)
                 if (process.env.NODE_ENV === 'development') {
@@ -177,9 +194,13 @@ export function useDashboardData() {
                     })
                 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> e76d21b (Изменение правки Мухаммада)
+=======
+>>>>>>> 0ddcdb9 (обновление по правкам Мухаммада)
+>>>>>>> aea01da (обновление по правкам Мухаммада)
                 setVpnKeys(formattedKeys)
             } else {
                 const fallbackKeys: DashboardVPNKey[] = []
