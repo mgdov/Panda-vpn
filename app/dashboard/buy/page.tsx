@@ -26,10 +26,9 @@ function BuyPageContent() {
             const data = await apiClient.getTariffs()
             setTariffs(data)
 
-            // Если есть tariff в URL, выбираем его
             const tariffId = searchParams.get("tariff")
             if (tariffId) {
-                const tariff = data.find(t => t.id === tariffId || t.code === tariffId)
+                const tariff = data.find((t) => t.id === tariffId || t.code === tariffId)
                 if (tariff) {
                     setSelectedTariff(tariff)
                 }
@@ -54,7 +53,7 @@ function BuyPageContent() {
     useEffect(() => {
         const tariffId = searchParams.get("tariff")
         if (tariffId && tariffs.length > 0) {
-            const tariff = tariffs.find(t => t.id === tariffId || t.code === tariffId)
+            const tariff = tariffs.find((t) => t.id === tariffId || t.code === tariffId)
             if (tariff) {
                 setSelectedTariff(tariff)
             }
@@ -73,10 +72,9 @@ function BuyPageContent() {
         try {
             const result = await apiClient.createPayment({
                 tariff_id: selectedTariff.id,
-                return_url: `${window.location.origin}/dashboard?payment=success`
+                return_url: `${window.location.origin}/dashboard?payment=success`,
             })
 
-            // Редирект на страницу оплаты YooKassa
             if (result.confirmation_url) {
                 window.location.href = result.confirmation_url
             } else {
@@ -85,7 +83,10 @@ function BuyPageContent() {
             }
         } catch (error: unknown) {
             console.error("Payment creation failed:", error)
-            const errorMessage = error instanceof Error ? error.message : "Не удалось создать платеж. Попробуйте еще раз."
+            const errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : "Не удалось создать платеж. Попробуйте еще раз."
             setError(errorMessage)
             setIsProcessing(false)
         }
@@ -115,6 +116,8 @@ function BuyPageContent() {
                 setActiveTab={(tab) => {
                     if (tab === "plans") {
                         router.push("/dashboard")
+                    } else {
+                        router.push(`/dashboard?tab=${tab}`)
                     }
                 }}
                 sidebarOpen={sidebarOpen}
@@ -123,10 +126,7 @@ function BuyPageContent() {
                 onLogout={handleLogout}
             />
 
-            <MobileSidebarToggle
-                sidebarOpen={sidebarOpen}
-                setSidebarOpen={setSidebarOpen}
-            />
+            <MobileSidebarToggle sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
             <main className="relative flex-1 w-full ml-0 md:ml-64 px-4 sm:px-6 md:px-10 lg:px-12 py-6 md:py-8 lg:py-10 transition-all z-10 overflow-x-hidden">
                 <div className="mb-6 space-y-3 md:mb-8">
@@ -165,8 +165,8 @@ function BuyPageContent() {
                                         key={tariff.id}
                                         onClick={() => setSelectedTariff(tariff)}
                                         className={`relative flex h-full flex-col overflow-hidden rounded-3xl border transition-all duration-300 cursor-pointer ${isSelected
-                                            ? "border-emerald-400/60 bg-linear-to-br from-emerald-900/40 via-slate-900/70 to-slate-950/80 shadow-2xl shadow-emerald-500/30"
-                                            : "border-white/10 bg-slate-900/70 hover:border-emerald-400/30 hover:shadow-xl hover:shadow-black/30"
+                                                ? "border-emerald-400/60 bg-linear-to-br from-emerald-900/40 via-slate-900/70 to-slate-950/80 shadow-2xl shadow-emerald-500/30"
+                                                : "border-white/10 bg-slate-900/70 hover:border-emerald-400/30 hover:shadow-xl hover:shadow-black/30"
                                             }`}
                                     >
                                         {isSelected && (
@@ -201,54 +201,35 @@ function BuyPageContent() {
                                                     <span className="text-xs font-medium text-gray-500">за весь период</span>
                                                 </div>
                                             </div>
+
+                                            {isSelected && (
+                                                <button
+                                                    onClick={handlePayment}
+                                                    disabled={isProcessing}
+                                                    className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold bg-linear-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    {isProcessing ? (
+                                                        <>
+                                                            <span className="animate-spin">⏳</span>
+                                                            Создание платежа...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span>💳</span>
+                                                            Оплатить тариф
+                                                        </>
+                                                    )}
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 )
                             })}
                         </div>
                     )}
-
-                    {selectedTariff && (
-                        <div className="mt-8 flex flex-col items-center gap-4">
-                            <div className="w-full max-w-md rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-6 py-4">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm font-medium text-emerald-200">Выбранный тариф:</span>
-                                    <span className="text-lg font-bold text-white">{selectedTariff.name}</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm font-medium text-emerald-200">Сумма к оплате:</span>
-                                    <span className="text-2xl font-bold text-white">
-                                        {selectedTariff.price_amount / 100} ₽
-                                    </span>
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={handlePayment}
-                                disabled={isProcessing}
-                                className="w-full max-w-md inline-flex items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-semibold bg-linear-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/40 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {isProcessing ? (
-                                    <>
-                                        <span className="animate-spin">⏳</span>
-                                        Создание платежа...
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>💳</span>
-                                        Оплатить
-                                    </>
-                                )}
-                            </button>
-
-                            <p className="text-xs text-gray-400 text-center">
-                                После нажатия вы будете перенаправлены на страницу оплаты
-                            </p>
-                        </div>
-                    )}
                 </div>
             </main>
-        </DashboardLayout >
+        </DashboardLayout>
     )
 }
 

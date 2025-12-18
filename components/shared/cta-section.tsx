@@ -19,16 +19,12 @@ export default function CTASection() {
 
                 {/* Main heading */}
                 <h2 className="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.12]">
-                    <span className="text-white">Готовы к </span>
-                    <span className="gradient-text">свободе</span>
-                    <span className="text-white">?</span>
+                    <span className="gradient-text">Попробуй абсолютно бесплатно</span>
                 </h2>
 
                 {/* Subheading */}
                 <p className="text-xl sm:text-2xl font-semibold text-gray-200 max-w-3xl mx-auto leading-[1.55]">
-                    Начните пользоваться <span className="gradient-text font-bold">прямо сейчас</span>
-                    <br />
-                    Без кредитных карт. Без обязательств.
+                    Без привязки карты и регистрации
                 </p>
 
                 {/* CTA Button */}
@@ -38,7 +34,7 @@ export default function CTASection() {
                         className="group inline-flex items-center gap-3 rounded-xl bg-linear-to-r from-green-500 via-emerald-500 to-teal-500 px-8 py-4 text-lg font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-green-500/45 glow-effect"
                     >
                         <span className="text-2xl transition-transform duration-300 group-hover:rotate-12">🚀</span>
-                        <span>Начать бесплатно</span>
+                        <span>Попробовать бесплатно</span>
                         <svg className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>

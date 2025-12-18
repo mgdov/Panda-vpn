@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
 import { useAuth } from "@/hooks/use-auth"
 import { useDashboardData } from "@/hooks/use-dashboard-data"
@@ -20,6 +21,9 @@ export default function DashboardPage() {
     const { isAuthenticated, userEmail, isLoading: authLoading, logout } = useAuth()
     const { plans, vpnKeys, loadData, plansError, keysError } = useDashboardData()
     const { copiedText, copyToClipboard } = useClipboard(2000, loadData)
+    const router = useRouter()
+    const searchParams = useSearchParams()
+    const pathname = usePathname()
 
     const [activeTab, setActiveTab] = useState<TabType>("plans")
     const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -44,6 +48,32 @@ export default function DashboardPage() {
     }, [isAuthenticated, loadData])
 
     useEffect(() => {
+        const tabParam = searchParams?.get("tab")
+        if (tabParam === "plans" || tabParam === "keys" || tabParam === "support") {
+            setActiveTab(tabParam)
+        }
+    }, [searchParams])
+
+    useEffect(() => {
+        if (!searchParams) return
+        const currentTabParam = searchParams.get("tab")
+        if ((activeTab === "plans" && currentTabParam === null) || currentTabParam === activeTab) {
+            return
+        }
+
+        const params = new URLSearchParams(searchParams.toString())
+        if (activeTab === "plans") {
+            params.delete("tab")
+        } else {
+            params.set("tab", activeTab)
+        }
+
+        const query = params.toString()
+        const target = query ? `${pathname}?${query}` : pathname
+        router.replace(target, { scroll: false })
+    }, [activeTab, router, pathname, searchParams])
+
+    useEffect(() => {
         // Редирект на логин если не авторизован (после загрузки)
         if (!authLoading && !isAuthenticated) {
             window.location.href = '/auth/login'
@@ -59,19 +89,19 @@ export default function DashboardPage() {
                 try {
                     // Небольшая задержка для того чтобы платеж успел обработаться на сервере
                     await new Promise(resolve => setTimeout(resolve, 1000))
-                    
+
                     // Синхронизируем статус последнего платежа (до 3 попыток)
                     let syncResult = null
                     for (let attempt = 0; attempt < 3; attempt++) {
                         try {
                             syncResult = await apiClient.syncLatestPayment()
                             console.log(`Payment sync attempt ${attempt + 1} result:`, syncResult)
-                            
+
                             // Если платеж обработан или уже обработан - выходим
                             if (syncResult.status === "success" || syncResult.status === "already_processed") {
                                 break
                             }
-                            
+
                             // Если платеж еще pending, ждем и пробуем еще раз
                             if (attempt < 2 && syncResult.status === "pending") {
                                 await new Promise(resolve => setTimeout(resolve, 2000))
@@ -85,13 +115,13 @@ export default function DashboardPage() {
                             }
                         }
                     }
-                    
+
                     // Обновляем ключи после синхронизации
                     await loadData()
-                    
+
                     // Если платеж обработан, показываем успех
                     if (syncResult && (syncResult.status === "success" || syncResult.status === "already_processed")) {
-            setPaymentSuccess(true)
+                        setPaymentSuccess(true)
                         // Скрываем сообщение через 5 секунд
                         setTimeout(() => setPaymentSuccess(false), 5000)
                     }
@@ -101,7 +131,7 @@ export default function DashboardPage() {
                     await loadData()
                 }
             }
-            
+
             syncAndLoad()
             // Убираем параметр из URL
             window.history.replaceState({}, "", "/dashboard")

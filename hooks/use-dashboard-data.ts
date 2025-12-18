@@ -112,7 +112,7 @@ export function useDashboardData() {
             if (keysResult.status === 'fulfilled' && keysResult.value) {
                 const formattedKeys: DashboardVPNKey[] = keysResult.value.map((key: ApiVPNKey) => ({
                     id: key.id,
-                    key: key.config_text || 'Generating...',
+                    key: key.subscription_url || key.config_text || 'Generating...',
                     location: '🌍 Auto-select',
                     status: key.active ? 'active' : 'expired',
                     expiresAt: key.expires_at || null,
@@ -124,9 +124,45 @@ export function useDashboardData() {
                     max_devices: key.max_devices || 1,
                     limit_message: key.limit_message || null,
                 }))
+
+                // Тестовый ключ для дев-среды (добавляем к реальным)
+                if (process.env.NODE_ENV === 'development') {
+                    formattedKeys.push({
+                        id: 'test-subscription-key',
+                        key: 'https://example.com/vless-subscription/test-key',
+                        location: '🌍 Auto-select',
+                        status: 'active',
+                        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                        marzban_client_id: 'test-marzban-client-id',
+                        protocol: 'vless',
+                        device_limit_reached: false,
+                        active_devices_count: 0,
+                        max_devices: 1,
+                        limit_message: null,
+                    })
+                }
                 setVpnKeys(formattedKeys)
             } else {
-                setVpnKeys([])
+                const fallbackKeys: DashboardVPNKey[] = []
+
+                // Если API ключей упало — всё равно показываем тестовый ключ в dev
+                if (process.env.NODE_ENV === 'development') {
+                    fallbackKeys.push({
+                        id: 'test-subscription-key',
+                        key: 'https://example.com/vless-subscription/test-key',
+                        location: '🌍 Auto-select',
+                        status: 'active',
+                        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                        marzban_client_id: 'test-marzban-client-id',
+                        protocol: 'vless',
+                        device_limit_reached: false,
+                        active_devices_count: 0,
+                        max_devices: 1,
+                        limit_message: null,
+                    })
+                }
+
+                setVpnKeys(fallbackKeys)
                 if (keysResult.status === 'rejected') {
                     const error = keysResult.reason
                     // Если это ошибка авторизации, очищаем токены и редиректим

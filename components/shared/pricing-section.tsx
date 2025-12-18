@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { apiClient } from "@/lib/api/client"
 import type { Tariff } from "@/lib/api/types"
 
@@ -39,10 +39,25 @@ const getDiscount = (duration: number): string | undefined => {
     return undefined
 }
 
+const SLIDER_INTERVAL = 6000
+
+const getSlidesPerView = () => {
+    if (typeof window === "undefined") {
+        return 1
+    }
+
+    if (window.innerWidth < 640) return 1
+    if (window.innerWidth < 1024) return 2
+    return 3
+}
+
 export default function PricingSection() {
     const [plans, setPlans] = useState<Plan[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [activeSlide, setActiveSlide] = useState(0)
+    const [isSliding, setIsSliding] = useState(true)
+    const [slidesPerView, setSlidesPerView] = useState(1)
 
     const loadTariffs = useCallback(async () => {
         setIsLoading(true)
@@ -76,6 +91,138 @@ export default function PricingSection() {
         loadTariffs()
     }, [loadTariffs])
 
+    useEffect(() => {
+        setSlidesPerView(getSlidesPerView())
+
+        const handleResize = () => {
+            setSlidesPerView(getSlidesPerView())
+        }
+
+        window.addEventListener("resize", handleResize)
+        return () => window.removeEventListener("resize", handleResize)
+    }, [])
+
+    const shouldUseSlider = plans.length > slidesPerView
+    const sliderPlans = useMemo(() => {
+        return shouldUseSlider ? [...plans, ...plans.slice(0, slidesPerView)] : plans
+    }, [plans, slidesPerView, shouldUseSlider])
+    const normalizedSlide = plans.length > 0 ? activeSlide % plans.length : 0
+
+    useEffect(() => {
+        setActiveSlide(0)
+        setIsSliding(true)
+    }, [slidesPerView, plans.length])
+
+    useEffect(() => {
+        if (!shouldUseSlider) {
+            setActiveSlide(0)
+            setIsSliding(true)
+            return
+        }
+
+        const id = setInterval(() => {
+            setIsSliding(true)
+            setActiveSlide((prev) => prev + 1)
+        }, SLIDER_INTERVAL)
+
+        return () => clearInterval(id)
+    }, [shouldUseSlider, plans.length])
+
+    useEffect(() => {
+        if (!shouldUseSlider || isSliding) {
+            return
+        }
+
+        const id = requestAnimationFrame(() => setIsSliding(true))
+        return () => cancelAnimationFrame(id)
+    }, [isSliding, shouldUseSlider])
+
+    const handleSliderTransitionEnd = () => {
+        if (!shouldUseSlider) {
+            return
+        }
+
+        if (activeSlide >= plans.length) {
+            setIsSliding(false)
+            setActiveSlide(0)
+        }
+    }
+
+    const renderPlanCard = (plan: Plan) => {
+        const perks = [
+            "Моментальное подключение",
+            "Работает на всех устройствах",
+            "Отмена в любой момент",
+        ]
+
+        return (
+            <div
+                className={`group relative flex h-full flex-col justify-between rounded-[28px] border bg-linear-to-br p-5 pt-8 sm:p-6 sm:pt-10 transition-all duration-500 shadow-[0_25px_60px_rgba(0,0,0,0.35)] ${plan.highlighted
+                    ? "from-emerald-500/15 via-slate-900/70 to-slate-900/40 border-emerald-400/60"
+                    : "from-slate-900/70 via-slate-900/40 to-slate-900/20 border-white/5 hover:border-emerald-300/40"}
+                `}
+            >
+                {plan.highlighted && (
+                    <div className="absolute top-2 right-4 rounded-full bg-linear-to-r from-emerald-500 to-green-500 px-5 py-1 text-xs font-semibold text-white shadow-lg">
+                        ⭐ Популярный
+                    </div>
+                )}
+
+                <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 text-left">
+                        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-2xl sm:text-3xl">
+                            {plan.icon}
+                        </span>
+                        <div>
+                            <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-200/70">Тариф</p>
+                            <h3 className="text-base font-bold text-white sm:text-lg">{plan.name}</h3>
+                            <p className="text-xs text-gray-400 sm:text-sm">{plan.period}</p>
+                        </div>
+                    </div>
+                    {plan.discount && (
+                        <span className="rounded-full border border-red-500/40 bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-200">
+                            {plan.discount}
+                        </span>
+                    )}
+                </div>
+
+                <div className="mt-5 rounded-2xl border border-white/5 bg-slate-950/40 p-4">
+                    <div className="flex items-end gap-2">
+                        <span className="text-3xl font-black text-white sm:text-4xl">{plan.price}</span>
+                        <div className="text-xs text-gray-300 sm:text-sm">
+                            ₽
+                            <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-200">
+                                за {plan.period.toLowerCase()}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <p className="mt-4 text-sm text-gray-300">
+                    {plan.description}
+                </p>
+
+                <ul className="mt-4 space-y-2 text-sm text-gray-200">
+                    {perks.map((perk) => (
+                        <li key={`${plan.id}-${perk}`} className="flex items-center gap-2">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                            <span>{perk}</span>
+                        </li>
+                    ))}
+                </ul>
+
+                <button
+                    className={`mt-6 w-full rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-300 ${plan.highlighted
+                        ? "bg-linear-to-r from-emerald-500 to-green-500 text-white shadow-lg shadow-emerald-500/40 hover:-translate-y-0.5"
+                        : "bg-white/5 text-white hover:bg-white/10"
+                        }`}
+                >
+                    {plan.highlighted ? "Выбрать план 🚀" : "Купить VPN"}
+                </button>
+            </div>
+        )
+    }
+
     return (
         <section className="relative py-16 sm:py-20 px-4" id="pricing">
             {/* Background decoration */}
@@ -92,10 +239,10 @@ export default function PricingSection() {
                         <span className="text-xs font-medium gradient-text">Прозрачные цены</span>
                     </div>
                     <h2 className="text-2xl md:text-3xl font-bold">
-                        <span className="gradient-text">Выберите свой план</span>
+                        <span className="gradient-text">Выбери свой идеальный тариф👇🏻</span>
                     </h2>
                     <p className="text-sm text-gray-400 max-w-2xl mx-auto">
-                        Никаких скрытых платежей. Отменить можно в любой момент.
+                        Никаких скрытых платежей. чем больше срок, тем больше скидка 😎
                     </p>
                 </div>
 
@@ -124,97 +271,74 @@ export default function PricingSection() {
                         <p className="text-sm text-yellow-50/80">Попробуйте обновить страницу позже.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                        {plans.map((plan, index) => (
-                            <div
-                                key={plan.id}
-                                className={`group relative glass-effect rounded-2xl p-5 transition-all duration-500 hover:scale-105 cursor-pointer flex flex-col ${plan.highlighted
-                                    ? "ring-2 ring-green-500 shadow-2xl shadow-green-500/30"
-                                    : "hover:shadow-xl hover:shadow-green-500/20"
-                                    }`}
-                                style={{ animationDelay: `${index * 100}ms` }}
-                            >
-                                {/* Popular badge */}
-                                {plan.highlighted && (
-                                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                                        <div className="bg-linear-to-r from-green-500 to-emerald-500 px-4 py-1 rounded-full text-white text-xs font-semibold shadow-lg">
-                                            ⭐ Популярный
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Discount badge */}
-                                {plan.discount && (
-                                    <div className="absolute top-3 right-3">
-                                        <div className="bg-red-500/20 border border-red-500/50 px-2 py-0.5 rounded-full text-red-400 text-xs font-semibold">
-                                            {plan.discount}
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div className="space-y-4 flex flex-col flex-1">
-                                    {/* Icon */}
-                                    <div className="text-4xl group-hover:scale-110 transition-transform duration-300">
-                                        {plan.icon}
-                                    </div>
-
-                                    {/* Plan name */}
-                                    <h3 className="text-lg font-semibold text-white group-hover:gradient-text transition-all duration-300">
-                                        {plan.name}
-                                    </h3>
-
-                                    {/* Price */}
-                                    <div className="space-y-0.5">
-                                        <div className="flex items-baseline gap-1.5">
-                                            <span className="text-3xl font-bold gradient-text">{plan.price}</span>
-                                            <span className="text-gray-400 text-base">₽</span>
-                                        </div>
-                                        <p className="text-gray-400 text-xs">{plan.period}</p>
-                                    </div>
-
-                                    {/* Description */}
-                                    <p className="text-gray-400 text-xs leading-relaxed flex-1">
-                                        {plan.description}
-                                    </p>
-
-                                    {/* CTA Button */}
-                                    <button
-                                        className={`w-full py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ${plan.highlighted
-                                            ? "bg-linear-to-r from-green-500 to-emerald-500 text-white hover:shadow-lg hover:shadow-green-500/50 hover:scale-105"
-                                            : "glass-effect text-white hover:bg-white/10"
-                                            }`}
+                    <div>
+                        {shouldUseSlider ? (
+                            <>
+                                <div className="relative w-full overflow-hidden">
+                                    <div
+                                        className={`flex ${isSliding ? "transition-transform duration-800 ease-in-out" : "transition-none"}`}
+                                        style={{ transform: `translateX(-${activeSlide * (100 / slidesPerView)}%)` }}
+                                        onTransitionEnd={handleSliderTransitionEnd}
                                     >
-                                        {plan.highlighted ? "Выбрать план 🚀" : "Купить →"}
-                                    </button>
+                                        {sliderPlans.map((plan, index) => (
+                                            <div
+                                                key={`${plan.id}-${index}`}
+                                                className="px-1 sm:px-2"
+                                                style={{ flex: `0 0 ${100 / slidesPerView}%` }}
+                                            >
+                                                {renderPlanCard(plan)}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
 
-                                {/* Hover gradient overlay */}
-                                <div className="absolute inset-0 bg-linear-to-br from-green-500/5 to-emerald-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                                <div className="mt-6 flex justify-center gap-2">
+                                    {plans.map((plan, index) => (
+                                        <button
+                                            key={plan.id}
+                                            type="button"
+                                            className={`h-2.5 rounded-full transition-all duration-300 ${normalizedSlide === index ? "w-8 bg-emerald-400" : "w-2.5 bg-white/20 hover:bg-white/40"}`}
+                                            aria-label={`Показать тариф: ${plan.name}`}
+                                            onClick={() => {
+                                                setIsSliding(true)
+                                                setActiveSlide(index)
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            </>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                                {plans.map((plan) => (
+                                    <div key={plan.id}>{renderPlanCard(plan)}</div>
+                                ))}
                             </div>
-                        ))}
+                        )}
                     </div>
                 )}
 
                 {/* Features list */}
-                <div className="mt-12 glass-effect rounded-xl p-6 max-w-4xl mx-auto">
-                    <h3 className="text-lg font-semibold gradient-text text-center mb-6">
-                        Все планы включают:
+                <div className="mt-12 glass-effect rounded-2xl p-6 sm:p-8 max-w-4xl mx-auto">
+                    <h3 className="text-xl font-semibold gradient-text text-center mb-8">
+                        Во все тарифы включены:
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         {[
-                            "⚡ Безлимитная скорость",
-                            "🌍 Доступ ко всем серверам",
-                            "🔒 AES-256 шифрование",
-                            "📱 Все устройства",
-                            "🚫 Без логов",
-                            "💬 24/7 поддержка",
-                        ].map((feature, index) => (
+                            { icon: "⚡", text: "Быстрая и стабильная скорость" },
+                            { icon: "🌍", text: "Доступ ко всем локациям (выбирайте страну/сервер одним нажатием)" },
+                            { icon: "🔒", text: "Защита ваших данных (безопасно даже в публичном Wi-Fi)" },
+                            { icon: "📱", text: "Работает на всех устройствах (iPhone/Android/Windows/Mac/TV)" },
+                            { icon: "🙈", text: "Мы не следим за вами (не храним историю сайтов и действий)" },
+                            { icon: "💬", text: "Поддержка всегда на связи (поможем с подключением и настройкой)" },
+                        ].map((feature) => (
                             <div
-                                key={index}
-                                className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-colors duration-300"
+                                key={feature.text}
+                                className="flex flex-wrap items-center gap-3 rounded-xl border border-white/5 bg-white/5 px-4 py-3 text-sm text-gray-200 transition-colors duration-300 hover:border-emerald-300/50 hover:text-white"
                             >
-                                <span className="text-base">{feature.split(" ")[0]}</span>
-                                <span>{feature.split(" ").slice(1).join(" ")}</span>
+                                <span className="text-lg">{feature.icon}</span>
+                                <span className="flex-1 min-w-[200px] leading-snug">
+                                    {feature.text}
+                                </span>
                             </div>
                         ))}
                     </div>
