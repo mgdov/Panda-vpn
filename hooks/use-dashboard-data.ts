@@ -138,10 +138,10 @@ export function useDashboardData() {
 >>>>>>> aea01da (обновление по правкам Мухаммада)
                 const formattedKeys: DashboardVPNKey[] = keysResult.value.map((key: ApiVPNKey) => {
                     // Определяем ключ для отображения: приоритет subscription_url > config_text
-                    const displayKey = key.preferred_method === 'subscription' 
+                    const displayKey = key.preferred_method === 'subscription'
                         ? (key.subscription_url || key.config_text || 'Generating...')
                         : (key.config_text || key.subscription_url || 'Generating...')
-                    
+
                     return {
                         id: key.id,
                         key: displayKey,
