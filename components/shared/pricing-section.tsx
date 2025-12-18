@@ -157,9 +157,9 @@ export default function PricingSection() {
 
         return (
             <div
-                className={`group relative flex h-full flex-col justify-between rounded-[28px] border bg-linear-to-br p-5 pt-8 sm:p-6 sm:pt-10 transition-all duration-500 shadow-[0_25px_60px_rgba(0,0,0,0.35)] ${plan.highlighted
-                    ? "from-emerald-500/15 via-slate-900/70 to-slate-900/40 border-emerald-400/60"
-                    : "from-slate-900/70 via-slate-900/40 to-slate-900/20 border-white/5 hover:border-emerald-300/40"}
+                className={`group relative flex h-full flex-col justify-between rounded-[28px] border p-5 pt-8 sm:p-6 sm:pt-10 transition-all duration-500 shadow-[0_25px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl ${plan.highlighted
+                    ? "border-emerald-300/70 bg-emerald-500/10"
+                    : "border-white/10 bg-white/5 hover:border-emerald-200/50"}
                 `}
             >
                 {plan.highlighted && (
@@ -225,13 +225,7 @@ export default function PricingSection() {
 
     return (
         <section className="relative py-16 sm:py-20 px-4" id="pricing">
-            {/* Background decoration */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 left-1/3 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-0 right-1/3 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl"></div>
-            </div>
-
-            <div className="relative z-10 max-w-7xl mx-auto">
+            <div className="max-w-7xl mx-auto">
                 {/* Section Header */}
                 <div className="mb-10 text-center space-y-2">
                     <div className="inline-flex items-center gap-2 glass-effect px-3 py-1.5 rounded-full mb-3">
@@ -274,7 +268,7 @@ export default function PricingSection() {
                     <div>
                         {shouldUseSlider ? (
                             <>
-                                <div className="relative w-full overflow-hidden">
+                                <div className="relative bg-transparent w-full overflow-hidden">
                                     <div
                                         className={`flex ${isSliding ? "transition-transform duration-800 ease-in-out" : "transition-none"}`}
                                         style={{ transform: `translateX(-${activeSlide * (100 / slidesPerView)}%)` }}
@@ -327,7 +321,7 @@ export default function PricingSection() {
                             { icon: "⚡", text: "Быстрая и стабильная скорость" },
                             { icon: "🌍", text: "Доступ ко всем локациям (выбирайте страну/сервер одним нажатием)" },
                             { icon: "🔒", text: "Защита ваших данных (безопасно даже в публичном Wi-Fi)" },
-                            { icon: "📱", text: "Работает на всех устройствах (iPhone/Android/Windows/Mac/TV)" },
+                            { icon: "📱", text: "Работает на всех устройствах iPhone, Android, Windows, Mac, TV" },
                             { icon: "🙈", text: "Мы не следим за вами (не храним историю сайтов и действий)" },
                             { icon: "💬", text: "Поддержка всегда на связи (поможем с подключением и настройкой)" },
                         ].map((feature) => (

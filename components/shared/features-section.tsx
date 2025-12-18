@@ -127,9 +127,9 @@ export default function FeaturesSection() {
                     </p>
                 </div>
 
-                <div className="relative w-full overflow-hidden">
+                <div className="relative w-full  overflow-hidden">
                     <div
-                        className={`flex ${isTransitioning ? "transition-transform duration-700 ease-in-out" : "transition-none"}`}
+                        className={`flex mt-1 ${isTransitioning ? "transition-transform duration-700 ease-in-out" : "transition-none"}`}
                         style={{ transform: `translateX(-${activeIndex * (100 / slidesPerView)}%)` }}
                         onTransitionEnd={handleTransitionEnd}
                     >
