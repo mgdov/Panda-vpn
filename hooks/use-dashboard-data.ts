@@ -22,6 +22,9 @@ export type DashboardVPNKey = {
     expiresAt: string | null
     marzban_client_id?: string
     protocol?: string
+    subscription_url?: string | null
+    config_text?: string | null
+    preferred_method?: 'subscription' | 'config'
     // Новые поля для ограничения устройств
     device_limit_reached?: boolean
     active_devices_count?: number
@@ -110,35 +113,11 @@ export function useDashboardData() {
 
             // Обработка ключей
             if (keysResult.status === 'fulfilled' && keysResult.value) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-                const formattedKeys: DashboardVPNKey[] = keysResult.value.map((key: ApiVPNKey) => ({
-                    id: key.id,
-                    key: key.subscription_url || key.config_text || 'Generating...',
-                    location: '🌍 Auto-select',
-                    status: key.active ? 'active' : 'expired',
-                    expiresAt: key.expires_at || null,
-                    marzban_client_id: key.marzban_client_id,
-                    protocol: key.protocol || 'vless',
-                    // Новые поля для ограничения устройств
-                    device_limit_reached: key.device_limit_reached || false,
-                    active_devices_count: key.active_devices_count || 0,
-                    max_devices: key.max_devices || 1,
-                    limit_message: key.limit_message || null,
-                }))
-
-                // Тестовый ключ для дев-среды (добавляем к реальным)
-                if (process.env.NODE_ENV === 'development') {
-                    formattedKeys.push({
-                        id: 'test-subscription-key',
-                        key: 'https://example.com/vless-subscription/test-key',
-                        location: '🌍 Auto-select',
-=======
-=======
->>>>>>> aea01da (обновление по правкам Мухаммада)
                 const formattedKeys: DashboardVPNKey[] = keysResult.value.map((key: ApiVPNKey) => {
-                    // Определяем ключ для отображения: приоритет subscription_url > config_text
-                    const displayKey = key.preferred_method === 'subscription'
+                    const prefersSubscription = key.preferred_method === 'subscription'
+                        || (!key.preferred_method && !!key.subscription_url)
+
+                    const displayKey = prefersSubscription
                         ? (key.subscription_url || key.config_text || 'Generating...')
                         : (key.config_text || key.subscription_url || 'Generating...')
 
@@ -147,80 +126,22 @@ export function useDashboardData() {
                         key: displayKey,
                         subscription_url: key.subscription_url || null,
                         config_text: key.config_text || null,
-                        preferred_method: key.preferred_method || (key.subscription_url ? 'subscription' : 'config'),
+                        preferred_method: prefersSubscription ? 'subscription' : 'config',
                         location: '🌍 Auto-select',
                         status: key.active ? 'active' : 'expired',
                         expiresAt: key.expires_at || null,
                         marzban_client_id: key.marzban_client_id,
                         protocol: key.protocol || 'vless',
-                        // Новые поля для ограничения устройств
                         device_limit_reached: key.device_limit_reached || false,
                         active_devices_count: key.active_devices_count || 0,
                         max_devices: key.max_devices || 1,
                         limit_message: key.limit_message || null,
                     }
                 })
-=======
-                const formattedKeys: DashboardVPNKey[] = keysResult.value.map((key: ApiVPNKey) => ({
-                    id: key.id,
-                    key: key.subscription_url || key.config_text || 'Generating...',
-                    location: '🌍 Auto-select',
-                    status: key.active ? 'active' : 'expired',
-                    expiresAt: key.expires_at || null,
-                    marzban_client_id: key.marzban_client_id,
-                    protocol: key.protocol || 'vless',
-                    // Новые поля для ограничения устройств
-                    device_limit_reached: key.device_limit_reached || false,
-                    active_devices_count: key.active_devices_count || 0,
-                    max_devices: key.max_devices || 1,
-                    limit_message: key.limit_message || null,
-                }))
 
-                // Тестовый ключ для дев-среды (добавляем к реальным)
-                if (process.env.NODE_ENV === 'development') {
-                    formattedKeys.push({
-                        id: 'test-subscription-key',
-                        key: 'https://example.com/vless-subscription/test-key',
-                        location: '🌍 Auto-select',
->>>>>>> e76d21b (Изменение правки Мухаммада)
-                        status: 'active',
-                        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                        marzban_client_id: 'test-marzban-client-id',
-                        protocol: 'vless',
-                        device_limit_reached: false,
-                        active_devices_count: 0,
-                        max_devices: 1,
-                        limit_message: null,
-                    })
-                }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
->>>>>>> e76d21b (Изменение правки Мухаммада)
-=======
->>>>>>> 0ddcdb9 (обновление по правкам Мухаммада)
->>>>>>> aea01da (обновление по правкам Мухаммада)
                 setVpnKeys(formattedKeys)
             } else {
                 const fallbackKeys: DashboardVPNKey[] = []
-
-                // Если API ключей упало — всё равно показываем тестовый ключ в dev
-                if (process.env.NODE_ENV === 'development') {
-                    fallbackKeys.push({
-                        id: 'test-subscription-key',
-                        key: 'https://example.com/vless-subscription/test-key',
-                        location: '🌍 Auto-select',
-                        status: 'active',
-                        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                        marzban_client_id: 'test-marzban-client-id',
-                        protocol: 'vless',
-                        device_limit_reached: false,
-                        active_devices_count: 0,
-                        max_devices: 1,
-                        limit_message: null,
-                    })
-                }
 
                 setVpnKeys(fallbackKeys)
                 if (keysResult.status === 'rejected') {

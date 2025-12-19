@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import VPNKeyCard, { type VPNKey } from "./vpn-key-card"
 import { apiClient } from "@/lib/api/client"
 
@@ -13,9 +14,6 @@ interface DashboardKeysTabProps {
 }
 
 export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefresh, errorMessage, onGoToPlans }: DashboardKeysTabProps) {
-
-
-
     const handleRevokeKey = async (keyId: string) => {
         if (!confirm("Вы уверены, что хотите удалить этот ключ? Это действие нельзя отменить.")) {
             return
@@ -39,10 +37,22 @@ export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefr
                     <h2 className="text-xl md:text-2xl font-bold text-white mb-1">Мои VPN ключи</h2>
                     <p className="text-gray-400 text-xs md:text-sm">Управляйте вашими подключениями VLESS</p>
                 </div>
-
             </div>
 
-
+            <div className="mb-6 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-xs text-emerald-100">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="font-semibold flex-1">
+                        ✅ Подключите Telegram — пришлем предупреждения об окончании доступа и ключи прямо в бот.
+                    </p>
+                    <Link
+                        href="https://t.me/panda_vpnp_bot"
+                        target="_blank"
+                        className="inline-flex items-center justify-center rounded-lg bg-linear-to-r from-sky-500 to-indigo-600 px-3 py-2 text-[11px] font-semibold text-white shadow-lg shadow-sky-500/30 transition-all duration-300 hover:-translate-y-0.5"
+                    >
+                        Подключить Telegram
+                    </Link>
+                </div>
+            </div>
 
             {vpnKeys.length === 0 ? (
                 <div className="text-center text-[14px] py-12 text-gray-500">
@@ -92,8 +102,7 @@ export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefr
                 <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
                     <p className="text-xs text-yellow-400 font-semibold mb-1">⚠️ Важно:</p>
                     <p className="text-xs text-yellow-300/80">
-                        Каждый ключ можно использовать только на <strong>1 устройстве</strong>.
-                        Для подключения нескольких устройств купите дополнительные тарифы.
+                        Каждый ключ можно использовать только на <strong>1 устройстве</strong>. Для подключения нескольких устройств купите дополнительные тарифы.
                     </p>
                 </div>
             </div>

@@ -23,8 +23,8 @@ export default function CTASection() {
                 </h2>
 
                 {/* Subheading */}
-                <p className="text-xl sm:text-2xl font-semibold text-gray-200 max-w-3xl mx-auto leading-[1.55]">
-                    Без привязки карты и регистрации
+                <p className="text-xl sm:text-xl font-semibold text-gray-200 max-w-2xl mx-auto leading-[1.4]">
+                    Без привязки карты и регистрации - просто кайф от безопасного и свободного интернета.
                 </p>
 
                 {/* CTA Button */}

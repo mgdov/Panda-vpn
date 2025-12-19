@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, Suspense } from "react"
+import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
 import { useAuth } from "@/hooks/use-auth"
@@ -148,7 +149,22 @@ function BuyPageContent() {
                     </div>
                 )}
 
-                <div className="bg-white/5 backdrop-blur-xl border border-green-700/20 rounded-xl md:rounded-2xl shadow-xl p-4 sm:p-5 md:p-6 lg:p-8">
+                <div className="bg-white/5 backdrop-blur-xl border border-green-700/20 rounded-xl md:rounded-2xl shadow-xl p-4 sm:p-5 md:p-6 lg:p-8 space-y-5">
+                    <div className="flex flex-col gap-3 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 sm:px-5 sm:py-4 text-sm text-emerald-100">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <p className="font-semibold flex-1">
+                                📣 Подключите Telegram за 2 клика, чтобы получать уведомления об окончании подписки и не пропускать новые акции.
+                            </p>
+                            <Link
+                                href="https://t.me/panda_vpnp_bot"
+                                target="_blank"
+                                className="inline-flex items-center justify-center rounded-xl bg-linear-to-r from-sky-500 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-500/30 hover:-translate-y-0.5 transition-all duration-300"
+                            >
+                                Подключить Telegram
+                            </Link>
+                        </div>
+                    </div>
+
                     {tariffs.length === 0 ? (
                         <div className="text-center py-12">
                             <p className="text-gray-400 mb-4">Тарифы не найдены</p>
@@ -165,8 +181,8 @@ function BuyPageContent() {
                                         key={tariff.id}
                                         onClick={() => setSelectedTariff(tariff)}
                                         className={`relative flex h-full flex-col overflow-hidden rounded-3xl border transition-all duration-300 cursor-pointer ${isSelected
-                                                ? "border-emerald-400/60 bg-linear-to-br from-emerald-900/40 via-slate-900/70 to-slate-950/80 shadow-2xl shadow-emerald-500/30"
-                                                : "border-white/10 bg-slate-900/70 hover:border-emerald-400/30 hover:shadow-xl hover:shadow-black/30"
+                                            ? "border-emerald-400/60 bg-linear-to-br from-emerald-900/40 via-slate-900/70 to-slate-950/80 shadow-2xl shadow-emerald-500/30"
+                                            : "border-white/10 bg-slate-900/70 hover:border-emerald-400/30 hover:shadow-xl hover:shadow-black/30"
                                             }`}
                                     >
                                         {isSelected && (

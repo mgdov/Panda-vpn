@@ -41,42 +41,6 @@ export default function DashboardSupportTab() {
                 </p>
             </div>
 
-            <div className="mt-10 w-full grid gap-5 max-w-4xl md:grid-cols-2">
-                {comingSoonSections.map((section) => (
-                    <div
-                        key={section.title}
-                        className="relative overflow-hidden rounded-3xl border border-emerald-500/25 bg-[#071811]/90 px-6 py-7 shadow-2xl shadow-emerald-900/30 transition-all duration-500 group hover:-translate-y-1 hover:border-emerald-300/60"
-                    >
-                        <div className="pointer-events-none absolute -right-16 -top-10 h-36 w-36 rounded-full bg-emerald-500/30 blur-3xl transition-opacity duration-500 group-hover:opacity-70" />
-                        <div className="pointer-events-none absolute -left-20 bottom-0 h-48 w-48 rounded-full bg-lime-500/10 blur-[120px]" />
-
-                        <div className="relative flex items-start justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                                <span className="text-4xl drop-shadow-lg">{section.icon}</span>
-                                <div>
-                                    <p className="text-sm uppercase tracking-[0.35em] text-emerald-200/80">Скоро</p>
-                                    <p className="text-2xl font-semibold text-white leading-tight">{section.title}</p>
-                                </div>
-                            </div>
-                            <span className="inline-flex items-center gap-2 rounded-full border border-amber-200/60 bg-amber-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-amber-100">
-                                <span className="h-2 w-2 rounded-full bg-amber-300 animate-pulse" />
-                                В разработке
-                            </span>
-                        </div>
-
-                        <p className="relative mt-4 text-sm text-emerald-100/80 leading-relaxed">
-                            {section.description}
-                        </p>
-
-                        <div className="relative mt-6 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-sm text-emerald-50/90 flex items-center gap-3">
-                            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/20 text-xl shadow-inner shadow-emerald-500/40">
-                                ✨
-                            </span>
-                            <p className="leading-relaxed">{section.highlight}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
         </div>
     )
 }

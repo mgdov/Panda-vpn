@@ -48,7 +48,7 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                     </div>
 
                     <h1 className="text-[28px] font-extrabold leading-[1.1] text-white sm:text-[36px] md:text-[44px] lg:text-[54px] xl:text-[62px] tracking-tight">
-                        Свобода интернета без блокировок и компромиссов
+                        Panda VPN - надежный Доступ в любое время
                     </h1>
                 </div>
 

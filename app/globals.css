@@ -9,6 +9,10 @@
     background: linear-gradient(135deg, #0a0f14 0%, #0e1821 50%, #0a1419 100%);
     background-attachment: fixed;
   }
+
+  .font-montserrat {
+    font-family: 'Montserrat', sans-serif;
+  }
 }
 
 /* Современные градиенты */
