@@ -81,6 +81,7 @@ export interface VPNKey {
     active: boolean
     subscription_url: string | null
     config_text: string | null
+    preferred_method?: 'subscription' | 'config'  // Какой способ использовать (subscription_url или config_text)
     quota_bytes?: number | null // Опционально, может быть в ClientResponse
     used_bytes?: number // Опционально, может быть в ClientResponse
     updated_at?: string // Опционально, может быть в ClientResponse

@@ -9,6 +9,9 @@ export interface VPNKey {
     status: 'active' | 'expired'
     expiresAt: string | null
     protocol?: string
+    subscription_url?: string | null  // Subscription URL (приоритетный способ)
+    config_text?: string | null  // Config text (fallback)
+    preferred_method?: 'subscription' | 'config'  // Какой способ использовать
     // Новые поля для ограничения устройств
     device_limit_reached?: boolean
     active_devices_count?: number
@@ -48,7 +51,9 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
         return protocol.toUpperCase()
     }
 
-    const isVLESS = vpnKey.key?.startsWith('vless://') || vpnKey.protocol === 'vless'
+    // Определяем тип ключа: subscription URL или vless конфиг
+    const isSubscription = vpnKey.key?.startsWith('http://') || vpnKey.key?.startsWith('https://')
+    const isVLESS = vpnKey.key?.startsWith('vless://') || (!isSubscription && vpnKey.protocol === 'vless')
     const keyText = vpnKey.key || 'Генерация ключа...'
 
     return (
@@ -110,11 +115,15 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                         </button>
                     )}
                 </div>
-                {isVLESS && (
+                {isSubscription ? (
+                    <p className="text-xs text-blue-400/70 mt-2">
+                        🔗 Subscription URL — используйте для автоматической подписки
+                    </p>
+                ) : isVLESS ? (
                     <p className="text-xs text-green-400/70 mt-2">
                         🔒 VLESS протокол — безопасное подключение
                     </p>
-                )}
+                ) : null}
                 {/* Информация об устройствах */}
                 {vpnKey.active_devices_count !== undefined && vpnKey.max_devices !== undefined && (
                     <p className="text-xs text-gray-500 mt-2">
