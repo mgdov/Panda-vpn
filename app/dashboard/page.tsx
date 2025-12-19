@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
 import { useAuth } from "@/hooks/use-auth"
@@ -17,7 +17,7 @@ import LoadingScreen from "@/components/shared/loading-screen"
 
 type TabType = "plans" | "keys" | "support"
 
-export default function DashboardPage() {
+function DashboardPageContent() {
     const { isAuthenticated, userEmail, isLoading: authLoading, logout } = useAuth()
     const { plans, vpnKeys, loadData, plansError, keysError } = useDashboardData()
     const { copiedText, copyToClipboard } = useClipboard(2000, loadData)
@@ -217,5 +217,13 @@ export default function DashboardPage() {
                 </div>
             </main>
         </DashboardLayout>
+    )
+}
+
+export default function DashboardPage() {
+    return (
+        <Suspense fallback={<LoadingScreen />}>
+            <DashboardPageContent />
+        </Suspense>
     )
 }
