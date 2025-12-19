@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useMemo } from "react"
+import { useRouter } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
 import type { Tariff } from "@/lib/api/types"
 
@@ -51,13 +52,18 @@ const getSlidesPerView = () => {
     return 3
 }
 
-export default function PricingSection() {
+interface PricingSectionProps {
+    isAuthenticated: boolean
+}
+
+export default function PricingSection({ isAuthenticated }: PricingSectionProps) {
     const [plans, setPlans] = useState<Plan[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [activeSlide, setActiveSlide] = useState(0)
     const [isSliding, setIsSliding] = useState(true)
     const [slidesPerView, setSlidesPerView] = useState(1)
+    const router = useRouter()
 
     const loadTariffs = useCallback(async () => {
         setIsLoading(true)
@@ -148,6 +154,14 @@ export default function PricingSection() {
         }
     }
 
+    const handlePlanCTA = () => {
+        if (isAuthenticated) {
+            router.push("/dashboard/buy")
+        } else {
+            router.push("/auth/signup")
+        }
+    }
+
     const renderPlanCard = (plan: Plan) => {
         const perks = [
             "Моментальное подключение",
@@ -212,10 +226,12 @@ export default function PricingSection() {
                 </ul>
 
                 <button
+                    type="button"
                     className={`mt-6 w-full rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-300 ${plan.highlighted
                         ? "bg-linear-to-r from-emerald-500 to-green-500 text-white shadow-lg shadow-emerald-500/40 hover:-translate-y-0.5"
                         : "bg-white/5 text-white hover:bg-white/10"
                         }`}
+                    onClick={handlePlanCTA}
                 >
                     {plan.highlighted ? "Выбрать план 🚀" : "Купить VPN"}
                 </button>

@@ -23,7 +23,7 @@ export default function Home() {
       <DecorativeBlobs />
       <HeroSection isAuthenticated={isAuthenticated} />
       <FeaturesSection />
-      <PricingSection />
+      <PricingSection isAuthenticated={isAuthenticated} />
       <CTASection />
     </>
   )
