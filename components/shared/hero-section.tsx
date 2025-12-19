@@ -93,9 +93,9 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
 
                 <div className="grid w-full max-w-3xl grid-cols-1 gap-3 text-sm font-medium text-gray-200 sm:grid-cols-3">
                     {[
-                        "⚡ Подключение за 30 секунд",
-                        "🔒 AES-256 и отсутствие логов",
-                        "🌍 40+ стран и стабильная скорость",
+                        "⚡ Высокая скорость интернета",
+                        "🔒 Простой в подключении и использовании",
+                        "🌍 Доступ к контенту из любой точки мира",
                     ].map((item) => (
                         <div key={item} className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3">
                             <span className="font-semibold text-white">{item.split(" ")[0]}</span>
