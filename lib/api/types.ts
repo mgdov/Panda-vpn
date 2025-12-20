@@ -237,6 +237,11 @@ export interface CreateRenewalPaymentRequest {
     return_url?: string
 }
 
+export interface CreateNewKeyPaymentRequest {
+    tariff_id: string
+    return_url?: string
+}
+
 export interface RenewRequest {
     tariff_code: string
     client_id: string

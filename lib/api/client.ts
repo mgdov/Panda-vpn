@@ -23,6 +23,7 @@ import type {
     KeySearchRequest,
     KeySearchResponse,
     CreateRenewalPaymentRequest,
+    CreateNewKeyPaymentRequest,
 } from "./types"
 import { getErrorMessage } from "./errors"
 
@@ -464,6 +465,13 @@ class APIClient {
 
     async createRenewalPayment(data: CreateRenewalPaymentRequest): Promise<PaymentResponse> {
         return this.request<PaymentResponse>(API_CONFIG.ENDPOINTS.PAYMENTS_CREATE_RENEWAL, {
+            method: "POST",
+            body: JSON.stringify(data),
+        }, false) // не требуется авторизация
+    }
+
+    async createNewKeyPayment(data: CreateNewKeyPaymentRequest): Promise<PaymentResponse> {
+        return this.request<PaymentResponse>(API_CONFIG.ENDPOINTS.PAYMENTS_CREATE_NEW_KEY, {
             method: "POST",
             body: JSON.stringify(data),
         }, false) // не требуется авторизация
