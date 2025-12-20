@@ -485,6 +485,7 @@ class APIClient {
         protocol: string
         expires_at: string | null
         active: boolean
+        is_renewal?: boolean
     }> {
         return this.request(`${API_CONFIG.ENDPOINTS.PAYMENTS_KEY_BY_PAYMENT}/${paymentId}`, {
             method: "GET",

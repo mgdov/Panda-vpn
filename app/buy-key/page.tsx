@@ -7,7 +7,7 @@ import type { KeySearchResponse, Tariff } from "@/lib/api/types"
 import { ChevronRight, Search, CheckCircle, XCircle, Loader2, Key, CreditCard, Copy, Check } from "lucide-react"
 import Link from "next/link"
 
-type Mode = "select" | "buy" | "renew" | "success"
+type Mode = "select" | "buy" | "renew" | "success" | "renewal_success"
 
 function BuyKeyPageContent() {
     const [mode, setMode] = useState<Mode>("select")
@@ -46,12 +46,11 @@ function BuyKeyPageContent() {
                 }, 500)
             }
         } else if (success === "true") {
-            setMode("success")
             // Пробуем получить payment_id из URL или localStorage
             const idToUse = paymentIdParam || localStorage.getItem("last_payment_id")
             if (idToUse) {
                 setPaymentId(idToUse)
-                // Загружаем ключ сразу
+                // Загружаем ключ сразу - режим будет определен после загрузки
                 loadKeyByPayment(idToUse)
             } else {
                 // Если нет payment_id, показываем сообщение
@@ -166,6 +165,12 @@ function BuyKeyPageContent() {
                     const key = await apiClient.getKeyByPayment(paymentIdToLoad)
                     setKeyData(key)
                     setIsLoadingKey(false)
+                    // Определяем режим в зависимости от того, было ли это продление
+                    if (key.is_renewal) {
+                        setMode("renewal_success")
+                    } else {
+                        setMode("success")
+                    }
                     // Очищаем localStorage после успешной загрузки
                     localStorage.removeItem("last_payment_id")
                     return
@@ -386,7 +391,150 @@ function BuyKeyPageContent() {
         )
     }
 
-    // Страница успешной оплаты
+    // Страница успешного продления ключа
+    if (mode === "renewal_success") {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4">
+                <div className="max-w-2xl mx-auto">
+                    <div className="mb-8">
+                        <Link
+                            href="/"
+                            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors mb-4"
+                        >
+                            ← На главную
+                        </Link>
+                        <h1 className="text-3xl font-bold text-white mb-2">Ключ успешно продлен!</h1>
+                        <p className="text-gray-400">Ваш ключ продлен и готов к использованию</p>
+                    </div>
+
+                    {isLoadingKey ? (
+                        <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <Loader2 size={48} className="animate-spin text-emerald-400 mb-4" />
+                                <p className="text-gray-400">Обработка платежа и продление ключа...</p>
+                                <p className="text-sm text-gray-500 mt-2">Это может занять несколько секунд</p>
+                            </div>
+                        </div>
+                    ) : keyData ? (
+                        <div className="space-y-6">
+                            <div className="bg-slate-800/60 backdrop-blur-md border border-emerald-500/30 rounded-xl p-6">
+                                <div className="flex items-start gap-3 mb-6">
+                                    <div className="p-2 bg-emerald-500/20 rounded-lg">
+                                        <CheckCircle className="text-emerald-400" size={24} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h2 className="text-xl font-bold text-white mb-1">Ключ успешно продлен!</h2>
+                                        <p className="text-sm text-gray-400">
+                                            Новый срок действия: {formatDate(keyData.expires_at)}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Subscription URL */}
+                                {keyData.subscription_url && (
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                                            Subscription URL
+                                        </label>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={keyData.subscription_url}
+                                                readOnly
+                                                className="flex-1 px-4 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-white text-sm font-mono"
+                                            />
+                                            <button
+                                                onClick={() => copyToClipboard(keyData.subscription_url, "subscription")}
+                                                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                                            >
+                                                {copiedField === "subscription" ? (
+                                                    <>
+                                                        <Check size={16} />
+                                                        Скопировано
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Copy size={16} />
+                                                        Копировать
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                                    <p className="text-sm text-blue-200">
+                                        💡 <strong>Ключ продлен!</strong> Используйте тот же subscription URL в вашем VPN приложении.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={() => {
+                                        // Переходим на страницу продления с предзаполненным ключом
+                                        const keyToUse = keyData.subscription_url || keyData.marzban_client_id || keyData.client_id
+                                        if (keyToUse) {
+                                            router.push(`/buy-key?mode=renew&key=${encodeURIComponent(keyToUse)}`)
+                                        } else {
+                                            router.push("/buy-key?mode=renew")
+                                        }
+                                    }}
+                                    className="flex-1 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <Key size={20} />
+                                    Продлить еще раз
+                                </button>
+                                <Link
+                                    href="/"
+                                    className="flex-1 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                                >
+                                    На главную
+                                </Link>
+                            </div>
+                        </div>
+                    ) : error ? (
+                        <div className="bg-slate-800/60 backdrop-blur-md border border-red-500/30 rounded-xl p-6">
+                            <div className="flex items-start gap-3">
+                                <XCircle className="text-red-400 flex-shrink-0 mt-0.5" size={24} />
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-semibold text-white mb-2">Ошибка</h3>
+                                    <p className="text-red-300 mb-4">{error}</p>
+                                    {paymentId && (
+                                        <button
+                                            onClick={() => loadKeyByPayment(paymentId)}
+                                            className="mt-4 w-full px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors"
+                                        >
+                                            Попробовать снова
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                            <div className="flex flex-col items-center justify-center py-8">
+                                <Loader2 size={32} className="animate-spin text-emerald-400 mb-4" />
+                                <p className="text-gray-400 text-center mb-2">Ожидание обработки платежа...</p>
+                                <p className="text-sm text-gray-500 text-center">Ключ будет продлен автоматически после обработки платежа</p>
+                            </div>
+                            {paymentId && (
+                                <button
+                                    onClick={() => loadKeyByPayment(paymentId)}
+                                    className="mt-4 w-full px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors"
+                                >
+                                    Проверить ключ сейчас
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+        )
+    }
+
+    // Страница успешной оплаты (новый ключ)
     if (mode === "success") {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4">
