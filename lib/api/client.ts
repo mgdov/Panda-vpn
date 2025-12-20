@@ -476,6 +476,20 @@ class APIClient {
             body: JSON.stringify(data),
         }, false) // не требуется авторизация
     }
+
+    async getKeyByPayment(paymentId: string): Promise<{
+        client_id: string
+        marzban_client_id: string
+        subscription_url: string | null
+        config_text: string | null
+        protocol: string
+        expires_at: string | null
+        active: boolean
+    }> {
+        return this.request(`${API_CONFIG.ENDPOINTS.PAYMENTS_KEY_BY_PAYMENT}/${paymentId}`, {
+            method: "GET",
+        }, false) // не требуется авторизация
+    }
 }
 
 export const apiClient = new APIClient(API_CONFIG.BASE_URL)

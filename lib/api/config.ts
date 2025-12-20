@@ -41,6 +41,7 @@ export const API_CONFIG = {
     PAYMENTS_KEY_SEARCH: "/api/key/search",
     PAYMENTS_CREATE_RENEWAL: "/api/create-renewal",
     PAYMENTS_CREATE_NEW_KEY: "/api/create-new-key",
+    PAYMENTS_KEY_BY_PAYMENT: "/api/key-by-payment",
 
     // Billing
     BILLING_STATE: "/api/billing/state",
