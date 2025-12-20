@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
 import type { KeySearchResponse, Tariff } from "@/lib/api/types"
@@ -9,7 +9,7 @@ import Link from "next/link"
 
 type Mode = "select" | "buy" | "renew" | "success"
 
-export default function BuyKeyPage() {
+function BuyKeyPageContent() {
     const [mode, setMode] = useState<Mode>("select")
     const [keyIdentifier, setKeyIdentifier] = useState("")
     const [searchResult, setSearchResult] = useState<KeySearchResponse | null>(null)
@@ -738,5 +738,17 @@ export default function BuyKeyPage() {
                 )}
             </div>
         </div>
+    )
+}
+
+export default function BuyKeyPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+                <Loader2 size={48} className="animate-spin text-emerald-400" />
+            </div>
+        }>
+            <BuyKeyPageContent />
+        </Suspense>
     )
 }
