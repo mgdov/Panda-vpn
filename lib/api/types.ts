@@ -217,6 +217,26 @@ export interface CreatePaymentRequest {
     amount?: number  // Опционально, если нужно передать сумму напрямую
 }
 
+export interface KeySearchRequest {
+    key_identifier: string
+}
+
+export interface KeySearchResponse {
+    found: boolean
+    client_id?: string
+    marzban_client_id?: string
+    expires_at?: string | null
+    active?: boolean
+    protocol?: string
+    message?: string
+}
+
+export interface CreateRenewalPaymentRequest {
+    client_id: string
+    tariff_id: string
+    return_url?: string
+}
+
 export interface RenewRequest {
     tariff_code: string
     client_id: string

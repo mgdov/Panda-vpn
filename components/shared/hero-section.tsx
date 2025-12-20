@@ -80,6 +80,12 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                             </Link>
                         )}
                     </div>
+                    <Link
+                        href="/renew-key"
+                        className="inline-flex items-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-5 py-2 text-sm font-semibold text-emerald-200 transition-all duration-300 hover:border-emerald-400/60 hover:bg-emerald-500/20 hover:text-white"
+                    >
+                        🔑 Продлить ключ
+                    </Link>
 
                     <button
                         type="button"

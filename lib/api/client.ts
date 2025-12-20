@@ -20,6 +20,9 @@ import type {
     DeviceRegisterRequest,
     DeviceRegisterResponse,
     DeviceListResponse,
+    KeySearchRequest,
+    KeySearchResponse,
+    CreateRenewalPaymentRequest,
 } from "./types"
 import { getErrorMessage } from "./errors"
 
@@ -449,6 +452,21 @@ class APIClient {
         return this.request(`${API_CONFIG.ENDPOINTS.DEVICES_REMOVE}/${deviceId}`, {
             method: "DELETE",
         })
+    }
+
+    // Key renewal endpoints (public, no auth required)
+    async searchKey(data: KeySearchRequest): Promise<KeySearchResponse> {
+        return this.request<KeySearchResponse>(API_CONFIG.ENDPOINTS.PAYMENTS_KEY_SEARCH, {
+            method: "POST",
+            body: JSON.stringify(data),
+        }, false) // не требуется авторизация
+    }
+
+    async createRenewalPayment(data: CreateRenewalPaymentRequest): Promise<PaymentResponse> {
+        return this.request<PaymentResponse>(API_CONFIG.ENDPOINTS.PAYMENTS_CREATE_RENEWAL, {
+            method: "POST",
+            body: JSON.stringify(data),
+        }, false) // не требуется авторизация
     }
 }
 

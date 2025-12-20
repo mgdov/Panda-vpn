@@ -38,6 +38,8 @@ export const API_CONFIG = {
     PAYMENTS_STATUS: "/api/payments/status",
     PAYMENTS_WEBHOOK: "/api/payments/webhook",
     PAYMENTS_SYNC_LATEST: "/api/payments/sync-latest",
+    PAYMENTS_KEY_SEARCH: "/api/key/search",
+    PAYMENTS_CREATE_RENEWAL: "/api/create-renewal",
 
     // Billing
     BILLING_STATE: "/api/billing/state",
