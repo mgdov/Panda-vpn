@@ -458,42 +458,9 @@ function BuyKeyPageContent() {
                                     </div>
                                 )}
 
-                                {/* Config Text */}
-                                {keyData.config_text && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                                            VLESS конфигурация
-                                        </label>
-                                        <div className="flex gap-2">
-                                            <textarea
-                                                value={keyData.config_text}
-                                                readOnly
-                                                rows={4}
-                                                className="flex-1 px-4 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-white text-sm font-mono resize-none"
-                                            />
-                                            <button
-                                                onClick={() => copyToClipboard(keyData.config_text, "config")}
-                                                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors flex items-center gap-2 self-start"
-                                            >
-                                                {copiedField === "config" ? (
-                                                    <>
-                                                        <Check size={16} />
-                                                        Скопировано
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Copy size={16} />
-                                                        Копировать
-                                                    </>
-                                                )}
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-
                                 <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
                                     <p className="text-sm text-blue-200">
-                                        💡 <strong>Как использовать:</strong> Скопируйте subscription URL или VLESS конфигурацию и вставьте в ваше VPN приложение (WireGuard, V2Ray и т.д.)
+                                        💡 <strong>Как использовать:</strong> Скопируйте subscription URL и вставьте в ваше VPN приложение (WireGuard, V2Ray и т.д.)
                                     </p>
                                 </div>
                             </div>
