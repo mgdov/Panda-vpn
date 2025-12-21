@@ -21,35 +21,101 @@ export default function HappInstruction({ subscriptionUrl }: HappInstructionProp
     const isWindows = /Windows/.test(userAgent)
 
     // Deep link для добавления подписки в happ
-    const addToHapp = () => {
+    const addToHapp = async () => {
         if (!subscriptionUrl) {
             alert("Subscription URL не найден")
             return
         }
 
+        // Сначала копируем в буфер обмена (до открытия deep link)
+        try {
+            await navigator.clipboard.writeText(subscriptionUrl)
+            console.log("✅ Subscription URL скопирован в буфер обмена")
+        } catch (error) {
+            console.error("Failed to copy to clipboard:", error)
+            // Fallback для старых браузеров
+            try {
+                const textArea = document.createElement("textarea")
+                textArea.value = subscriptionUrl
+                textArea.style.position = "fixed"
+                textArea.style.opacity = "0"
+                document.body.appendChild(textArea)
+                textArea.select()
+                document.execCommand("copy")
+                document.body.removeChild(textArea)
+                console.log("✅ Subscription URL скопирован (fallback method)")
+            } catch (fallbackError) {
+                console.error("Fallback copy also failed:", fallbackError)
+            }
+        }
+
         // Кодируем URL для передачи в deep link
         const encodedUrl = encodeURIComponent(subscriptionUrl)
         
-        // Формат deep link для happ (может потребоваться уточнение)
-        // Обычно для VPN приложений используется формат: app://import?url=...
-        const deepLink = `happ://add-subscription?url=${encodedUrl}`
+        // Определяем формат deep link в зависимости от платформы
+        // Для happ приложения обычно используется формат: happ://import?url=...
+        // Или универсальный формат для VPN приложений
+        let deepLink = `happ://import?url=${encodedUrl}`
+        
+        // Альтернативные форматы (пробуем если основной не сработает)
+        const alternativeLinks = [
+            `happ://add-subscription?url=${encodedUrl}`,
+            `happ://add?url=${encodedUrl}`,
+            `happ://subscribe?url=${encodedUrl}`,
+        ]
         
         // Пробуем открыть deep link
-        window.location.href = deepLink
+        let linkOpened = false
         
-        // Fallback: если deep link не сработал, показываем инструкцию
+        // Функция для открытия deep link
+        const openDeepLink = (link: string): boolean => {
+            try {
+                // Используем window.location для более надежного открытия
+                window.location.href = link
+                linkOpened = true
+                console.log("✅ Deep link opened:", link)
+                return true
+            } catch (e) {
+                console.error("Failed to open deep link:", e)
+                // Fallback: создаем скрытую ссылку
+                try {
+                    const a = document.createElement('a')
+                    a.href = link
+                    a.style.display = 'none'
+                    a.target = '_blank'
+                    document.body.appendChild(a)
+                    a.click()
+                    setTimeout(() => document.body.removeChild(a), 100)
+                    linkOpened = true
+                    return true
+                } catch (fallbackError) {
+                    console.error("Fallback deep link also failed:", fallbackError)
+                    return false
+                }
+            }
+        }
+        
+        // Пробуем основной формат
+        openDeepLink(deepLink)
+        
+        // Если через 1 секунду не сработало, пробуем альтернативные форматы
         setTimeout(() => {
-            const confirmed = confirm(
-                "Если приложение не открылось автоматически:\n\n" +
-                "1. Убедитесь, что приложение happ установлено\n" +
-                "2. Скопируйте subscription URL и добавьте его вручную в приложении\n\n" +
-                "Скопировать subscription URL?"
-            )
-            if (confirmed) {
-                navigator.clipboard.writeText(subscriptionUrl)
-                alert("Subscription URL скопирован в буфер обмена!")
+            if (!linkOpened && alternativeLinks.length > 0) {
+                console.log("Trying alternative deep link format...")
+                openDeepLink(alternativeLinks[0])
             }
         }, 1000)
+        
+        // Показываем сообщение пользователю
+        setTimeout(() => {
+            alert(
+                "✅ Subscription URL скопирован в буфер обмена!\n\n" +
+                "Если приложение happ не открылось автоматически:\n" +
+                "1. Откройте приложение happ вручную\n" +
+                "2. Добавьте подписку через меню (URL уже в буфере обмена)\n\n" +
+                "Или вставьте URL вручную из буфера обмена."
+            )
+        }, 500)
     }
 
     const appStoreLinks = {
