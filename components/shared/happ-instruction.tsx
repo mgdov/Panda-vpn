@@ -73,10 +73,8 @@ export default function HappInstruction({ subscriptionUrl }: HappInstructionProp
             if (successful) {
                 console.log("✅ Subscription URL скопирован в буфер обмена")
                 copySuccess = true
-            } else {
-                console.warn("⚠️ document.execCommand('copy') вернул false")
-                // Не критично - deep link все равно откроется, и пользователь может скопировать вручную
             }
+            // Если копирование не удалось - не критично, deep link все равно передаст URL в приложение
         } catch (error) {
             console.error("Failed to copy using execCommand:", error)
             // Не критично - deep link все равно откроется
