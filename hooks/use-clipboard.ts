@@ -30,13 +30,68 @@ export function useClipboard(resetDelay = 2000, onDeviceRegistered?: RefreshCall
 
     const copyToClipboard = useCallback(async (text: string, id: string) => {
         // Копируем текст в буфер обмена
+        // Используем синхронный метод document.execCommand для надежности
+        // (работает в контексте пользовательского действия и не требует фокуса документа)
+        let copySuccess = false
         try {
-            await navigator.clipboard.writeText(text)
-        setCopiedText(id)
-
-        setTimeout(() => {
-            setCopiedText(null)
-        }, resetDelay)
+            // Пробуем синхронный метод сначала (более надежный)
+            const textArea = document.createElement("textarea")
+            textArea.value = text
+            textArea.style.position = "fixed"
+            textArea.style.left = "-999999px"
+            textArea.style.top = "-999999px"
+            textArea.style.opacity = "0"
+            textArea.setAttribute('readonly', '')
+            document.body.appendChild(textArea)
+            
+            // Выбираем текст синхронно
+            if (navigator.userAgent.match(/ipad|iphone/i)) {
+                // Для iOS нужен другой подход
+                const range = document.createRange()
+                range.selectNodeContents(textArea)
+                const selection = window.getSelection()
+                if (selection) {
+                    selection.removeAllRanges()
+                    selection.addRange(range)
+                }
+                textArea.setSelectionRange(0, 999999)
+            } else {
+                textArea.select()
+            }
+            
+            const successful = document.execCommand("copy")
+            document.body.removeChild(textArea)
+            
+            if (successful) {
+                copySuccess = true
+            } else {
+                // Fallback на современный API, если execCommand не сработал
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(text)
+                    copySuccess = true
+                }
+            }
+        } catch (err) {
+            // Fallback на современный API, если execCommand выбросил ошибку
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(text)
+                    copySuccess = true
+                } else {
+                    throw err
+                }
+            } catch (fallbackErr) {
+                console.error("Failed to copy:", fallbackErr)
+                throw fallbackErr
+            }
+        }
+        
+        if (copySuccess) {
+            setCopiedText(id)
+            setTimeout(() => {
+                setCopiedText(null)
+            }, resetDelay)
+        }
             
             // Регистрируем устройство при использовании конфига
             // Только если это валидный VLESS конфиг
