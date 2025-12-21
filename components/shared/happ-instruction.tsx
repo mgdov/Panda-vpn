@@ -28,34 +28,46 @@ export default function HappInstruction({ subscriptionUrl }: HappInstructionProp
         }
 
         // Копируем в буфер обмена СИНХРОННО используя document.execCommand
-        // Это работает в контексте пользовательского действия и не требует фокуса документа
+        // ВАЖНО: копирование должно произойти ДО открытия deep link
         let copySuccess = false
         try {
+            // Создаем textarea для копирования
             const textArea = document.createElement("textarea")
             textArea.value = subscriptionUrl
+            // Устанавливаем стили для скрытия элемента, но элемент должен быть видимым для копирования
             textArea.style.position = "fixed"
-            textArea.style.left = "-999999px"
-            textArea.style.top = "-999999px"
+            textArea.style.left = "0"
+            textArea.style.top = "0"
+            textArea.style.width = "1px"
+            textArea.style.height = "1px"
+            textArea.style.padding = "0"
+            textArea.style.border = "none"
+            textArea.style.outline = "none"
+            textArea.style.boxShadow = "none"
+            textArea.style.background = "transparent"
             textArea.style.opacity = "0"
-            textArea.setAttribute('readonly', '')
+            // НЕ устанавливаем readonly, так как это может мешать копированию в некоторых браузерах
+            
             document.body.appendChild(textArea)
             
-            // Выбираем текст синхронно
+            // Фокусируемся на textarea
+            textArea.focus()
+            
+            // Выбираем весь текст
             if (navigator.userAgent.match(/ipad|iphone/i)) {
-                // Для iOS нужен другой подход
-                const range = document.createRange()
-                range.selectNodeContents(textArea)
-                const selection = window.getSelection()
-                if (selection) {
-                    selection.removeAllRanges()
-                    selection.addRange(range)
-                }
-                textArea.setSelectionRange(0, 999999)
+                // Для iOS используем setSelectionRange
+                textArea.setSelectionRange(0, subscriptionUrl.length)
             } else {
+                // Для других платформ используем select()
                 textArea.select()
+                // Дополнительно устанавливаем диапазон выбора для надежности
+                textArea.setSelectionRange(0, subscriptionUrl.length)
             }
             
+            // Пробуем скопировать
             const successful = document.execCommand("copy")
+            
+            // Удаляем textarea сразу после копирования
             document.body.removeChild(textArea)
             
             if (successful) {
@@ -63,9 +75,11 @@ export default function HappInstruction({ subscriptionUrl }: HappInstructionProp
                 copySuccess = true
             } else {
                 console.warn("⚠️ document.execCommand('copy') вернул false")
+                // Не критично - deep link все равно откроется, и пользователь может скопировать вручную
             }
         } catch (error) {
             console.error("Failed to copy using execCommand:", error)
+            // Не критично - deep link все равно откроется
         }
 
         // Кодируем URL для передачи в deep link
@@ -74,9 +88,11 @@ export default function HappInstruction({ subscriptionUrl }: HappInstructionProp
         // Используем формат, который работает (видно в логах: "Launched external handler for 'happ://add-subscription?url=...'")
         const deepLink = `happ://add-subscription?url=${encodedUrl}`
         
-        // Открываем deep link сразу после копирования
+        // Открываем deep link ПОСЛЕ копирования (но сразу, без задержек)
         // Используем window.location.href для надежного открытия
         try {
+            // Небольшая задержка только для завершения операции копирования
+            // Но делаем это синхронно, чтобы не потерять контекст пользовательского действия
             window.location.href = deepLink
             console.log("✅ Deep link opened:", deepLink)
         } catch (e) {
@@ -97,6 +113,7 @@ export default function HappInstruction({ subscriptionUrl }: HappInstructionProp
         // Показываем сообщение пользователю только если копирование не удалось
         // (чтобы не мешать открытию приложения)
         if (!copySuccess) {
+            // Используем setTimeout, чтобы не блокировать открытие deep link
             setTimeout(() => {
                 alert(
                     "Если приложение happ не открылось автоматически:\n\n" +
