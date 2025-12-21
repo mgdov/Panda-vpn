@@ -162,7 +162,14 @@ function BuyKeyPageContent() {
             // Пробуем получить ключ несколько раз (платеж может обрабатываться)
             for (let attempt = 0; attempt < 15; attempt++) {
                 try {
+                    console.log(`[DEBUG] Attempt ${attempt + 1}: Requesting key for payment ${paymentIdToLoad}`)
                     const key = await apiClient.getKeyByPayment(paymentIdToLoad)
+                    console.log(`[DEBUG] Key received:`, {
+                        expires_at: key.expires_at,
+                        subscription_url: key.subscription_url,
+                        is_renewal: key.is_renewal,
+                        client_id: key.client_id
+                    })
                     setKeyData(key)
                     setIsLoadingKey(false)
                     // Определяем режим в зависимости от того, было ли это продление
@@ -237,17 +244,29 @@ function BuyKeyPageContent() {
     }
 
     const formatDate = (dateString: string | null | undefined) => {
-        if (!dateString) return "Без ограничений"
+        console.log(`[DEBUG] formatDate called with:`, dateString, `type:`, typeof dateString)
+        if (!dateString) {
+            console.log(`[DEBUG] dateString is falsy, returning "Без ограничений"`)
+            return "Без ограничений"
+        }
         try {
             const date = new Date(dateString)
-            return date.toLocaleDateString('ru-RU', {
+            console.log(`[DEBUG] Parsed date:`, date)
+            if (isNaN(date.getTime())) {
+                console.log(`[DEBUG] Invalid date, returning original string`)
+                return dateString
+            }
+            const formatted = date.toLocaleDateString('ru-RU', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
             })
-        } catch {
+            console.log(`[DEBUG] Formatted date:`, formatted)
+            return formatted
+        } catch (err) {
+            console.log(`[DEBUG] Error formatting date:`, err)
             return dateString
         }
     }
@@ -597,11 +616,13 @@ function BuyKeyPageContent() {
                                 </div>
 
                                 {/* Subscription URL */}
-                                {keyData.subscription_url && (
-                                    <div className="mb-4">
-                                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                                            Subscription URL (рекомендуется)
-                                        </label>
+                                {(() => {
+                                    console.log(`[DEBUG] Rendering subscription_url:`, keyData.subscription_url)
+                                    return keyData.subscription_url && (
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                Subscription URL (рекомендуется)
+                                            </label>
                                         <div className="flex gap-2">
                                             <input
                                                 type="text"
