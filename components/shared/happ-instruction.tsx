@@ -21,101 +21,92 @@ export default function HappInstruction({ subscriptionUrl }: HappInstructionProp
     const isWindows = /Windows/.test(userAgent)
 
     // Deep link для добавления подписки в happ
-    const addToHapp = async () => {
+    const addToHapp = () => {
         if (!subscriptionUrl) {
             alert("Subscription URL не найден")
             return
         }
 
-        // Сначала копируем в буфер обмена (до открытия deep link)
+        // Копируем в буфер обмена СИНХРОННО используя document.execCommand
+        // Это работает в контексте пользовательского действия и не требует фокуса документа
+        let copySuccess = false
         try {
-            await navigator.clipboard.writeText(subscriptionUrl)
-            console.log("✅ Subscription URL скопирован в буфер обмена")
-        } catch (error) {
-            console.error("Failed to copy to clipboard:", error)
-            // Fallback для старых браузеров
-            try {
-                const textArea = document.createElement("textarea")
-                textArea.value = subscriptionUrl
-                textArea.style.position = "fixed"
-                textArea.style.opacity = "0"
-                document.body.appendChild(textArea)
+            const textArea = document.createElement("textarea")
+            textArea.value = subscriptionUrl
+            textArea.style.position = "fixed"
+            textArea.style.left = "-999999px"
+            textArea.style.top = "-999999px"
+            textArea.style.opacity = "0"
+            textArea.setAttribute('readonly', '')
+            document.body.appendChild(textArea)
+            
+            // Выбираем текст синхронно
+            if (navigator.userAgent.match(/ipad|iphone/i)) {
+                // Для iOS нужен другой подход
+                const range = document.createRange()
+                range.selectNodeContents(textArea)
+                const selection = window.getSelection()
+                if (selection) {
+                    selection.removeAllRanges()
+                    selection.addRange(range)
+                }
+                textArea.setSelectionRange(0, 999999)
+            } else {
                 textArea.select()
-                document.execCommand("copy")
-                document.body.removeChild(textArea)
-                console.log("✅ Subscription URL скопирован (fallback method)")
-            } catch (fallbackError) {
-                console.error("Fallback copy also failed:", fallbackError)
             }
+            
+            const successful = document.execCommand("copy")
+            document.body.removeChild(textArea)
+            
+            if (successful) {
+                console.log("✅ Subscription URL скопирован в буфер обмена")
+                copySuccess = true
+            } else {
+                console.warn("⚠️ document.execCommand('copy') вернул false")
+            }
+        } catch (error) {
+            console.error("Failed to copy using execCommand:", error)
         }
 
         // Кодируем URL для передачи в deep link
         const encodedUrl = encodeURIComponent(subscriptionUrl)
         
-        // Определяем формат deep link в зависимости от платформы
-        // Для happ приложения обычно используется формат: happ://import?url=...
-        // Или универсальный формат для VPN приложений
-        let deepLink = `happ://import?url=${encodedUrl}`
+        // Используем формат, который работает (видно в логах: "Launched external handler for 'happ://add-subscription?url=...'")
+        const deepLink = `happ://add-subscription?url=${encodedUrl}`
         
-        // Альтернативные форматы (пробуем если основной не сработает)
-        const alternativeLinks = [
-            `happ://add-subscription?url=${encodedUrl}`,
-            `happ://add?url=${encodedUrl}`,
-            `happ://subscribe?url=${encodedUrl}`,
-        ]
-        
-        // Пробуем открыть deep link
-        let linkOpened = false
-        
-        // Функция для открытия deep link
-        const openDeepLink = (link: string): boolean => {
+        // Открываем deep link сразу после копирования
+        // Используем window.location.href для надежного открытия
+        try {
+            window.location.href = deepLink
+            console.log("✅ Deep link opened:", deepLink)
+        } catch (e) {
+            console.error("Failed to open deep link:", e)
+            // Fallback: создаем скрытую ссылку
             try {
-                // Используем window.location для более надежного открытия
-                window.location.href = link
-                linkOpened = true
-                console.log("✅ Deep link opened:", link)
-                return true
-            } catch (e) {
-                console.error("Failed to open deep link:", e)
-                // Fallback: создаем скрытую ссылку
-                try {
-                    const a = document.createElement('a')
-                    a.href = link
-                    a.style.display = 'none'
-                    a.target = '_blank'
-                    document.body.appendChild(a)
-                    a.click()
-                    setTimeout(() => document.body.removeChild(a), 100)
-                    linkOpened = true
-                    return true
-                } catch (fallbackError) {
-                    console.error("Fallback deep link also failed:", fallbackError)
-                    return false
-                }
+                const a = document.createElement('a')
+                a.href = deepLink
+                a.style.display = 'none'
+                document.body.appendChild(a)
+                a.click()
+                setTimeout(() => document.body.removeChild(a), 100)
+            } catch (fallbackError) {
+                console.error("Fallback deep link also failed:", fallbackError)
             }
         }
         
-        // Пробуем основной формат
-        openDeepLink(deepLink)
-        
-        // Если через 1 секунду не сработало, пробуем альтернативные форматы
-        setTimeout(() => {
-            if (!linkOpened && alternativeLinks.length > 0) {
-                console.log("Trying alternative deep link format...")
-                openDeepLink(alternativeLinks[0])
-            }
-        }, 1000)
-        
-        // Показываем сообщение пользователю
-        setTimeout(() => {
-            alert(
-                "✅ Subscription URL скопирован в буфер обмена!\n\n" +
-                "Если приложение happ не открылось автоматически:\n" +
-                "1. Откройте приложение happ вручную\n" +
-                "2. Добавьте подписку через меню (URL уже в буфере обмена)\n\n" +
-                "Или вставьте URL вручную из буфера обмена."
-            )
-        }, 500)
+        // Показываем сообщение пользователю только если копирование не удалось
+        // (чтобы не мешать открытию приложения)
+        if (!copySuccess) {
+            setTimeout(() => {
+                alert(
+                    "Если приложение happ не открылось автоматически:\n\n" +
+                    "1. Откройте приложение happ вручную\n" +
+                    "2. Добавьте подписку через меню\n" +
+                    "3. Вставьте subscription URL вручную:\n\n" +
+                    subscriptionUrl
+                )
+            }, 1500)
+        }
     }
 
     const appStoreLinks = {
