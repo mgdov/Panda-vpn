@@ -124,6 +124,33 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                         🔒 VLESS протокол — безопасное подключение
                     </p>
                 ) : null}
+                
+                {/* Кнопка для добавления в happ приложение (только для subscription URL) */}
+                {isSubscription && keyText !== 'Генерация ключа...' && (
+                    <button
+                        onClick={() => {
+                            const encodedUrl = encodeURIComponent(keyText)
+                            const deepLink = `happ://add-subscription?url=${encodedUrl}`
+                            window.location.href = deepLink
+                            
+                            setTimeout(() => {
+                                const confirmed = confirm(
+                                    "Если приложение не открылось автоматически:\n\n" +
+                                    "1. Убедитесь, что приложение happ установлено\n" +
+                                    "2. Скопируйте subscription URL и добавьте его вручную\n\n" +
+                                    "Скопировать subscription URL?"
+                                )
+                                if (confirmed) {
+                                    onCopy(keyText, vpnKey.id)
+                                }
+                            }, 1000)
+                        }}
+                        className="mt-3 w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg transition-all duration-200 hover:scale-105 text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
+                    >
+                        <span>🐼</span>
+                        Добавить Панду в приложение
+                    </button>
+                )}
                 {/* Информация об устройствах */}
                 {vpnKey.active_devices_count !== undefined && vpnKey.max_devices !== undefined && (
                     <p className="text-xs text-gray-500 mt-2">

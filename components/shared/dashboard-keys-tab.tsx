@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import VPNKeyCard, { type VPNKey } from "./vpn-key-card"
+import HappInstruction from "./happ-instruction"
 import { apiClient } from "@/lib/api/client"
 
 interface DashboardKeysTabProps {
@@ -88,6 +89,20 @@ export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefr
                     </div>
                 </>
             )}
+
+            {/* Инструкция по установке happ */}
+            {vpnKeys.length > 0 && (() => {
+                // Находим первый subscription URL среди ключей
+                const subscriptionKey = vpnKeys.find(key => {
+                    const hasSubscriptionUrl = key.subscription_url && (key.subscription_url.startsWith('http://') || key.subscription_url.startsWith('https://'))
+                    const hasKeyAsUrl = key.key && (key.key.startsWith('http://') || key.key.startsWith('https://'))
+                    return hasSubscriptionUrl || hasKeyAsUrl
+                })
+                const subscriptionUrl = subscriptionKey?.subscription_url || (subscriptionKey?.key?.startsWith('http') ? subscriptionKey.key : null)
+                return subscriptionUrl ? (
+                    <HappInstruction subscriptionUrl={subscriptionUrl} />
+                ) : null
+            })()}
 
             <div className="mt-6 p-4 md:p-5 bg-blue-900/20 border border-blue-500/50 rounded-xl hover:border-blue-500/70 transition-all duration-300 hover:shadow-lg hover:shadow-blue-900/30">
                 <p className="text-sm md:text-base text-blue-400 mb-2.5 font-semibold flex items-center gap-2">
