@@ -66,9 +66,9 @@ export function useClipboard(resetDelay = 2000, onDeviceRegistered?: RefreshCall
             
             if (successful) {
                 copySuccess = true
-            } else {
-                console.warn("⚠️ document.execCommand('copy') вернул false")
             }
+            // Если execCommand вернул false - не критично, это может быть из-за политики браузера
+            // Не логируем предупреждение, чтобы не засорять консоль
         } catch (err) {
             // НЕ используем fallback на navigator.clipboard.writeText,
             // так как он может выполняться после потери фокуса документа
