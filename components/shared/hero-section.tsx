@@ -88,9 +88,6 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                             </Link>
                         )}
                     </div>
-
-
-
                 </div>
 
                 <div className="grid w-full max-w-3xl grid-cols-1 gap-3 text-sm font-medium text-gray-200 sm:grid-cols-3">
