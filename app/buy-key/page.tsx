@@ -175,25 +175,48 @@ function BuyKeyPageContent() {
                     localStorage.removeItem("last_payment_id")
                     return
                 } catch (err: any) {
-                    if (err.message?.includes("not processed yet") || err.message?.includes("Payment not processed")) {
+                    // Проверяем, является ли это ошибкой "платеж обрабатывается"
+                    const isProcessingError = err.message?.includes("not processed yet") || 
+                                            err.message?.includes("Payment not processed") ||
+                                            err.message?.includes("being processed") ||
+                                            err.status === 202 || // HTTP 202 Accepted
+                                            err.response?.status === 202
+                    
+                    // Проверяем, является ли это ошибкой 404 (ключ не найден, но платеж может обрабатываться)
+                    const isNotFoundError = err.status === 404 || 
+                                          err.response?.status === 404 ||
+                                          err.message?.includes("not found") ||
+                                          err.message?.includes("Key not found")
+                    
+                    if (isProcessingError) {
                         // Платеж еще обрабатывается, ждем
                         if (attempt < 14) {
                             await new Promise(resolve => setTimeout(resolve, 2000))
                             continue
                         }
+                    } else if (isNotFoundError && payment.status === "processing") {
+                        // Ключ не найден, но платеж обрабатывается - ждем
+                        if (attempt < 14) {
+                            await new Promise(resolve => setTimeout(resolve, 2000))
+                            continue
+                        }
                     }
+                    
                     // Если это последняя попытка или другая ошибка
                     if (attempt === 14) {
-                        setError("Платеж обрабатывается. Пожалуйста, обновите страницу через несколько секунд.")
-                        setIsLoadingKey(false)
-                        // Автоматически обновим через 5 секунд
-                        setTimeout(() => {
-                            if (paymentIdToLoad) {
-                                loadKeyByPayment(paymentIdToLoad)
-                            }
-                        }, 5000)
-                        return
+                        if (isProcessingError || (isNotFoundError && payment.status === "processing")) {
+                            setError("Платеж обрабатывается. Пожалуйста, обновите страницу через несколько секунд.")
+                            setIsLoadingKey(false)
+                            // Автоматически обновим через 5 секунд
+                            setTimeout(() => {
+                                if (paymentIdToLoad) {
+                                    loadKeyByPayment(paymentIdToLoad)
+                                }
+                            }, 5000)
+                            return
+                        }
                     }
+                    // Для других ошибок пробрасываем исключение
                     throw err
                 }
             }
