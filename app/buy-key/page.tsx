@@ -234,12 +234,46 @@ function BuyKeyPageContent() {
     }
 
     const copyToClipboard = async (text: string, field: string) => {
+        // Используем синхронный метод document.execCommand для надежности
+        // (работает в контексте пользовательского действия и не требует фокуса документа)
+        let copySuccess = false
         try {
-            await navigator.clipboard.writeText(text)
-            setCopiedField(field)
-            setTimeout(() => setCopiedField(null), 2000)
+            const textArea = document.createElement("textarea")
+            textArea.value = text
+            textArea.style.position = "fixed"
+            textArea.style.left = "-999999px"
+            textArea.style.top = "-999999px"
+            textArea.style.opacity = "0"
+            textArea.setAttribute('readonly', '')
+            document.body.appendChild(textArea)
+            
+            // Выбираем текст синхронно
+            if (navigator.userAgent.match(/ipad|iphone/i)) {
+                const range = document.createRange()
+                range.selectNodeContents(textArea)
+                const selection = window.getSelection()
+                if (selection) {
+                    selection.removeAllRanges()
+                    selection.addRange(range)
+                }
+                textArea.setSelectionRange(0, 999999)
+            } else {
+                textArea.select()
+            }
+            
+            const successful = document.execCommand("copy")
+            document.body.removeChild(textArea)
+            
+            if (successful) {
+                copySuccess = true
+            }
         } catch (err) {
             console.error("Failed to copy:", err)
+        }
+        
+        if (copySuccess) {
+            setCopiedField(field)
+            setTimeout(() => setCopiedField(null), 2000)
         }
     }
 

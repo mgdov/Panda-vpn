@@ -30,11 +30,13 @@ export function useClipboard(resetDelay = 2000, onDeviceRegistered?: RefreshCall
 
     const copyToClipboard = useCallback(async (text: string, id: string) => {
         // Копируем текст в буфер обмена
-        // Используем синхронный метод document.execCommand для надежности
+        // Используем ТОЛЬКО синхронный метод document.execCommand для надежности
         // (работает в контексте пользовательского действия и не требует фокуса документа)
+        // НЕ используем navigator.clipboard.writeText, так как он асинхронный и может выполняться
+        // после потери фокуса документа (например, при открытии deep link)
         let copySuccess = false
         try {
-            // Пробуем синхронный метод сначала (более надежный)
+            // Используем синхронный метод
             const textArea = document.createElement("textarea")
             textArea.value = text
             textArea.style.position = "fixed"
@@ -65,25 +67,12 @@ export function useClipboard(resetDelay = 2000, onDeviceRegistered?: RefreshCall
             if (successful) {
                 copySuccess = true
             } else {
-                // Fallback на современный API, если execCommand не сработал
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    await navigator.clipboard.writeText(text)
-                    copySuccess = true
-                }
+                console.warn("⚠️ document.execCommand('copy') вернул false")
             }
         } catch (err) {
-            // Fallback на современный API, если execCommand выбросил ошибку
-            try {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    await navigator.clipboard.writeText(text)
-                    copySuccess = true
-                } else {
-                    throw err
-                }
-            } catch (fallbackErr) {
-                console.error("Failed to copy:", fallbackErr)
-                throw fallbackErr
-            }
+            // НЕ используем fallback на navigator.clipboard.writeText,
+            // так как он может выполняться после потери фокуса документа
+            console.error("Failed to copy using execCommand:", err)
         }
         
         if (copySuccess) {
@@ -91,7 +80,6 @@ export function useClipboard(resetDelay = 2000, onDeviceRegistered?: RefreshCall
             setTimeout(() => {
                 setCopiedText(null)
             }, resetDelay)
-        }
             
             // Регистрируем устройство при использовании конфига
             // Только если это валидный VLESS конфиг
@@ -119,8 +107,6 @@ export function useClipboard(resetDelay = 2000, onDeviceRegistered?: RefreshCall
                     }
                 }
             }
-        } catch (err) {
-            console.error("Failed to copy:", err)
         }
     }, [resetDelay, onDeviceRegistered])
 
