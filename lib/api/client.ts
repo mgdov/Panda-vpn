@@ -95,6 +95,17 @@ class APIClient {
                 console.log('[API Response]', response.status, fullUrl)
             }
 
+            // Обработка 202 Accepted - это не ошибка, но и не успех с данными
+            // FastAPI возвращает 202 с текстом, а не JSON
+            if (response.status === 202) {
+                const text = await response.text()
+                console.log(`[DEBUG API] 202 Accepted response from ${fullUrl}:`, text)
+                const apiError: any = new Error(text || "Payment is being processed")
+                apiError.status = response.status
+                apiError.response = { status: response.status, data: { detail: text } }
+                throw apiError
+            }
+
             // Обработка 401 - автоматический refresh токена
             if (response.status === 401 && retryOn401) {
                 const refreshed = await this.refreshAccessToken()
@@ -146,10 +157,14 @@ class APIClient {
             }
 
             if (response.status === 204) {
+                console.log(`[DEBUG API] 204 No Content response from ${fullUrl}`)
                 return {} as T
             }
 
-            return response.json()
+            const jsonData = await response.json()
+            console.log(`[DEBUG API] Response from ${fullUrl}:`, jsonData)
+            console.log(`[DEBUG API] Response type:`, typeof jsonData, `Keys:`, Object.keys(jsonData || {}))
+            return jsonData
         } catch (error) {
             // Обработка сетевых ошибок
             if (error instanceof TypeError && error.message === "Failed to fetch") {
