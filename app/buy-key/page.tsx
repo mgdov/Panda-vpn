@@ -648,7 +648,8 @@ function BuyKeyPageContent() {
                                             </button>
                                         </div>
                                     </div>
-                                )}
+                                    )
+                                })()}
 
                                 <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
                                     <p className="text-sm text-blue-200">
