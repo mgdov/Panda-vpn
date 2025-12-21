@@ -213,6 +213,13 @@ export default function SignupPage() {
           </FormSubmitButton>
         </form>
 
+        <Link
+          href="/buy-key"
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-5 py-3 text-sm font-semibold text-emerald-200 transition-all duration-300 hover:border-emerald-400/60 hover:bg-emerald-500/20 hover:text-white"
+        >
+          💳 Купить без регистрации
+        </Link>
+
         <SocialAuthButtons mode="signup" />
 
         <p className="text-center text-sm text-gray-400 mt-6">

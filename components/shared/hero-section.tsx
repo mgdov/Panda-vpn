@@ -69,6 +69,14 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                                 >
                                     Войти в аккаунт
                                 </Link>
+                                <button
+                                    type="button"
+                                    onClick={openGuide}
+                                    className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-sky-500 to-indigo-500 px-5 py-2 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-sky-500/35"
+                                >
+                                    <PlayCircle size={16} />
+                                    Смотреть инструкцию
+                                </button>
                             </>
                         ) : (
                             <Link
@@ -80,21 +88,9 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                             </Link>
                         )}
                     </div>
-                    <Link
-                        href="/buy-key"
-                        className="inline-flex items-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-5 py-2 text-sm font-semibold text-emerald-200 transition-all duration-300 hover:border-emerald-400/60 hover:bg-emerald-500/20 hover:text-white"
-                    >
-                        💳 Купить без регистрации
-                    </Link>
 
-                    <button
-                        type="button"
-                        onClick={openGuide}
-                        className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-sky-500 to-indigo-500 px-5 py-2 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-sky-500/35"
-                    >
-                        <PlayCircle size={16} />
-                        Смотреть инструкцию
-                    </button>
+
+
                 </div>
 
                 <div className="grid w-full max-w-3xl grid-cols-1 gap-3 text-sm font-medium text-gray-200 sm:grid-cols-3">
