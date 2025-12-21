@@ -506,6 +506,31 @@ class APIClient {
             method: "GET",
         }, false) // не требуется авторизация
     }
+
+    // Node selection API
+    async getTopNodes(n: number = 5, region?: string | null): Promise<import("./types").NodeTop[]> {
+        const params = new URLSearchParams()
+        params.append("n", n.toString())
+        if (region) {
+            params.append("region", region)
+        }
+        return this.request(`/api/nodes/top?${params.toString()}`, {
+            method: "GET",
+        }, false) // публичный endpoint
+    }
+
+    async submitClientMetrics(metrics: import("./types").ClientMetricsRequest): Promise<{ status: string; message: string }> {
+        return this.request("/api/nodes/metrics", {
+            method: "POST",
+            body: JSON.stringify(metrics),
+        }, false) // публичный endpoint
+    }
+
+    async getNodeHealth(nodeId: string): Promise<import("./types").NodeHealth> {
+        return this.request(`/api/nodes/${nodeId}/health`, {
+            method: "GET",
+        }, false) // публичный endpoint
+    }
 }
 
 export const apiClient = new APIClient(API_CONFIG.BASE_URL)

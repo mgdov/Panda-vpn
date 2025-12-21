@@ -29,6 +29,50 @@ export interface Node {
     port?: number
 }
 
+// Node selection types
+export interface NodeTop {
+    node_id: string
+    name: string
+    domain?: string | null
+    ip?: string | null
+    port?: number | null
+    region?: string | null
+    avg_latency_ms?: number | null
+    p50_latency_ms?: number | null
+    p95_latency_ms?: number | null
+    load_factor: number
+    active_connections: number
+    capacity: number
+    health: string
+    score?: number | null
+    last_checked?: string | null
+}
+
+export interface ClientMetricsRequest {
+    node_id: string
+    measured_latency_ms: number
+    success: boolean
+    error_message?: string | null
+    client_id?: string | null
+}
+
+export interface NodeHealth {
+    node_id: string
+    name: string
+    health_status: string
+    avg_latency_ms?: number | null
+    p50_latency_ms?: number | null
+    p95_latency_ms?: number | null
+    load_factor: number
+    active_connections: number
+    capacity: number
+    consecutive_failures: number
+    last_success?: string | null
+    last_failure?: string | null
+    checked_at?: string | null
+    score?: number | null
+}
+
 // MarzbanClient - клиенты из таблицы marzban_clients (используется в /profile/keys)
 export interface VPNClient {
     id: string
