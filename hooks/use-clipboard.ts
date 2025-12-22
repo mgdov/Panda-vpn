@@ -76,10 +76,10 @@ export function useClipboard(resetDelay = 2000, onDeviceRegistered?: RefreshCall
         }
         
         if (copySuccess) {
-            setCopiedText(id)
-            setTimeout(() => {
-                setCopiedText(null)
-            }, resetDelay)
+        setCopiedText(id)
+        setTimeout(() => {
+            setCopiedText(null)
+        }, resetDelay)
             
             // Регистрируем устройство при использовании конфига
             // Только если это валидный VLESS конфиг
