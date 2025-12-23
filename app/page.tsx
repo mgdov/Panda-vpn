@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import DecorativeBlobs from "@/components/shared/decorative-blobs"
 import HeroSection from "@/components/shared/hero-section"
 import FeaturesSection from "@/components/shared/features-section"
+import TestimonialsSection from "@/components/shared/testimonials-section"
 import PricingSection from "@/components/shared/pricing-section"
 import CTASection from "@/components/shared/cta-section"
 
@@ -23,6 +24,7 @@ export default function Home() {
       <DecorativeBlobs />
       <HeroSection isAuthenticated={isAuthenticated} />
       <FeaturesSection />
+      <TestimonialsSection />
       <PricingSection isAuthenticated={isAuthenticated} />
       <CTASection />
     </>
