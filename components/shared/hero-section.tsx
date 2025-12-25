@@ -63,6 +63,14 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                                     Попробовать бесплатно
                                     <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
                                 </Link>
+                                <a
+                                    href="https://t.me/pandavpn_bot?start=from_site"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-blue-500 to-cyan-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/35"
+                                >
+                                    🤖 Регистрация через Telegram
+                                </a>
                                 <Link
                                     href="/auth/login"
                                     className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-5 py-2.5 text-sm font-semibold text-gray-200 transition-all duration-300 hover:border-white/25 hover:text-white"
