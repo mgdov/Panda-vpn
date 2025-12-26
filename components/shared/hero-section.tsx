@@ -58,22 +58,15 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                             <>
                                 <Link
                                     href="/auth/signup"
-                                    className="group inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-green-500 to-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/35"
+                                    className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-linear-to-r from-green-500 to-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/35 sm:w-auto"
                                 >
                                     Попробовать бесплатно
                                     <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
                                 </Link>
-                                <a
-                                    href="https://t.me/pandavpn_bot?start=from_site"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-blue-500 to-cyan-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/35"
-                                >
-                                    🤖 Регистрация через Telegram
-                                </a>
+
                                 <Link
                                     href="/auth/login"
-                                    className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-5 py-2.5 text-sm font-semibold text-gray-200 transition-all duration-300 hover:border-white/25 hover:text-white"
+                                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 px-5 py-2.5 text-sm font-semibold text-gray-200 transition-all duration-300 hover:border-white/25 hover:text-white sm:w-auto"
                                 >
                                     Войти в аккаунт
                                 </Link>
@@ -88,13 +81,13 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                             </>
                         ) : (
                             <>
-                            <Link
-                                href="/dashboard"
-                                className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-green-500 to-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/35"
-                            >
-                                <User size={16} />
-                                Войти в личный кабинет
-                            </Link>
+                                <Link
+                                    href="/dashboard"
+                                    className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-green-500 to-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/35"
+                                >
+                                    <User size={16} />
+                                    Войти в личный кабинет
+                                </Link>
                                 <button
                                     type="button"
                                     onClick={openGuide}
@@ -127,52 +120,52 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
 
             {
                 isGuideOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-8 sm:py-12">
-                    <div className="absolute inset-0" onClick={closeGuide} />
-                    <div className="relative z-10 w-full max-w-2xl rounded-2xl border border-white/10 bg-slate-900/95 p-4 sm:p-6 text-left shadow-2xl backdrop-blur max-h-[90vh] overflow-y-auto">
-                        <button
-                            type="button"
-                            onClick={closeGuide}
-                            className="absolute top-4 right-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 text-white/80 transition hover:bg-white/10"
-                            aria-label="Закрыть инструкцию"
-                        >
-                            ×
-                        </button>
-                        <div className="text-left pr-12 sm:pr-14">
-                            <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-emerald-200/70 sm:text-xs">
-                                Вы подключаете на устройство:
-                            </p>
-                            <h3 className="mt-2 text-lg font-bold text-white sm:text-xl">Выберите платформу</h3>
-                        </div>
-
-                        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                            {devices.map((device) => (
-                                <button
-                                    key={device.id}
-                                    type="button"
-                                    onClick={() => setSelectedDevice(device.id)}
-                                    className={`rounded-xl border px-3 py-2 text-sm font-semibold transition ${selectedDevice === device.id
-                                        ? "border-emerald-400 bg-emerald-400/10 text-white"
-                                        : "border-white/10 bg-white/5 text-gray-200 hover:border-emerald-300/60 hover:text-white"
-                                        }`}
-                                >
-                                    {device.label}
-                                </button>
-                            ))}
-                        </div>
-
-                        {activeDevice && (
-                            <div className="mt-6 space-y-4">
-                                <div className="aspect-video w-full rounded-xl border border-dashed border-emerald-400/50 bg-slate-900/60 flex items-center justify-center text-xs font-semibold text-emerald-200 sm:text-sm">
-                                    Видеоинструкция скоро появится
-                                </div>
-                                <p className="text-sm text-gray-200 leading-relaxed">
-                                    {activeDevice.description}
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-8 sm:py-12">
+                        <div className="absolute inset-0" onClick={closeGuide} />
+                        <div className="relative z-10 w-full max-w-2xl rounded-2xl border border-white/10 bg-slate-900/95 p-4 sm:p-6 text-left shadow-2xl backdrop-blur max-h-[90vh] overflow-y-auto">
+                            <button
+                                type="button"
+                                onClick={closeGuide}
+                                className="absolute top-4 right-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 text-white/80 transition hover:bg-white/10"
+                                aria-label="Закрыть инструкцию"
+                            >
+                                ×
+                            </button>
+                            <div className="text-left pr-12 sm:pr-14">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-emerald-200/70 sm:text-xs">
+                                    Вы подключаете на устройство:
                                 </p>
+                                <h3 className="mt-2 text-lg font-bold text-white sm:text-xl">Выберите платформу</h3>
                             </div>
-                        )}
+
+                            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                {devices.map((device) => (
+                                    <button
+                                        key={device.id}
+                                        type="button"
+                                        onClick={() => setSelectedDevice(device.id)}
+                                        className={`rounded-xl border px-3 py-2 text-sm font-semibold transition ${selectedDevice === device.id
+                                            ? "border-emerald-400 bg-emerald-400/10 text-white"
+                                            : "border-white/10 bg-white/5 text-gray-200 hover:border-emerald-300/60 hover:text-white"
+                                            }`}
+                                    >
+                                        {device.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {activeDevice && (
+                                <div className="mt-6 space-y-4">
+                                    <div className="aspect-video w-full rounded-xl border border-dashed border-emerald-400/50 bg-slate-900/60 flex items-center justify-center text-xs font-semibold text-emerald-200 sm:text-sm">
+                                        Видеоинструкция скоро появится
+                                    </div>
+                                    <p className="text-sm text-gray-200 leading-relaxed">
+                                        {activeDevice.description}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
                 )
             }
         </section >
