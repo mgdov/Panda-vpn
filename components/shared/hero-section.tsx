@@ -86,7 +86,7 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                                     className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-green-500 to-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/35"
                                 >
                                     <User size={16} />
-                                    Войти в личный кабинет
+                                    Перейти в личный кабинет
                                 </Link>
                                 <button
                                     type="button"
