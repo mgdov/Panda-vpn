@@ -23,8 +23,9 @@ export default function Home() {
       <Navbar />
       <DecorativeBlobs />
       <HeroSection isAuthenticated={isAuthenticated} />
-      <FeaturesSection />
       <TestimonialsSection />
+      <FeaturesSection />
+
       <PricingSection isAuthenticated={isAuthenticated} />
       <CTASection />
     </>
