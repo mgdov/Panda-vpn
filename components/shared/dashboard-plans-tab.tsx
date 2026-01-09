@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation"
 import { memo, useCallback } from "react"
 import Link from "next/link"
+import { useAuth } from "@/hooks/use-auth"
+import { generateTelegramLink } from "@/lib/utils/telegram"
 
 export interface Plan {
     id: string
@@ -22,10 +24,21 @@ interface DashboardPlansTabProps {
 
 const DashboardPlansTab = memo(function DashboardPlansTab({ plans, errorMessage }: DashboardPlansTabProps) {
     const router = useRouter()
+    const { userEmail } = useAuth()
 
     const handlePlanSelection = useCallback((planId: string) => {
         router.push(`/dashboard/buy?tariff=${encodeURIComponent(planId)}`)
     }, [router])
+
+    const handleTelegramConnect = useCallback(() => {
+        if (!userEmail) {
+            alert("Email не найден. Пожалуйста, войдите в аккаунт.")
+            return
+        }
+
+        const link = generateTelegramLink(userEmail, 'p_vpnbot')
+        window.open(link, '_blank')
+    }, [userEmail])
 
     return (
         <div>
@@ -37,13 +50,14 @@ const DashboardPlansTab = memo(function DashboardPlansTab({ plans, errorMessage 
                     <p className="font-semibold flex-1">
                         📣 Подключите Telegram в пару кликов, чтобы получать уведомления об окончании подписки и не пропускать акции.
                     </p>
-                    <Link
-                        href="https://t.me/panda_vpnp_bot"
-                        target="_blank"
-                        className="inline-flex items-center justify-center rounded-lg bg-linear-to-r from-sky-500 to-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-sky-500/30 hover:-translate-y-0.5 transition-all duration-300"
+                    <button
+                        type="button"
+                        onClick={handleTelegramConnect}
+                        disabled={!userEmail}
+                        className="inline-flex items-center justify-center rounded-lg bg-linear-to-r from-sky-500 to-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-sky-500/30 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Подключить Telegram
-                    </Link>
+                    </button>
                 </div>
             </div>
 

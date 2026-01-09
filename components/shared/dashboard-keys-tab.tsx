@@ -4,6 +4,8 @@ import Link from "next/link"
 import VPNKeyCard, { type VPNKey } from "./vpn-key-card"
 import HappInstruction from "./happ-instruction"
 import { apiClient } from "@/lib/api/client"
+import { useAuth } from "@/hooks/use-auth"
+import { generateTelegramLink } from "@/lib/utils/telegram"
 
 interface DashboardKeysTabProps {
     vpnKeys: VPNKey[]
@@ -15,6 +17,8 @@ interface DashboardKeysTabProps {
 }
 
 export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefresh, errorMessage, onGoToPlans }: DashboardKeysTabProps) {
+    const { userEmail } = useAuth()
+
     const handleRevokeKey = async (keyId: string) => {
         if (!confirm("Вы уверены, что хотите удалить этот ключ? Это действие нельзя отменить.")) {
             return
@@ -31,6 +35,16 @@ export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefr
         }
     }
 
+    const handleTelegramConnect = () => {
+        if (!userEmail) {
+            alert("Email не найден. Пожалуйста, войдите в аккаунт.")
+            return
+        }
+
+        const link = generateTelegramLink(userEmail, 'p_vpnbot')
+        window.open(link, '_blank')
+    }
+
     return (
         <div>
             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
@@ -45,13 +59,14 @@ export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefr
                     <p className="font-semibold flex-1">
                         ✅ Подключите Telegram — пришлем предупреждения об окончании доступа и ключи прямо в бот.
                     </p>
-                    <Link
-                        href="https://t.me/panda_vpnp_bot"
-                        target="_blank"
-                        className="inline-flex items-center justify-center rounded-lg bg-linear-to-r from-sky-500 to-indigo-600 px-3 py-2 text-[11px] font-semibold text-white shadow-lg shadow-sky-500/30 transition-all duration-300 hover:-translate-y-0.5"
+                    <button
+                        type="button"
+                        onClick={handleTelegramConnect}
+                        disabled={!userEmail}
+                        className="inline-flex items-center justify-center rounded-lg bg-linear-to-r from-sky-500 to-indigo-600 px-3 py-2 text-[11px] font-semibold text-white shadow-lg shadow-sky-500/30 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Подключить Telegram
-                    </Link>
+                    </button>
                 </div>
             </div>
 

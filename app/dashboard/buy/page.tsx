@@ -10,6 +10,7 @@ import DashboardSidebar from "@/components/shared/dashboard-sidebar"
 import MobileSidebarToggle from "@/components/shared/mobile-sidebar-toggle"
 import LoadingScreen from "@/components/shared/loading-screen"
 import type { Tariff } from "@/lib/api/types"
+import { generateTelegramLink } from "@/lib/utils/telegram"
 
 function BuyPageContent() {
     const router = useRouter()
@@ -102,6 +103,16 @@ function BuyPageContent() {
         logout()
     }
 
+    const handleTelegramConnect = useCallback(() => {
+        if (!userEmail) {
+            alert("Email не найден. Пожалуйста, войдите в аккаунт.")
+            return
+        }
+
+        const link = generateTelegramLink(userEmail, 'p_vpnbot')
+        window.open(link, '_blank')
+    }, [userEmail])
+
     if (authLoading) {
         return <LoadingScreen />
     }
@@ -155,13 +166,14 @@ function BuyPageContent() {
                             <p className="font-semibold flex-1">
                                 📣 Подключите Telegram за 2 клика, чтобы получать уведомления об окончании подписки и не пропускать новые акции.
                             </p>
-                            <Link
-                                href="https://t.me/panda_vpnp_bot"
-                                target="_blank"
-                                className="inline-flex items-center justify-center rounded-xl bg-linear-to-r from-sky-500 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-500/30 hover:-translate-y-0.5 transition-all duration-300"
+                            <button
+                                type="button"
+                                onClick={handleTelegramConnect}
+                                disabled={!userEmail}
+                                className="inline-flex items-center justify-center rounded-xl bg-linear-to-r from-sky-500 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-500/30 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Подключить Telegram
-                            </Link>
+                            </button>
                         </div>
                     </div>
 
