@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
 import type { Tariff } from "@/lib/api/types"
 
+
+
 interface Plan {
     id: string
     name: string
@@ -55,6 +57,7 @@ const getSlidesPerView = () => {
 interface PricingSectionProps {
     isAuthenticated: boolean
 }
+
 
 export default function PricingSection({ isAuthenticated }: PricingSectionProps) {
     const [plans, setPlans] = useState<Plan[]>([])
@@ -142,7 +145,7 @@ export default function PricingSection({ isAuthenticated }: PricingSectionProps)
         const id = requestAnimationFrame(() => setIsSliding(true))
         return () => cancelAnimationFrame(id)
     }, [isSliding, shouldUseSlider])
-
+    
     const handleSliderTransitionEnd = () => {
         if (!shouldUseSlider) {
             return
@@ -244,10 +247,11 @@ export default function PricingSection({ isAuthenticated }: PricingSectionProps)
             <div className="max-w-7xl mx-auto">
                 {/* Section Header */}
                 <div className="mb-10 text-center space-y-2">
-                    <div className="inline-flex items-center gap-2 glass-effect px-3 py-1.5 rounded-full mb-3">
-                        <span className="text-sm">💎</span>
-                        <span className="text-xs font-medium gradient-text">Прозрачные цены</span>
-                    </div>
+
+                    <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.28em] text-blue-100/80">
+                        <span className="text-base">💎</span>
+                        Прозрачные цены
+                    </span>
                     <h2 className="text-2xl md:text-3xl font-bold">
                         <span className="gradient-text">Выбери свой идеальный тариф👇🏻</span>
                     </h2>

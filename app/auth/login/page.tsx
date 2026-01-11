@@ -83,7 +83,7 @@ export default function LoginPage() {
           </FormSubmitButton>
         </form>
 
-        <SocialAuthButtons mode="login" />
+      
 
         <p className="text-center text-sm font-medium text-gray-300">
           Нет аккаунта?{" "}

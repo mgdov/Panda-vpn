@@ -41,22 +41,6 @@ export default function CTASection() {
                     </Link>
                 </div>
 
-                {/* Trust signals */}
-                <div className="pt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-12">
-                    <div className="glass-effect px-6 py-4 rounded-xl">
-                        <div className="text-3xl font-black gradient-text">10,000+</div>
-                        <div className="mt-1 text-sm font-medium text-gray-200">Активных пользователей</div>
-                    </div>
-                    <div className="glass-effect px-6 py-4 rounded-xl">
-                        <div className="text-3xl font-black gradient-text">99.9%</div>
-                        <div className="mt-1 text-sm font-medium text-gray-200">Uptime</div>
-                    </div>
-                    <div className="glass-effect px-6 py-4 rounded-xl">
-                        <div className="text-3xl font-black gradient-text">4.9/5</div>
-                        <div className="mt-1 text-sm font-medium text-gray-200">Рейтинг</div>
-                    </div>
-                </div>
-
                 {/* Social proof */}
                 <div className="pt-8 space-y-4">
                     <p className="text-sm font-medium text-gray-300">Нам доверяют:</p>

@@ -13,7 +13,10 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Panda VPN | Premium VPN Keys",
   description: "Secure VPN access with Panda VPN. Get instant access to premium VPN keys.",
-  generator: 'v0.app'
+  generator: 'v0.app',
+  icons: {
+    icon: '/panda-icon.svg',
+  },
 }
 
 export default function RootLayout({

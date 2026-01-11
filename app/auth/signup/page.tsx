@@ -213,14 +213,6 @@ export default function SignupPage() {
           </FormSubmitButton>
         </form>
 
-        <a
-          href="https://t.me/pandavpn_bot?start=from_site"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-blue-500/40 bg-blue-500/10 px-5 py-3 text-sm font-semibold text-blue-200 transition-all duration-300 hover:border-blue-400/60 hover:bg-blue-500/20 hover:text-white"
-        >
-          🤖 Зарегистрироваться через Telegram
-        </a>
 
         <Link
           href="/buy-key"
@@ -229,7 +221,6 @@ export default function SignupPage() {
           💳 Купить без регистрации
         </Link>
 
-        <SocialAuthButtons mode="signup" />
 
         <p className="text-center text-sm text-gray-400 mt-6">
           Уже есть аккаунт?{" "}

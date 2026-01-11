@@ -40,81 +40,63 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                 <div className="absolute bottom-[-120px] left-1/5 h-72 w-72 rounded-full bg-teal-500/10 blur-3xl" />
             </div>
 
-            <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center gap-8 px-4 text-center">
-                <div className="space-y-5">
-                    <div className="inline-flex items-center justify-center gap-2 rounded-full bg-white/5 px-4 py-2 text-xs font-bold text-gray-100 ring-1 ring-green-500/40">
-                        <span className="text-base">🐼</span>
-                        Panda VPN — быстрый и лёгкий VPN‑сервис
-                    </div>
-
-                    <h1 className="text-[28px] font-extrabold leading-[1.1] text-white sm:text-[36px] md:text-[44px] lg:text-[54px] xl:text-[62px] tracking-tight">
-                        Panda VPN - надежный Доступ в любое время
-                    </h1>
+            <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center justify-center gap-8 px-4">
+                {/* Заголовок */}
+                <div className="inline-flex items-center justify-center gap-2 rounded-full bg-white/5 px-4 py-2 text-xs font-bold text-gray-100 ring-1 ring-green-500/40">
+                    <span className="text-base">🐼</span>
+                    Panda VPN — быстрый и лёгкий VPN‑сервис
                 </div>
 
-                <div className="flex flex-col items-center gap-2">
-                    <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-3">
-                        {!isAuthenticated ? (
-                            <>
-                                <Link
-                                    href="/auth/signup"
-                                    className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-linear-to-r from-green-500 to-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/35 sm:w-auto"
-                                >
-                                    Попробовать бесплатно
-                                    <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
-                                </Link>
-
-                                <Link
-                                    href="/auth/login"
-                                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 px-5 py-2.5 text-sm font-semibold text-gray-200 transition-all duration-300 hover:border-white/25 hover:text-white sm:w-auto"
-                                >
-                                    Войти в аккаунт
-                                </Link>
-                                <button
-                                    type="button"
-                                    onClick={openGuide}
-                                    className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-sky-500 to-indigo-500 px-5 py-2 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-sky-500/35"
-                                >
-                                    <PlayCircle size={16} />
-                                    Смотреть инструкцию
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <Link
-                                    href="/dashboard"
-                                    className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-green-500 to-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/35"
-                                >
-                                    <User size={16} />
-                                    Перейти в личный кабинет
-                                </Link>
-                                <button
-                                    type="button"
-                                    onClick={openGuide}
-                                    className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-sky-500 to-indigo-500 px-5 py-2 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-sky-500/35"
-                                >
-                                    <PlayCircle size={16} />
-                                    Смотреть инструкцию
-                                </button>
-                            </>
-
-
-
-                        )}
-                    </div>
-                </div>
-
-                <div className="grid w-full max-w-3xl grid-cols-1 gap-3 text-sm font-medium text-gray-200 sm:grid-cols-3">
-                    {[
-                        "⚡ Высокая скорость интернета",
-                        "🔒 Простой в подключении и использовании",
-                        "🌍 Доступ к контенту из любой точки мира",
-                    ].map((item) => (
-                        <div key={item} className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3">
-                            <span className="font-semibold text-white">{item.split(" ")[0]}</span>
-                            <span className="text-gray-100">{item.split(" ").slice(1).join(" ")}</span>
+                {/* Сетка кнопок 2x2 */}
+                <div className="grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+                    {/* Кнопка 1: Попробовать бесплатно */}
+                    <Link
+                        href="/auth/signup"
+                        className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 p-1 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-green-500/50 backdrop-blur-sm"
+                    >
+                        <div className="relative flex h-full min-h-[140px] flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-green-500/[0.03] to-emerald-600/[0.03] px-8 py-6 text-center backdrop-blur-sm">
+                            <span className="text-3xl">🎁</span>
+                            <span className="text-xl font-bold text-white sm:text-2xl">Попробовать бесплатно</span>
+                            <ChevronRight size={24} className="text-white/80 transition-transform group-hover:translate-x-2" />
                         </div>
-                    ))}
+                    </Link>
+
+                    {/* Кнопка 2: Продлить мой VPN */}
+                    <Link
+                        href="/renew-key"
+                        className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 p-1 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-purple-500/50 backdrop-blur-sm"
+                    >
+                        <div className="relative flex h-full min-h-[140px] flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-purple-500/[0.03] to-pink-600/[0.03] px-8 py-6 text-center backdrop-blur-sm">
+                            <span className="text-3xl">⏰</span>
+                            <span className="text-xl font-bold text-white sm:text-2xl">Продлить мой VPN</span>
+                            <ChevronRight size={24} className="text-white/80 transition-transform group-hover:translate-x-2" />
+                        </div>
+                    </Link>
+
+                    {/* Кнопка 3: Войти в аккаунт */}
+                    <Link
+                        href="/auth/login"
+                        className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 p-1 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-blue-500/50 backdrop-blur-sm"
+                    >
+                        <div className="relative flex h-full min-h-[140px] flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-blue-500/[0.03] to-cyan-600/[0.03] px-8 py-6 text-center backdrop-blur-sm">
+                            <User size={36} className="text-white" />
+                            <span className="text-xl font-bold text-white sm:text-2xl">Войти в аккаунт</span>
+                            <ChevronRight size={24} className="text-white/80 transition-transform group-hover:translate-x-2" />
+                        </div>
+                    </Link>
+
+                    {/* Кнопка 4: Видео-инструкция */}
+                    <button
+                        type="button"
+                        onClick={openGuide}
+                        className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 p-1 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-orange-500/50 backdrop-blur-sm"
+                    >
+                        <div className="relative flex h-full min-h-[140px] flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-orange-500/[0.03] to-red-600/[0.03] px-8 py-6 text-center backdrop-blur-sm">
+                            <PlayCircle size={36} className="text-white" />
+                            <span className="text-xl font-bold text-white sm:text-2xl">Видео-инструкция</span>
+                            <span className="text-sm font-medium text-white/90">как подключить?</span>
+                        </div>
+                    </button>
                 </div>
             </div>
 
