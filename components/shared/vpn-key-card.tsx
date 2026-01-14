@@ -68,23 +68,19 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
             // Получаем deep link для выбранного приложения
             const deepLinkData = await apiClient.getDeepLink(vpnKey.id, app)
             
-            // Открываем deep link
-            window.location.href = deepLinkData.deeplink
+            // ВАРИАНТ 1: Открываем в новой вкладке (для промежуточной страницы)
+            // Это позволяет пользователю легко вернуться на сайт
+            const newWindow = window.open(deepLinkData.deeplink, '_blank')
             
-            // Fallback: если приложение не открылось через 2 секунды, предлагаем установить
-            setTimeout(() => {
-                const shouldInstall = confirm(
-                    `Приложение ${deepLinkData.app_name} не открылось автоматически.\n\n` +
-                    `Возможные причины:\n` +
-                    `• Приложение не установлено\n` +
-                    `• Браузер заблокировал открытие\n\n` +
-                    `Открыть страницу установки приложения?`
-                )
-                
-                if (shouldInstall && deepLinkData.fallback_url) {
-                    window.open(deepLinkData.fallback_url, '_blank')
-                }
-            }, 2000)
+            // Проверяем открылась ли новая вкладка
+            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                // Popup blocker заблокировал - пробуем открыть в текущей вкладке
+                console.log('Popup blocked, opening in current tab')
+                window.location.href = deepLinkData.deeplink
+            } else {
+                console.log('Opened in new tab successfully')
+            }
+            
         } catch (error) {
             console.error('Failed to generate deep link:', error)
             alert('Не удалось создать ссылку для добавления в приложение. Попробуйте скопировать ключ вручную.')
