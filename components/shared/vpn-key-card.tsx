@@ -91,22 +91,16 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
 
     return (
         <div className="p-4 md:p-5 bg-linear-to-br from-slate-800/60 to-slate-900/80 backdrop-blur-md border border-green-700/30 rounded-xl hover:border-green-600/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-600/20 hover:scale-[1.02] hover:-translate-y-0.5 flex flex-col gap-3 group">
+            {/* Заголовок с названием ключа */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                     <div className="w-10 h-10 rounded-lg bg-green-600/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        {isVLESS ? (
-                            <span className="text-lg">🔐</span>
-                        ) : (
-                            <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                            </svg>
-                        )}
+                        <span className="text-lg">🔐</span>
                     </div>
                     <div>
                         <h3 className="text-base md:text-lg font-bold text-white">
-                            {getProtocolName(vpnKey.protocol)} {vpnKey.location}
+                            Название ключа: {vpnKey.location}
                         </h3>
-                        <p className="text-xs md:text-sm text-gray-400">{vpnKey.location}</p>
                     </div>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${vpnKey.status === 'active'
@@ -115,6 +109,24 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                     }`}>
                     {vpnKey.status === 'active' ? 'Активен' : 'Истек'}
                 </span>
+            </div>
+
+            {/* Дата истечения - более заметная */}
+            <div className="p-3 bg-gradient-to-r from-orange-900/40 to-red-900/40 border-2 border-orange-500/60 rounded-lg">
+                <p className="text-sm font-bold text-orange-300 flex items-center gap-2">
+                    <span className="text-lg">⏰</span>
+                    Истекает: <span className="text-orange-100">{formatExpiresAt(vpnKey.expiresAt)}</span>
+                </p>
+            </div>
+
+            {/* Инструкция - добавлена сверху */}
+            <div className="p-3 bg-purple-900/20 border border-purple-500/40 rounded-lg">
+                <p className="text-xs text-purple-300 mb-2 font-semibold">📱 Инструкция:</p>
+                <ol className="text-xs text-purple-200/80 space-y-1 ml-4 list-decimal">
+                    <li>Установите приложение для вашего устройства</li>
+                    <li>Нажмите "Добавить VPN в приложение"</li>
+                    <li>Вернитесь на сайт и снова нажмите кнопку добавления</li>
+                </ol>
             </div>
 
             {/* Информация об активных устройствах (показывается только если есть активные устройства) */}
@@ -148,106 +160,108 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                         </button>
                     )}
                 </div>
-                {isSubscription ? (
-                    <p className="text-xs text-blue-400/70 mt-2">
-                        🔗 Subscription URL — используйте для автоматической подписки
-                    </p>
-                ) : isVLESS ? (
-                    <p className="text-xs text-green-400/70 mt-2">
-                        🔒 VLESS протокол — безопасное подключение
-                    </p>
-                ) : null}
 
-                {/* Кнопка для добавления в приложение */}
+                {/* Кнопки установки и добавления */}
                 {keyText !== 'Генерация ключа...' && !vpnKey.device_limit_reached && (
-                    <button
-                        onClick={() => setShowAppSelector(true)}
-                        disabled={isAddingToApp}
-                        className="mt-3 w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 disabled:opacity-50 text-white rounded-lg transition-all duration-200 hover:scale-105 disabled:hover:scale-100 text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
-                    >
-                        {isAddingToApp ? (
-                            <>
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                Открытие...
-                            </>
-                        ) : (
-                            <>
-                                <Smartphone size={16} />
-                                🔥 Добавить ключ в приложение
-                            </>
-                        )}
-                    </button>
+                    <div className="mt-3 space-y-2">
+                        {/* Кнопка 1: Установить приложение */}
+                        <a
+                            href={isSubscription ? "https://hiddify.com" : "https://v2rayn.org"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-lg transition-all duration-200 hover:scale-105 text-sm font-semibold shadow-lg shadow-blue-900/30 flex items-center justify-center gap-2"
+                        >
+                            <span>📲</span>
+                            Установить приложение
+                        </a>
+
+                        {/* Кнопка 2: Добавить VPN в приложение */}
+                        <button
+                            onClick={() => setShowAppSelector(true)}
+                            disabled={isAddingToApp}
+                            className="w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 disabled:opacity-50 text-white rounded-lg transition-all duration-200 hover:scale-105 disabled:hover:scale-100 text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
+                        >
+                            {isAddingToApp ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    Открытие...
+                                </>
+                            ) : (
+                                <>
+                                    <Smartphone size={16} />
+                                    🔥 Добавить VPN в приложение
+                                </>
+                            )}
+                        </button>
+                    </div>
                 )}
                 {/* Информация об устройствах */}
                 {vpnKey.active_devices_count !== undefined && vpnKey.max_devices !== undefined && (
                     <p className="text-xs text-gray-500 mt-2">
                         Устройств: {vpnKey.active_devices_count} / {vpnKey.max_devices}
-                    </p>
-                )}
-            </div>
 
-            <div className="flex items-center justify-between text-xs md:text-sm flex-wrap gap-2">
-                <span className="text-gray-400 font-medium">
-                    Истекает: <span className="text-white">{formatExpiresAt(vpnKey.expiresAt)}</span>
-                </span>
-                <div className="flex gap-2.5">
-                    {/* Кнопка показа устройств */}
-                    {vpnKey.active_devices_count !== undefined && vpnKey.active_devices_count > 0 && (
-                        <button
-                            onClick={() => setShowDevices(!showDevices)}
-                            className="text-blue-400 hover:text-blue-300 transition-colors duration-300 font-semibold hover:scale-105 flex items-center gap-1"
-                            title="Показать устройства"
-                        >
-                            {showDevices ? (
-                                <>
-                                    <ChevronUp size={14} />
-                                    Скрыть устройства
-                                </>
-                            ) : (
-                                <>
-                                    <ChevronDown size={14} />
-                                    Устройства ({vpnKey.active_devices_count})
-                                </>
-                            )}
-                        </button>
-                    )}
-                    {onRevoke && (
-                        <button
-                            onClick={() => onRevoke(vpnKey.id)}
-                            className="text-red-400 hover:text-red-300 transition-colors duration-300 font-semibold hover:scale-105"
-                        >
-                            Удалить
-                        </button>
-                    )}
-                </div>
-            </div>
+                        <div className="flex items-center justify-between text-xs md:text-sm flex-wrap gap-2">
+                            <span className="text-gray-400 font-medium">
+                                Истекает: <span className="text-white">{formatExpiresAt(vpnKey.expiresAt)}</span>
+                            </span>
+                            <div className="flex gap-2.5">
+                                {/* Кнопка показа устройств */}
+                                {vpnKey.active_devices_count !== undefined && vpnKey.active_devices_count > 0 && (
+                                    <button
+                                        onClick={() => setShowDevices(!showDevices)}
+                                        className="text-blue-400 hover:text-blue-300 transition-colors duration-300 font-semibold hover:scale-105 flex items-center gap-1"
+                                        title="Показать устройства"
+                                    >
+                                        {showDevices ? (
+                                            <>
+                                                <ChevronUp size={14} />
+                                                Скрыть устройства
+                                            </>
+                                        ) : (
+                                            <>
+                                                <ChevronDown size={14} />
+                                                Устройства ({vpnKey.active_devices_count})
+                                            </>
+                                        )}
+                                    </button>
+                                )}
+                                {onRevoke && (
+                                    <button
+                                        onClick={() => onRevoke(vpnKey.id)}
+                                        className="text-red-400 hover:text-red-300 transition-colors duration-300 font-semibold hover:scale-105"
+                                    >
+                                        Удалить
+                                    </button>
+                                )}
+                            </div>
+                        </div>
 
-            {/* Список устройств */}
-            {showDevices && (
-                <KeyDevicesList
-                    clientId={vpnKey.id}
-                    onDeviceRemoved={() => {
-                        // Обновляем счетчик устройств локально
-                        if (vpnKey.active_devices_count !== undefined) {
-                            vpnKey.active_devices_count = Math.max(0, vpnKey.active_devices_count - 1)
-                        }
-                        // Обновляем данные с сервера
-                        if (onRefresh) {
-                            setTimeout(() => onRefresh(), 500)
-                        }
-                    }}
-                />
-            )}
+                        {/* Список устройств */}
+                        {showDevices && (
+                            <KeyDevicesList
+                                clientId={vpnKey.id}
+                                onDeviceRemoved={() => {
+                                    // Обновляем счетчик устройств локально
+                                    if (vpnKey.active_devices_count !== undefined) {
+                                        vpnKey.active_devices_count = Math.max(0, vpnKey.active_devices_count - 1)
+                                    }
+                                    // Обновляем данные с сервера
+                                    if (onRefresh) {
+                                        setTimeout(() => onRefresh(), 500)
+                                    }
+                                }}
+                            />
+                        )}
 
-            {/* Модальное окно выбора приложения */}
-            <AppSelectorModal
-                isOpen={showAppSelector}
-                onClose={() => setShowAppSelector(false)}
-                onSelect={handleAddToApp}
-                keyId={vpnKey.id}
-            />
-        </div>
-    )
-})
+                        {/* Модальное окно выбора приложения */}
+                        <AppSelectorModal
+                            isOpen={showAppSelector}
+                            onClose={() => setShowAppSelector(false)}
+                            onSelect={handleAddToApp}
+                            keyId={vpnKey.id}
+                        />
+                    </div>
+                )
+                })
 
-export default VPNKeyCard
+                export default VPNKeyCard

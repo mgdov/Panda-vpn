@@ -118,24 +118,6 @@ export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefr
                     <HappInstruction subscriptionUrl={subscriptionUrl} />
                 ) : null
             })()}
-
-            <div className="mt-6 p-4 md:p-5 bg-blue-900/20 border border-blue-500/50 rounded-xl hover:border-blue-500/70 transition-all duration-300 hover:shadow-lg hover:shadow-blue-900/30">
-                <p className="text-sm md:text-base text-blue-400 mb-2.5 font-semibold flex items-center gap-2">
-                    <span className="text-xl">📱</span>
-                    Как использовать вашу подписку:
-                </p>
-                <ol className="text-xs md:text-sm text-blue-300 space-y-1.5 ml-6 list-decimal">
-                    <li>Скопируйте ссылку подписки, нажав на иконку копирования</li>
-                    <li>Откройте приложение v2rayN / v2rayNG / Shadowrocket / Clash</li>
-                    <li>Добавьте подписку через буфер обмена (VLESS определится автоматически)</li>
-                </ol>
-                <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
-                    <p className="text-xs text-yellow-400 font-semibold mb-1">⚠️ Важно:</p>
-                    <p className="text-xs text-yellow-300/80">
-                        Каждый ключ можно использовать только на <strong>1 устройстве</strong>. Для подключения нескольких устройств купите дополнительные тарифы.
-                    </p>
-                </div>
-            </div>
         </div>
     )
 }

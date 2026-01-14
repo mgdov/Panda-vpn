@@ -242,7 +242,7 @@ export default function TestimonialsSection() {
                 </div>
 
                 <div className="text-center text-sm font-medium text-gray-300">
-                    Средняя оценка сообщества — <span className="font-bold text-white">4.7/5</span>. Спасибо, что доверяете Panda VPN.
+                    Средняя оценка сообщества — <span className="font-bold text-white">4.9/5</span>. Спасибо, что доверяете Panda VPN.
                 </div>
             </div>
         </section>

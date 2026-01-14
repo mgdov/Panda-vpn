@@ -144,11 +144,6 @@ const DashboardPlansTab = memo(function DashboardPlansTab({ plans, errorMessage 
                 </div>
             )}
 
-            {plans.length > 0 && !errorMessage && (
-                <div className="mt-8 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-5 py-4 text-center text-sm font-medium text-emerald-200">
-                    💡 Все тарифы включают 7 дней бесплатного доступа и не ограничивают число устройств
-                </div>
-            )}
         </div>
     )
 })
