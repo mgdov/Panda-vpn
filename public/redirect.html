@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Открытие Happ</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            max-width: 500px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h2 {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 10px 0;
+        }
+        .fallback {
+            display: none;
+            margin-top: 20px;
+        }
+        .fallback.show {
+            display: block;
+        }
+        .download-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .download-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 12px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .download-link:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+        .emoji {
+            font-size: 24px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <h2>🐼 Открываем Happ...</h2>
+        <p id="message">Пожалуйста, подождите</p>
+        
+        <div id="fallback" class="fallback">
+            <p>Приложение не открылось автоматически?</p>
+            <div class="download-links">
+                <a href="https://apps.apple.com/app/happ-proxy-utility-plus/id6746188973" 
+                   target="_blank" 
+                   class="download-link">
+                    <span class="emoji">📱</span> Скачать для iOS
+                </a>
+                <a href="https://play.google.com/store/apps/details?id=app.hiddify.com" 
+                   target="_blank" 
+                   class="download-link">
+                    <span class="emoji">📲</span> Скачать для Android
+                </a>
+            </div>
+            <p style="margin-top: 20px; font-size: 14px; opacity: 0.8;">
+                После установки нажмите кнопку "Добавить ключ" снова
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Получаем параметры из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectTo = urlParams.get('redirect_to');
+        
+        console.log('Redirect page loaded');
+        console.log('redirect_to parameter:', redirectTo);
+        
+        if (redirectTo) {
+            // Декодируем URL (на всякий случай, если он был двойным encoded)
+            let decodedUrl = redirectTo;
+            try {
+                // Проверяем нужно ли декодировать
+                if (redirectTo.includes('%')) {
+                    decodedUrl = decodeURIComponent(redirectTo);
+                    console.log('Decoded URL:', decodedUrl);
+                }
+            } catch (e) {
+                console.error('Error decoding URL:', e);
+            }
+            
+            // Логируем для отладки
+            console.log('Attempting to open:', decodedUrl);
+            
+            // Пытаемся открыть deep link
+            window.location.href = decodedUrl;
+            
+            // Показываем fallback через 2 секунды
+            setTimeout(() => {
+                document.getElementById('message').textContent = 
+                    'Если приложение не открылось, установите Happ:';
+                document.getElementById('fallback').classList.add('show');
+            }, 2000);
+            
+            // Альтернативный метод через iframe (для некоторых браузеров)
+            setTimeout(() => {
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = decodedUrl;
+                document.body.appendChild(iframe);
+                
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                }, 1000);
+            }, 100);
+            
+        } else {
+            // Нет параметра redirect_to
+            document.getElementById('message').textContent = 
+                'Ошибка: отсутствует параметр redirect_to';
+            document.getElementById('fallback').classList.add('show');
+            console.error('No redirect_to parameter found');
+        }
+        
+        // Обработка возврата на страницу (если пользователь вернулся из приложения)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                console.log('User returned to page - app might have opened successfully');
+            }
+        });
+        
+        // Обработка события blur (когда фокус уходит со страницы)
+        window.addEventListener('blur', () => {
+            console.log('Page lost focus - app might be opening');
+        });
+    </script>
+</body>
+</html>
