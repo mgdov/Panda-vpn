@@ -29,13 +29,13 @@ function BuyKeyPageContent() {
     useEffect(() => {
         // Загружаем тарифы при загрузке страницы
         loadTariffs()
-        
+
         // Проверяем параметры URL
         const success = searchParams.get("success")
         const paymentIdParam = searchParams.get("payment_id")
         const modeParam = searchParams.get("mode")
         const keyParam = searchParams.get("key")
-        
+
         if (modeParam === "renew") {
             setMode("renew")
             if (keyParam) {
@@ -111,7 +111,7 @@ function BuyKeyPageContent() {
 
         try {
             const baseReturnUrl = `${window.location.origin}/buy-key?success=true`
-            
+
             if (mode === "buy") {
                 // Покупка нового ключа
                 const payment = await apiClient.createNewKeyPayment({
@@ -157,7 +157,7 @@ function BuyKeyPageContent() {
     const loadKeyByPayment = async (paymentIdToLoad: string) => {
         setIsLoadingKey(true)
         setError(null)
-        
+
         try {
             // Пробуем получить ключ несколько раз (платеж может обрабатываться)
             for (let attempt = 0; attempt < 15; attempt++) {
@@ -183,18 +183,18 @@ function BuyKeyPageContent() {
                     return
                 } catch (err: any) {
                     // Проверяем, является ли это ошибкой "платеж обрабатывается"
-                    const isProcessingError = err.message?.includes("not processed yet") || 
-                                            err.message?.includes("Payment not processed") ||
-                                            err.message?.includes("being processed") ||
-                                            err.status === 202 || // HTTP 202 Accepted
-                                            err.response?.status === 202
-                    
+                    const isProcessingError = err.message?.includes("not processed yet") ||
+                        err.message?.includes("Payment not processed") ||
+                        err.message?.includes("being processed") ||
+                        err.status === 202 || // HTTP 202 Accepted
+                        err.response?.status === 202
+
                     // Проверяем, является ли это ошибкой 404 (ключ не найден, но платеж может обрабатываться)
-                    const isNotFoundError = err.status === 404 || 
-                                          err.response?.status === 404 ||
-                                          err.message?.includes("not found") ||
-                                          err.message?.includes("Key not found")
-                    
+                    const isNotFoundError = err.status === 404 ||
+                        err.response?.status === 404 ||
+                        err.message?.includes("not found") ||
+                        err.message?.includes("Key not found")
+
                     if (isProcessingError) {
                         // Платеж еще обрабатывается, ждем
                         if (attempt < 14) {
@@ -208,7 +208,7 @@ function BuyKeyPageContent() {
                             continue
                         }
                     }
-                    
+
                     // Если это последняя попытка или другая ошибка
                     if (attempt === 14) {
                         if (isProcessingError || (isNotFoundError && payment.status === "processing")) {
@@ -233,6 +233,36 @@ function BuyKeyPageContent() {
         }
     }
 
+    const handleAddToHapp = (subscriptionUrl: string) => {
+        if (!subscriptionUrl) {
+            alert("Subscription URL не найден")
+            return
+        }
+
+        // Копируем в буфер обмена перед открытием deep link
+        copyToClipboard(subscriptionUrl, "subscription")
+
+        // Кодируем URL для передачи в deep link
+        const encodedUrl = encodeURIComponent(subscriptionUrl)
+        const deepLink = `happ://add-subscription?url=${encodedUrl}`
+
+        // Открываем deep link
+        window.location.href = deepLink
+
+        // Показываем подсказку если приложение не открылось
+        setTimeout(() => {
+            const confirmed = confirm(
+                "Если приложение не открылось автоматически:\n\n" +
+                "1. Убедитесь, что приложение happ установлено\n" +
+                "2. Subscription URL уже скопирован - добавьте его вручную\n\n" +
+                "Открыть инструкцию по установке?"
+            )
+            if (confirmed) {
+                window.open("https://happ.page.link/install", "_blank")
+            }
+        }, 1500)
+    }
+
     const copyToClipboard = async (text: string, field: string) => {
         // Используем синхронный метод document.execCommand для надежности
         // (работает в контексте пользовательского действия и не требует фокуса документа)
@@ -246,7 +276,7 @@ function BuyKeyPageContent() {
             textArea.style.opacity = "0"
             textArea.setAttribute('readonly', '')
             document.body.appendChild(textArea)
-            
+
             // Выбираем текст синхронно
             if (navigator.userAgent.match(/ipad|iphone/i)) {
                 const range = document.createRange()
@@ -260,17 +290,17 @@ function BuyKeyPageContent() {
             } else {
                 textArea.select()
             }
-            
+
             const successful = document.execCommand("copy")
             document.body.removeChild(textArea)
-            
+
             if (successful) {
                 copySuccess = true
             }
         } catch (err) {
             console.error("Failed to copy:", err)
         }
-        
+
         if (copySuccess) {
             setCopiedField(field)
             setTimeout(() => setCopiedField(null), 2000)
@@ -390,6 +420,29 @@ function BuyKeyPageContent() {
                         <p className="text-gray-400">Выберите тариф для покупки</p>
                     </div>
 
+                    {/* Предупреждение о сохранении ключа */}
+                    <div className="bg-red-500/20 backdrop-blur-md border-2 border-red-500 rounded-xl p-6 mb-6 shadow-lg shadow-red-500/20 animate-pulse">
+                        <div className="flex items-start gap-4">
+                            <div className="p-3 bg-red-500/30 rounded-full flex-shrink-0">
+                                <svg className="w-8 h-8 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="text-xl font-bold text-red-200 mb-3">⚠️ ВАЖНО! Сохраните ваш ключ!</h3>
+                                <div className="space-y-2 text-red-100">
+                                    <p className="font-semibold">После покупки обязательно сохраните subscription URL ключа!</p>
+                                    <ul className="list-disc list-inside space-y-1 text-sm">
+                                        <li>Скопируйте ключ и сохраните его в надежном месте</li>
+                                        <li>Без ключа вы не сможете подключиться к VPN</li>
+                                        <li>Ключ понадобится для продления подписки</li>
+                                        <li>Восстановить потерянный ключ невозможно!</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
                         {isLoadingTariffs ? (
                             <div className="flex items-center justify-center py-8">
@@ -403,11 +456,10 @@ function BuyKeyPageContent() {
                                     <button
                                         key={tariff.id}
                                         onClick={() => handleSelectTariff(tariff)}
-                                        className={`p-4 rounded-lg border-2 transition-all text-left ${
-                                            selectedTariff?.id === tariff.id
-                                                ? "border-emerald-500 bg-emerald-500/10"
-                                                : "border-white/10 bg-slate-900/50 hover:border-emerald-500/50"
-                                        }`}
+                                        className={`p-4 rounded-lg border-2 transition-all text-left ${selectedTariff?.id === tariff.id
+                                            ? "border-emerald-500 bg-emerald-500/10"
+                                            : "border-white/10 bg-slate-900/50 hover:border-emerald-500/50"
+                                            }`}
                                     >
                                         <div className="flex items-center justify-between">
                                             <div>
@@ -506,6 +558,23 @@ function BuyKeyPageContent() {
                                     </div>
                                 </div>
 
+                                {/* НАПОМИНАНИЕ О СОХРАНЕНИИ КЛЮЧА */}
+                                <div className="mb-6 p-4 bg-red-500/20 border-2 border-red-500 rounded-lg">
+                                    <div className="flex items-start gap-3">
+                                        <div className="p-2 bg-red-500/30 rounded-lg flex-shrink-0">
+                                            <svg className="w-5 h-5 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-red-200 text-sm mb-1">💾 Не забудьте сохранить ключ!</p>
+                                            <p className="text-xs text-red-100">
+                                                Убедитесь, что subscription URL сохранен в надежном месте для будущих продлений.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {/* Subscription URL */}
                                 {keyData.subscription_url && (
                                     <div className="mb-4">
@@ -536,6 +605,14 @@ function BuyKeyPageContent() {
                                                 )}
                                             </button>
                                         </div>
+                                        {/* Кнопка для добавления в happ приложение */}
+                                        <button
+                                            onClick={() => handleAddToHapp(keyData.subscription_url)}
+                                            className="mt-3 w-full px-4 py-3 bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg transition-all duration-200 hover:scale-[1.02] text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
+                                        >
+                                            <span>🐼</span>
+                                            Вставить в VPN приложение
+                                        </button>
                                     </div>
                                 )}
 
@@ -649,6 +726,23 @@ function BuyKeyPageContent() {
                                     </div>
                                 </div>
 
+                                {/* ВАЖНОЕ ПРЕДУПРЕЖДЕНИЕ О СОХРАНЕНИИ */}
+                                <div className="mb-6 p-4 bg-red-500/20 border-2 border-red-500 rounded-lg animate-pulse">
+                                    <div className="flex items-start gap-3">
+                                        <div className="p-2 bg-red-500/30 rounded-lg flex-shrink-0">
+                                            <svg className="w-6 h-6 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-red-200 mb-1">⚠️ СОХРАНИТЕ КЛЮЧ ПРЯМО СЕЙЧАС!</p>
+                                            <p className="text-sm text-red-100">
+                                                Скопируйте subscription URL и сохраните его в надежном месте! Без него вы потеряете доступ к VPN и не сможете продлить подписку. Восстановление невозможно!
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {/* Subscription URL */}
                                 {(() => {
                                     console.log(`[DEBUG] Rendering subscription_url:`, keyData.subscription_url)
@@ -657,31 +751,39 @@ function BuyKeyPageContent() {
                                             <label className="block text-sm font-medium text-gray-300 mb-2">
                                                 Subscription URL (рекомендуется)
                                             </label>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                value={keyData.subscription_url}
-                                                readOnly
-                                                className="flex-1 px-4 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-white text-sm font-mono"
-                                            />
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={keyData.subscription_url}
+                                                    readOnly
+                                                    className="flex-1 px-4 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-white text-sm font-mono"
+                                                />
+                                                <button
+                                                    onClick={() => copyToClipboard(keyData.subscription_url, "subscription")}
+                                                    className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                                                >
+                                                    {copiedField === "subscription" ? (
+                                                        <>
+                                                            <Check size={16} />
+                                                            Скопировано
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Copy size={16} />
+                                                            Копировать
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                            {/* Кнопка для добавления в happ приложение */}
                                             <button
-                                                onClick={() => copyToClipboard(keyData.subscription_url, "subscription")}
-                                                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                                                onClick={() => handleAddToHapp(keyData.subscription_url)}
+                                                className="mt-3 w-full px-4 py-3 bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg transition-all duration-200 hover:scale-[1.02] text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
                                             >
-                                                {copiedField === "subscription" ? (
-                                                    <>
-                                                        <Check size={16} />
-                                                        Скопировано
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Copy size={16} />
-                                                        Копировать
-                                                    </>
-                                                )}
+                                                <span>🐼</span>
+                                                Вставить в VPN приложение
                                             </button>
                                         </div>
-                                    </div>
                                     )
                                 })()}
 
@@ -834,7 +936,7 @@ function BuyKeyPageContent() {
                                     </div>
 
                                     <h2 className="text-xl font-bold text-white mb-4">Выберите тариф для продления</h2>
-                                    
+
                                     {isLoadingTariffs ? (
                                         <div className="flex items-center justify-center py-8">
                                             <Loader2 size={24} className="animate-spin text-emerald-400" />
@@ -847,11 +949,10 @@ function BuyKeyPageContent() {
                                                 <button
                                                     key={tariff.id}
                                                     onClick={() => handleSelectTariff(tariff)}
-                                                    className={`p-4 rounded-lg border-2 transition-all text-left ${
-                                                        selectedTariff?.id === tariff.id
-                                                            ? "border-emerald-500 bg-emerald-500/10"
-                                                            : "border-white/10 bg-slate-900/50 hover:border-emerald-500/50"
-                                                    }`}
+                                                    className={`p-4 rounded-lg border-2 transition-all text-left ${selectedTariff?.id === tariff.id
+                                                        ? "border-emerald-500 bg-emerald-500/10"
+                                                        : "border-white/10 bg-slate-900/50 hover:border-emerald-500/50"
+                                                        }`}
                                                 >
                                                     <div className="flex items-center justify-between">
                                                         <div>

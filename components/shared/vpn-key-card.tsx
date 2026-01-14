@@ -67,11 +67,11 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
         try {
             // Получаем deep link для выбранного приложения
             const deepLinkData = await apiClient.getDeepLink(vpnKey.id, app)
-            
+
             // ВАРИАНТ 1: Открываем в новой вкладке (для промежуточной страницы)
             // Это позволяет пользователю легко вернуться на сайт
             const newWindow = window.open(deepLinkData.deeplink, '_blank')
-            
+
             // Проверяем открылась ли новая вкладка
             if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
                 // Popup blocker заблокировал - пробуем открыть в текущей вкладке
@@ -80,7 +80,7 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
             } else {
                 console.log('Opened in new tab successfully')
             }
-            
+
         } catch (error) {
             console.error('Failed to generate deep link:', error)
             alert('Не удалось создать ссылку для добавления в приложение. Попробуйте скопировать ключ вручную.')
@@ -157,7 +157,7 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                         🔒 VLESS протокол — безопасное подключение
                     </p>
                 ) : null}
-                
+
                 {/* Кнопка для добавления в приложение */}
                 {keyText !== 'Генерация ключа...' && !vpnKey.device_limit_reached && (
                     <button
