@@ -17,10 +17,17 @@ const APPS: AppInfo[] = [
     {
         id: "happ",
         name: "Happ (Hiddify)",
-        description: "Универсальный клиент с простым интерфейсом",
+        description: "Лучший универсальный клиент для VLESS",
         icon: "🐼",
         platform: "Both",
         recommended: true,
+    },
+    {
+        id: "direct",
+        name: "Прямая ссылка",
+        description: "Открыть subscription URL напрямую (автоматически перехватится приложением)",
+        icon: "🔗",
+        platform: "Both",
     },
     {
         id: "v2rayng",
@@ -32,7 +39,7 @@ const APPS: AppInfo[] = [
     {
         id: "shadowrocket",
         name: "Shadowrocket",
-        description: "Премиум клиент для iOS",
+        description: "Премиум клиент для iOS (платный)",
         icon: "🚀",
         platform: "iOS",
     },

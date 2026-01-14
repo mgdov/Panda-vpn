@@ -293,7 +293,7 @@ export interface DeepLinkResponse {
     description: string
 }
 
-export type VPNAppType = "happ" | "v2rayng" | "shadowrocket" | "singbox" | "v2box" | "streisand"
+export type VPNAppType = "happ" | "v2rayng" | "shadowrocket" | "singbox" | "v2box" | "streisand" | "direct"
 
 export interface RenewRequest {
     tariff_code: string
