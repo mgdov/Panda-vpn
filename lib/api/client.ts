@@ -24,6 +24,8 @@ import type {
     KeySearchResponse,
     CreateRenewalPaymentRequest,
     CreateNewKeyPaymentRequest,
+    DeepLinkResponse,
+    VPNAppType,
 } from "./types"
 import { getErrorMessage } from "./errors"
 
@@ -388,6 +390,11 @@ class APIClient {
             config: data.config_text || "",
             subscription_url: data.subscription_url || ""
         }
+    }
+
+    // Deep link для добавления ключа в приложение
+    async getDeepLink(clientId: string, app: VPNAppType = "happ"): Promise<DeepLinkResponse> {
+        return this.request<DeepLinkResponse>(`${API_CONFIG.ENDPOINTS.VPN_DEEPLINK}/${clientId}?app=${app}`)
     }
 
     // Payment endpoints

@@ -1,6 +1,9 @@
-import { Copy, Check, ChevronDown, ChevronUp } from "lucide-react"
+import { Copy, Check, ChevronDown, ChevronUp, Smartphone } from "lucide-react"
 import { memo, useState } from "react"
 import KeyDevicesList from "./key-devices-list"
+import AppSelectorModal from "./app-selector-modal"
+import { apiClient } from "@/lib/api/client"
+import type { VPNAppType } from "@/lib/api/types"
 
 export interface VPNKey {
     id: string
@@ -29,6 +32,8 @@ interface VPNKeyCardProps {
 
 const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevoke, onRefresh }: VPNKeyCardProps) {
     const [showDevices, setShowDevices] = useState(false)
+    const [showAppSelector, setShowAppSelector] = useState(false)
+    const [isAddingToApp, setIsAddingToApp] = useState(false)
 
     const formatExpiresAt = (expiresAt: string | null) => {
         if (!expiresAt) return 'Без ограничений'
@@ -55,6 +60,38 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
     const isSubscription = vpnKey.key?.startsWith('http://') || vpnKey.key?.startsWith('https://')
     const isVLESS = vpnKey.key?.startsWith('vless://') || (!isSubscription && vpnKey.protocol === 'vless')
     const keyText = vpnKey.key || 'Генерация ключа...'
+
+    // Функция для добавления ключа в приложение
+    const handleAddToApp = async (app: VPNAppType) => {
+        setIsAddingToApp(true)
+        try {
+            // Получаем deep link для выбранного приложения
+            const deepLinkData = await apiClient.getDeepLink(vpnKey.id, app)
+            
+            // Открываем deep link
+            window.location.href = deepLinkData.deeplink
+            
+            // Fallback: если приложение не открылось через 2 секунды, предлагаем установить
+            setTimeout(() => {
+                const shouldInstall = confirm(
+                    `Приложение ${deepLinkData.app_name} не открылось автоматически.\n\n` +
+                    `Возможные причины:\n` +
+                    `• Приложение не установлено\n` +
+                    `• Браузер заблокировал открытие\n\n` +
+                    `Открыть страницу установки приложения?`
+                )
+                
+                if (shouldInstall && deepLinkData.fallback_url) {
+                    window.open(deepLinkData.fallback_url, '_blank')
+                }
+            }, 2000)
+        } catch (error) {
+            console.error('Failed to generate deep link:', error)
+            alert('Не удалось создать ссылку для добавления в приложение. Попробуйте скопировать ключ вручную.')
+        } finally {
+            setIsAddingToApp(false)
+        }
+    }
 
     return (
         <div className="p-4 md:p-5 bg-linear-to-br from-slate-800/60 to-slate-900/80 backdrop-blur-md border border-green-700/30 rounded-xl hover:border-green-600/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-600/20 hover:scale-[1.02] hover:-translate-y-0.5 flex flex-col gap-3 group">
@@ -125,30 +162,24 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                     </p>
                 ) : null}
                 
-                {/* Кнопка для добавления в happ приложение (только для subscription URL) */}
-                {isSubscription && keyText !== 'Генерация ключа...' && (
+                {/* Кнопка для добавления в приложение */}
+                {keyText !== 'Генерация ключа...' && !vpnKey.device_limit_reached && (
                     <button
-                        onClick={() => {
-                            const encodedUrl = encodeURIComponent(keyText)
-                            const deepLink = `happ://add-subscription?url=${encodedUrl}`
-                            window.location.href = deepLink
-                            
-                            setTimeout(() => {
-                                const confirmed = confirm(
-                                    "Если приложение не открылось автоматически:\n\n" +
-                                    "1. Убедитесь, что приложение happ установлено\n" +
-                                    "2. Скопируйте subscription URL и добавьте его вручную\n\n" +
-                                    "Скопировать subscription URL?"
-                                )
-                                if (confirmed) {
-                                    onCopy(keyText, vpnKey.id)
-                                }
-                            }, 1000)
-                        }}
-                        className="mt-3 w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg transition-all duration-200 hover:scale-105 text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
+                        onClick={() => setShowAppSelector(true)}
+                        disabled={isAddingToApp}
+                        className="mt-3 w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 disabled:opacity-50 text-white rounded-lg transition-all duration-200 hover:scale-105 disabled:hover:scale-100 text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
                     >
-                        <span>🐼</span>
-                        Добавить Панду в приложение
+                        {isAddingToApp ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Открытие...
+                            </>
+                        ) : (
+                            <>
+                                <Smartphone size={16} />
+                                🔥 Добавить ключ в приложение
+                            </>
+                        )}
                     </button>
                 )}
                 {/* Информация об устройствах */}
@@ -211,6 +242,14 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                     }}
                 />
             )}
+
+            {/* Модальное окно выбора приложения */}
+            <AppSelectorModal
+                isOpen={showAppSelector}
+                onClose={() => setShowAppSelector(false)}
+                onSelect={handleAddToApp}
+                keyId={vpnKey.id}
+            />
         </div>
     )
 })

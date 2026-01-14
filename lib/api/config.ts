@@ -31,6 +31,7 @@ export const API_CONFIG = {
     VPN_CONFIG: "/api/me/vpn/config",
     VPN_RENEW: "/api/vpn/renew",
     VPN_TOPUP: "/api/vpn/topup",
+    VPN_DEEPLINK: "/api/deeplink",
 
     // Payments
     PAYMENTS_CREATE: "/api/payments/create",

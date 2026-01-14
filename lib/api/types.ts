@@ -286,6 +286,15 @@ export interface CreateNewKeyPaymentRequest {
     return_url?: string
 }
 
+export interface DeepLinkResponse {
+    deeplink: string
+    fallback_url?: string | null
+    app_name: string
+    description: string
+}
+
+export type VPNAppType = "happ" | "v2rayng" | "shadowrocket" | "singbox" | "v2box" | "streisand"
+
 export interface RenewRequest {
     tariff_code: string
     client_id: string
