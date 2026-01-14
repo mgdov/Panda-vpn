@@ -197,8 +197,10 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                 )}
                 {/* Информация об устройствах */}
                 {vpnKey.active_devices_count !== undefined && vpnKey.max_devices !== undefined && (
-                    <p className="text-xs text-gray-500 mt-2">
-                        Устройств: {vpnKey.active_devices_count} / {vpnKey.max_devices}
+                    <div className="mt-2">
+                        <p className="text-xs text-gray-500">
+                            Устройств: {vpnKey.active_devices_count} / {vpnKey.max_devices}
+                        </p>
 
                         <div className="flex items-center justify-between text-xs md:text-sm flex-wrap gap-2">
                             <span className="text-gray-400 font-medium">
@@ -252,16 +254,19 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                                 }}
                             />
                         )}
-
-                        {/* Модальное окно выбора приложения */}
-                        <AppSelectorModal
-                            isOpen={showAppSelector}
-                            onClose={() => setShowAppSelector(false)}
-                            onSelect={handleAddToApp}
-                            keyId={vpnKey.id}
-                        />
                     </div>
-                )
-                })
+                )}
+            </div>
 
-                export default VPNKeyCard
+            {/* Модальное окно выбора приложения */}
+            <AppSelectorModal
+                isOpen={showAppSelector}
+                onClose={() => setShowAppSelector(false)}
+                onSelect={handleAddToApp}
+                keyId={vpnKey.id}
+            />
+        </div>
+    )
+})
+
+export default VPNKeyCard
