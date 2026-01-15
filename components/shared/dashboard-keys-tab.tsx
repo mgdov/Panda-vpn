@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import VPNKeyCard, { type VPNKey } from "./vpn-key-card"
-import HappInstruction from "./happ-instruction"
 import { apiClient } from "@/lib/api/client"
 import { useAuth } from "@/hooks/use-auth"
 import { generateTelegramLink } from "@/lib/utils/telegram"
@@ -104,20 +103,6 @@ export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefr
                     </div>
                 </>
             )}
-
-            {/* Инструкция по установке happ */}
-            {vpnKeys.length > 0 && (() => {
-                // Находим первый subscription URL среди ключей
-                const subscriptionKey = vpnKeys.find(key => {
-                    const hasSubscriptionUrl = key.subscription_url && (key.subscription_url.startsWith('http://') || key.subscription_url.startsWith('https://'))
-                    const hasKeyAsUrl = key.key && (key.key.startsWith('http://') || key.key.startsWith('https://'))
-                    return hasSubscriptionUrl || hasKeyAsUrl
-                })
-                const subscriptionUrl = subscriptionKey?.subscription_url || (subscriptionKey?.key?.startsWith('http') ? subscriptionKey.key : null)
-                return subscriptionUrl ? (
-                    <HappInstruction subscriptionUrl={subscriptionUrl} />
-                ) : null
-            })()}
         </div>
     )
 }

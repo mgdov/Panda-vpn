@@ -34,6 +34,7 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
     const [showDevices, setShowDevices] = useState(false)
     const [showAppSelector, setShowAppSelector] = useState(false)
     const [isAddingToApp, setIsAddingToApp] = useState(false)
+    const [showOtherDevices, setShowOtherDevices] = useState(false)
 
     const formatExpiresAt = (expiresAt: string | null) => {
         if (!expiresAt) return 'Без ограничений'
@@ -111,22 +112,13 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                 </span>
             </div>
 
-            {/* Дата истечения - более заметная */}
-            <div className="p-3 bg-gradient-to-r from-orange-900/40 to-red-900/40 border-2 border-orange-500/60 rounded-lg">
-                <p className="text-sm font-bold text-orange-300 flex items-center gap-2">
-                    <span className="text-lg">⏰</span>
-                    Истекает: <span className="text-orange-100">{formatExpiresAt(vpnKey.expiresAt)}</span>
+            {/* Дата истечения */}
+            <div className="p-2.5 bg-slate-800/50 border border-slate-600/50 rounded-lg">
+                <p className="text-xs text-gray-300 flex items-center gap-2">
+                    <span>⏰</span>
+                    <span className="font-medium">Истекает:</span>
+                    <span className="text-white font-semibold">{formatExpiresAt(vpnKey.expiresAt)}</span>
                 </p>
-            </div>
-
-            {/* Инструкция - добавлена сверху */}
-            <div className="p-3 bg-purple-900/20 border border-purple-500/40 rounded-lg">
-                <p className="text-xs text-purple-300 mb-2 font-semibold">📱 Инструкция:</p>
-                <ol className="text-xs text-purple-200/80 space-y-1 ml-4 list-decimal">
-                    <li>Установите приложение для вашего устройства</li>
-                    <li>Нажмите "Добавить VPN в приложение"</li>
-                    <li>Вернитесь на сайт и снова нажмите кнопку добавления</li>
-                </ol>
             </div>
 
             {/* Информация об активных устройствах (показывается только если есть активные устройства) */}
@@ -163,36 +155,99 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
 
                 {/* Кнопки установки и добавления */}
                 {keyText !== 'Генерация ключа...' && !vpnKey.device_limit_reached && (
-                    <div className="mt-3 space-y-2">
-                        {/* Кнопка 1: Установить приложение */}
-                        <a
-                            href="https://apps.apple.com/fi/app/happ-proxy-utility/id6504287215"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-lg transition-all duration-200 hover:scale-105 text-sm font-semibold shadow-lg shadow-blue-900/30 flex items-center justify-center gap-2"
-                        >
-                            <span>📲</span>
-                            Установить приложение
-                        </a>
+                    <div className="mt-3 space-y-3">
+                        {/* Секция 1: Установите приложение */}
+                        <div className="space-y-2">
+                            <p className="text-xs font-semibold text-gray-300 flex items-center gap-1">
+                                <span>1️⃣</span> Установите приложение:
+                            </p>
 
-                        {/* Кнопка 2: Добавить VPN в приложение */}
-                        <button
-                            onClick={() => setShowAppSelector(true)}
-                            disabled={isAddingToApp}
-                            className="w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 disabled:opacity-50 text-white rounded-lg transition-all duration-200 hover:scale-105 disabled:hover:scale-100 text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
-                        >
-                            {isAddingToApp ? (
-                                <>
-                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    Открытие...
-                                </>
-                            ) : (
-                                <>
-                                    <Smartphone size={16} />
-                                    🔥 Добавить VPN в приложение
-                                </>
-                            )}
-                        </button>
+                            {/* Основные платформы: iPhone и Android */}
+                            <div className="grid grid-cols-2 gap-2">
+                                <a
+                                    href="https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-200 hover:scale-105 text-xs font-semibold shadow-lg shadow-blue-900/30 flex items-center justify-center gap-1.5"
+                                >
+                                    <span>📱</span>
+                                    Айфон
+                                </a>
+                                <a
+                                    href="https://play.google.com/store/apps/details?id=com.happproxy"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-3 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg transition-all duration-200 hover:scale-105 text-xs font-semibold shadow-lg shadow-green-900/30 flex items-center justify-center gap-1.5"
+                                >
+                                    <span>🤖</span>
+                                    Андройд
+                                </a>
+                            </div>
+
+                            {/* Выпадающий список для других устройств */}
+                            <div className="space-y-2">
+                                <button
+                                    onClick={() => setShowOtherDevices(!showOtherDevices)}
+                                    className="w-full px-3 py-2 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/50 text-gray-300 rounded-lg transition-all duration-200 text-xs font-medium flex items-center justify-center gap-2"
+                                >
+                                    Другое устройство
+                                    {showOtherDevices ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                                </button>
+
+                                {showOtherDevices && (
+                                    <div className="space-y-2 pl-2 border-l-2 border-slate-600/50">
+                                        <a
+                                            href="https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block px-3 py-2 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/50 text-gray-300 rounded-lg transition-all duration-200 text-xs font-medium"
+                                        >
+                                            💻 MacBook
+                                        </a>
+                                        <a
+                                            href="https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block px-3 py-2 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/50 text-gray-300 rounded-lg transition-all duration-200 text-xs font-medium"
+                                        >
+                                            🖥️ Windows
+                                        </a>
+                                        <a
+                                            href="https://play.google.com/store/apps/details?id=com.happproxy"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block px-3 py-2 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/50 text-gray-300 rounded-lg transition-all duration-200 text-xs font-medium"
+                                        >
+                                            📺 AndroidTV
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Секция 2: Добавить Панду в приложение */}
+                        <div className="space-y-2">
+                            <p className="text-xs font-semibold text-gray-300 flex items-center gap-1">
+                                <span>2️⃣</span> Добавить Панду в приложение:
+                            </p>
+                            <button
+                                onClick={() => setShowAppSelector(true)}
+                                disabled={isAddingToApp}
+                                className="w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 disabled:opacity-50 text-white rounded-lg transition-all duration-200 hover:scale-105 disabled:hover:scale-100 text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
+                            >
+                                {isAddingToApp ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        Открытие...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Smartphone size={16} />
+                                        🐼 Добавить Панду в приложение
+                                    </>
+                                )}
+                            </button>
+                        </div>
                     </div>
                 )}
                 {/* Информация об устройствах */}
@@ -202,10 +257,7 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                             Устройств: {vpnKey.active_devices_count} / {vpnKey.max_devices}
                         </p>
 
-                        <div className="flex items-center justify-between text-xs md:text-sm flex-wrap gap-2">
-                            <span className="text-gray-400 font-medium">
-                                Истекает: <span className="text-white">{formatExpiresAt(vpnKey.expiresAt)}</span>
-                            </span>
+                        <div className="flex items-center justify-end text-xs md:text-sm flex-wrap gap-2">
                             <div className="flex gap-2.5">
                                 {/* Кнопка показа устройств */}
                                 {vpnKey.active_devices_count !== undefined && vpnKey.active_devices_count > 0 && (

@@ -121,13 +121,39 @@ export function useDashboardData() {
                         ? (key.subscription_url || key.config_text || 'Generating...')
                         : (key.config_text || key.subscription_url || 'Generating...')
 
+                    // Calculate tariff name based on expiration duration
+                    let tariffName = 'Тариф'
+                    if (key.expires_at) {
+                        try {
+                            const expiresDate = new Date(key.expires_at)
+                            const createdDate = new Date(key.created_at)
+                            const durationDays = Math.round((expiresDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24))
+
+                            if (durationDays >= 350) {
+                                tariffName = 'Тариф 1 год'
+                            } else if (durationDays >= 175) {
+                                tariffName = 'Тариф 6 месяцев'
+                            } else if (durationDays >= 85) {
+                                tariffName = 'Тариф 3 месяца'
+                            } else if (durationDays >= 28) {
+                                tariffName = 'Тариф 1 месяц'
+                            } else if (durationDays >= 6) {
+                                tariffName = 'Тариф 1 неделя'
+                            } else {
+                                tariffName = 'Тариф'
+                            }
+                        } catch (e) {
+                            tariffName = 'Тариф'
+                        }
+                    }
+
                     return {
                         id: key.id,
                         key: displayKey,
                         subscription_url: key.subscription_url || null,
                         config_text: key.config_text || null,
                         preferred_method: prefersSubscription ? 'subscription' : 'config',
-                        location: '🌍 Auto-select',
+                        location: tariffName,
                         status: key.active ? 'active' : 'expired',
                         expiresAt: key.expires_at || null,
                         marzban_client_id: key.marzban_client_id,

@@ -1,20 +1,20 @@
 
 "use client"
 
-function RedirectToDashboard() {
-    const router = useRouter();
-    useEffect(() => {
-        router.push("https://vpn-p.ru/dashboard?tab=keys");
-    }, [router]);
-    return null;
-}
-
 import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
 import type { KeySearchResponse, Tariff } from "@/lib/api/types"
 import { ChevronRight, Search, CheckCircle, XCircle, Loader2, Key, CreditCard, Copy, Check } from "lucide-react"
 import Link from "next/link"
+
+function RedirectToDashboard() {
+    const router = useRouter();
+    useEffect(() => {
+        router.push("/dashboard?tab=keys");
+    }, [router]);
+    return null;
+}
 
 type Mode = "select" | "buy" | "renew" | "success" | "renewal_success"
 
