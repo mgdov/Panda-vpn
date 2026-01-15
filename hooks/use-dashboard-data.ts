@@ -123,11 +123,14 @@ export function useDashboardData() {
 
                     // Calculate tariff name based on expiration duration
                     let tariffName = 'Тариф'
-                    if (key.expires_at) {
+                    if (key.expires_at && key.created_at) {
                         try {
                             const expiresDate = new Date(key.expires_at)
                             const createdDate = new Date(key.created_at)
-                            const durationDays = Math.round((expiresDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24))
+                            const durationMs = expiresDate.getTime() - createdDate.getTime()
+                            const durationDays = Math.round(durationMs / (1000 * 60 * 60 * 24))
+
+                            console.log(`[Tariff Debug] Key: ${key.id}, Created: ${key.created_at}, Expires: ${key.expires_at}, Duration: ${durationDays} days`)
 
                             if (durationDays >= 350) {
                                 tariffName = 'Тариф 1 год'
@@ -139,12 +142,17 @@ export function useDashboardData() {
                                 tariffName = 'Тариф 1 месяц'
                             } else if (durationDays >= 6) {
                                 tariffName = 'Тариф 1 неделя'
+                            } else if (durationDays > 0) {
+                                tariffName = `Тариф ${durationDays} дн.`
                             } else {
                                 tariffName = 'Тариф'
                             }
                         } catch (e) {
+                            console.error('[Tariff Error]', e, 'Key:', key)
                             tariffName = 'Тариф'
                         }
+                    } else {
+                        console.warn('[Tariff Warning] Missing dates for key:', key.id, 'created_at:', key.created_at, 'expires_at:', key.expires_at)
                     }
 
                     return {
