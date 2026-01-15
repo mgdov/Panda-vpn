@@ -12,6 +12,7 @@ export interface VPNKey {
     status: 'active' | 'expired'
     expiresAt: string | null
     protocol?: string
+    marzban_client_id?: string  // 5 заглавных букв - название ключа из Marzban
     subscription_url?: string | null  // Subscription URL (приоритетный способ)
     config_text?: string | null  // Config text (fallback)
     preferred_method?: 'subscription' | 'config'  // Какой способ использовать
@@ -34,7 +35,6 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
     const [showDevices, setShowDevices] = useState(false)
     const [showAppSelector, setShowAppSelector] = useState(false)
     const [isAddingToApp, setIsAddingToApp] = useState(false)
-    const [showOtherDevices, setShowOtherDevices] = useState(false)
 
     const formatExpiresAt = (expiresAt: string | null) => {
         if (!expiresAt) return 'Без ограничений'
@@ -68,11 +68,11 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
         try {
             // Получаем deep link для выбранного приложения
             const deepLinkData = await apiClient.getDeepLink(vpnKey.id, app)
-
+            
             // ВАРИАНТ 1: Открываем в новой вкладке (для промежуточной страницы)
             // Это позволяет пользователю легко вернуться на сайт
             const newWindow = window.open(deepLinkData.deeplink, '_blank')
-
+            
             // Проверяем открылась ли новая вкладка
             if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
                 // Popup blocker заблокировал - пробуем открыть в текущей вкладке
@@ -81,7 +81,7 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
             } else {
                 console.log('Opened in new tab successfully')
             }
-
+            
         } catch (error) {
             console.error('Failed to generate deep link:', error)
             alert('Не удалось создать ссылку для добавления в приложение. Попробуйте скопировать ключ вручную.')
@@ -92,16 +92,31 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
 
     return (
         <div className="p-4 md:p-5 bg-linear-to-br from-slate-800/60 to-slate-900/80 backdrop-blur-md border border-green-700/30 rounded-xl hover:border-green-600/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-600/20 hover:scale-[1.02] hover:-translate-y-0.5 flex flex-col gap-3 group">
-            {/* Заголовок с названием ключа */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                     <div className="w-10 h-10 rounded-lg bg-green-600/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <span className="text-lg">🔐</span>
+                        {isVLESS ? (
+                            <span className="text-lg">🔐</span>
+                        ) : (
+                            <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                            </svg>
+                        )}
                     </div>
                     <div>
-                        <h3 className="text-base md:text-lg font-bold text-white">
-                            Название ключа: {vpnKey.location}
+                        <h3 className="text-base md:text-lg font-bold text-white flex items-center gap-2">
+                            {vpnKey.marzban_client_id ? (
+                                <>
+                                    <span>Ключ</span>
+                                    <span className="px-2 py-0.5 bg-blue-900/40 border border-blue-500/50 text-blue-300 text-sm font-mono rounded">
+                                        {vpnKey.marzban_client_id}
+                                    </span>
+                                </>
+                            ) : (
+                                <>{getProtocolName(vpnKey.protocol)} {vpnKey.location}</>
+                            )}
                         </h3>
+                        <p className="text-xs md:text-sm text-gray-400">{getProtocolName(vpnKey.protocol)}</p>
                     </div>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${vpnKey.status === 'active'
@@ -110,15 +125,6 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                     }`}>
                     {vpnKey.status === 'active' ? 'Активен' : 'Истек'}
                 </span>
-            </div>
-
-            {/* Дата истечения */}
-            <div className="p-2.5 bg-slate-800/50 border border-slate-600/50 rounded-lg">
-                <p className="text-xs text-gray-300 flex items-center gap-2">
-                    <span>⏰</span>
-                    <span className="font-medium">Истекает:</span>
-                    <span className="text-white font-semibold">{formatExpiresAt(vpnKey.expiresAt)}</span>
-                </p>
             </div>
 
             {/* Информация об активных устройствах (показывается только если есть активные устройства) */}
@@ -152,163 +158,96 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                         </button>
                     )}
                 </div>
-
-                {/* Кнопки установки и добавления */}
+                {isSubscription ? (
+                    <p className="text-xs text-blue-400/70 mt-2">
+                        🔗 Subscription URL — используйте для автоматической подписки
+                    </p>
+                ) : isVLESS ? (
+                    <p className="text-xs text-green-400/70 mt-2">
+                        🔒 VLESS протокол — безопасное подключение
+                    </p>
+                ) : null}
+                
+                {/* Кнопка для добавления в приложение */}
                 {keyText !== 'Генерация ключа...' && !vpnKey.device_limit_reached && (
-                    <div className="mt-3 space-y-3">
-                        {/* Секция 1: Установите приложение */}
-                        <div className="space-y-2">
-                            <p className="text-xs font-semibold text-gray-300 flex items-center gap-1">
-                                <span>1️⃣</span> Установите приложение:
-                            </p>
-
-                            {/* Основные платформы: iPhone и Android */}
-                            <div className="grid grid-cols-2 gap-2">
-                                <a
-                                    href="https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-200 hover:scale-105 text-xs font-semibold shadow-lg shadow-blue-900/30 flex items-center justify-center gap-1.5"
-                                >
-                                    <span>📱</span>
-                                    Айфон
-                                </a>
-                                <a
-                                    href="https://play.google.com/store/apps/details?id=com.happproxy"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="px-3 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg transition-all duration-200 hover:scale-105 text-xs font-semibold shadow-lg shadow-green-900/30 flex items-center justify-center gap-1.5"
-                                >
-                                    <span>🤖</span>
-                                    Андройд
-                                </a>
-                            </div>
-
-                            {/* Выпадающий список для других устройств */}
-                            <div className="space-y-2">
-                                <button
-                                    onClick={() => setShowOtherDevices(!showOtherDevices)}
-                                    className="w-full px-3 py-2 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/50 text-gray-300 rounded-lg transition-all duration-200 text-xs font-medium flex items-center justify-center gap-2"
-                                >
-                                    Другое устройство
-                                    {showOtherDevices ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                                </button>
-
-                                {showOtherDevices && (
-                                    <div className="space-y-2 pl-2 border-l-2 border-slate-600/50">
-                                        <a
-                                            href="https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="block px-3 py-2 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/50 text-gray-300 rounded-lg transition-all duration-200 text-xs font-medium"
-                                        >
-                                            💻 MacBook
-                                        </a>
-                                        <a
-                                            href="https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="block px-3 py-2 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/50 text-gray-300 rounded-lg transition-all duration-200 text-xs font-medium"
-                                        >
-                                            🖥️ Windows
-                                        </a>
-                                        <a
-                                            href="https://play.google.com/store/apps/details?id=com.happproxy"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="block px-3 py-2 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/50 text-gray-300 rounded-lg transition-all duration-200 text-xs font-medium"
-                                        >
-                                            📺 AndroidTV
-                                        </a>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Секция 2: Добавить Панду в приложение */}
-                        <div className="space-y-2">
-                            <p className="text-xs font-semibold text-gray-300 flex items-center gap-1">
-                                <span>2️⃣</span> Добавить Панду в приложение:
-                            </p>
-                            <button
-                                onClick={() => setShowAppSelector(true)}
-                                disabled={isAddingToApp}
-                                className="w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 disabled:opacity-50 text-white rounded-lg transition-all duration-200 hover:scale-105 disabled:hover:scale-100 text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
-                            >
-                                {isAddingToApp ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        Открытие...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Smartphone size={16} />
-                                        🐼 Добавить Панду в приложение
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    </div>
+                    <button
+                        onClick={() => setShowAppSelector(true)}
+                        disabled={isAddingToApp}
+                        className="mt-3 w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 disabled:opacity-50 text-white rounded-lg transition-all duration-200 hover:scale-105 disabled:hover:scale-100 text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
+                    >
+                        {isAddingToApp ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Открытие...
+                            </>
+                        ) : (
+                            <>
+                                <Smartphone size={16} />
+                                🔥 Добавить ключ в приложение
+                            </>
+                        )}
+                    </button>
                 )}
                 {/* Информация об устройствах */}
                 {vpnKey.active_devices_count !== undefined && vpnKey.max_devices !== undefined && (
-                    <div className="mt-2">
-                        <p className="text-xs text-gray-500">
-                            Устройств: {vpnKey.active_devices_count} / {vpnKey.max_devices}
-                        </p>
-
-                        <div className="flex items-center justify-end text-xs md:text-sm flex-wrap gap-2">
-                            <div className="flex gap-2.5">
-                                {/* Кнопка показа устройств */}
-                                {vpnKey.active_devices_count !== undefined && vpnKey.active_devices_count > 0 && (
-                                    <button
-                                        onClick={() => setShowDevices(!showDevices)}
-                                        className="text-blue-400 hover:text-blue-300 transition-colors duration-300 font-semibold hover:scale-105 flex items-center gap-1"
-                                        title="Показать устройства"
-                                    >
-                                        {showDevices ? (
-                                            <>
-                                                <ChevronUp size={14} />
-                                                Скрыть устройства
-                                            </>
-                                        ) : (
-                                            <>
-                                                <ChevronDown size={14} />
-                                                Устройства ({vpnKey.active_devices_count})
-                                            </>
-                                        )}
-                                    </button>
-                                )}
-                                {onRevoke && (
-                                    <button
-                                        onClick={() => onRevoke(vpnKey.id)}
-                                        className="text-red-400 hover:text-red-300 transition-colors duration-300 font-semibold hover:scale-105"
-                                    >
-                                        Удалить
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Список устройств */}
-                        {showDevices && (
-                            <KeyDevicesList
-                                clientId={vpnKey.id}
-                                onDeviceRemoved={() => {
-                                    // Обновляем счетчик устройств локально
-                                    if (vpnKey.active_devices_count !== undefined) {
-                                        vpnKey.active_devices_count = Math.max(0, vpnKey.active_devices_count - 1)
-                                    }
-                                    // Обновляем данные с сервера
-                                    if (onRefresh) {
-                                        setTimeout(() => onRefresh(), 500)
-                                    }
-                                }}
-                            />
-                        )}
-                    </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                        Устройств: {vpnKey.active_devices_count} / {vpnKey.max_devices}
+                    </p>
                 )}
             </div>
+
+            <div className="flex items-center justify-between text-xs md:text-sm flex-wrap gap-2">
+                <span className="text-gray-400 font-medium">
+                    Истекает: <span className="text-white">{formatExpiresAt(vpnKey.expiresAt)}</span>
+                </span>
+                <div className="flex gap-2.5">
+                    {/* Кнопка показа устройств */}
+                    {vpnKey.active_devices_count !== undefined && vpnKey.active_devices_count > 0 && (
+                        <button
+                            onClick={() => setShowDevices(!showDevices)}
+                            className="text-blue-400 hover:text-blue-300 transition-colors duration-300 font-semibold hover:scale-105 flex items-center gap-1"
+                            title="Показать устройства"
+                        >
+                            {showDevices ? (
+                                <>
+                                    <ChevronUp size={14} />
+                                    Скрыть устройства
+                                </>
+                            ) : (
+                                <>
+                                    <ChevronDown size={14} />
+                                    Устройства ({vpnKey.active_devices_count})
+                                </>
+                            )}
+                        </button>
+                    )}
+                    {onRevoke && (
+                        <button
+                            onClick={() => onRevoke(vpnKey.id)}
+                            className="text-red-400 hover:text-red-300 transition-colors duration-300 font-semibold hover:scale-105"
+                        >
+                            Удалить
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {/* Список устройств */}
+            {showDevices && (
+                <KeyDevicesList
+                    clientId={vpnKey.id}
+                    onDeviceRemoved={() => {
+                        // Обновляем счетчик устройств локально
+                        if (vpnKey.active_devices_count !== undefined) {
+                            vpnKey.active_devices_count = Math.max(0, vpnKey.active_devices_count - 1)
+                        }
+                        // Обновляем данные с сервера
+                        if (onRefresh) {
+                            setTimeout(() => onRefresh(), 500)
+                        }
+                    }}
+                />
+            )}
 
             {/* Модальное окно выбора приложения */}
             <AppSelectorModal
