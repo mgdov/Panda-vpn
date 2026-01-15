@@ -712,328 +712,256 @@ function BuyKeyPageContent() {
                             </div>
                         </div>
                     ) : keyData ? (
-                        <div className="space-y-6">
-                            <div className="bg-slate-800/60 backdrop-blur-md border border-emerald-500/30 rounded-xl p-6">
-                                <div className="flex items-start gap-3 mb-6">
-                                    <div className="p-2 bg-emerald-500/20 rounded-lg">
-                                        <CheckCircle className="text-emerald-400" size={24} />
-                                    </div>
-                                    <div className="flex-1">
-                                        <h2 className="text-xl font-bold text-white mb-1">Ключ успешно создан!</h2>
-                                        <p className="text-sm text-gray-400">
-                                            Истекает: {formatDate(keyData.expires_at)}
-                                        </p>
-                                    </div>
-                                </div>
+                        useEffect(() => {
+                            router.push("https://vpn-p.ru/dashboard?tab=keys")
+                        }, [])
+                        return null
+                    💡 <strong>Как использовать:</strong> Скопируйте subscription URL и вставьте в ваше VPN приложение (WireGuard, V2Ray и т.д.)
+                </p>
+            </div>
+                            </div >
 
-                                {/* ВАЖНОЕ ПРЕДУПРЕЖДЕНИЕ О СОХРАНЕНИИ */}
-                                <div className="mb-6 p-4 bg-red-500/20 border-2 border-red-500 rounded-lg animate-pulse">
-                                    <div className="flex items-start gap-3">
-                                        <div className="p-2 bg-red-500/30 rounded-lg flex-shrink-0">
-                                            <svg className="w-6 h-6 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-red-200 mb-1">⚠️ СОХРАНИТЕ КЛЮЧ ПРЯМО СЕЙЧАС!</p>
-                                            <p className="text-sm text-red-100">
-                                                Скопируйте subscription URL и сохраните его в надежном месте! Без него вы потеряете доступ к VPN и не сможете продлить подписку. Восстановление невозможно!
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Subscription URL */}
-                                {(() => {
-                                    console.log(`[DEBUG] Rendering subscription_url:`, keyData.subscription_url)
-                                    return keyData.subscription_url && (
-                                        <div className="mb-4">
-                                            <label className="block text-sm font-medium text-gray-300 mb-2">
-                                                Subscription URL (рекомендуется)
-                                            </label>
-                                            <div className="flex gap-2">
-                                                <input
-                                                    type="text"
-                                                    value={keyData.subscription_url}
-                                                    readOnly
-                                                    className="flex-1 px-4 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-white text-sm font-mono"
-                                                />
-                                                <button
-                                                    onClick={() => copyToClipboard(keyData.subscription_url, "subscription")}
-                                                    className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors flex items-center gap-2"
-                                                >
-                                                    {copiedField === "subscription" ? (
-                                                        <>
-                                                            <Check size={16} />
-                                                            Скопировано
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <Copy size={16} />
-                                                            Копировать
-                                                        </>
-                                                    )}
-                                                </button>
-                                            </div>
-                                            {/* Кнопка для добавления в happ приложение */}
-                                            <button
-                                                onClick={() => handleAddToHapp(keyData.subscription_url)}
-                                                className="mt-3 w-full px-4 py-3 bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg transition-all duration-200 hover:scale-[1.02] text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
-                                            >
-                                                <span>🐼</span>
-                                                Вставить в VPN приложение
-                                            </button>
-                                        </div>
-                                    )
-                                })()}
-
-                                <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                                    <p className="text-sm text-blue-200">
-                                        💡 <strong>Как использовать:</strong> Скопируйте subscription URL и вставьте в ваше VPN приложение (WireGuard, V2Ray и т.д.)
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="flex gap-4">
-                                <button
-                                    onClick={() => {
-                                        // Переходим на страницу продления с предзаполненным ключом
-                                        const keyToUse = keyData.subscription_url || keyData.marzban_client_id || keyData.client_id
-                                        if (keyToUse) {
-                                            router.push(`/buy-key?mode=renew&key=${encodeURIComponent(keyToUse)}`)
-                                        } else {
-                                            router.push("/buy-key?mode=renew")
-                                        }
-                                    }}
-                                    className="flex-1 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors text-center"
-                                >
-                                    Продлить этот ключ
-                                </button>
-                                <Link
-                                    href="/"
-                                    className="flex-1 px-6 py-3 border border-white/20 text-gray-300 hover:text-white hover:border-white/30 rounded-lg transition-colors text-center"
-                                >
-                                    На главную
-                                </Link>
-                            </div>
-                        </div>
+            <div className="flex gap-4">
+                <button
+                    onClick={() => {
+                        // Переходим на страницу продления с предзаполненным ключом
+                        const keyToUse = keyData.subscription_url || keyData.marzban_client_id || keyData.client_id
+                        if (keyToUse) {
+                            router.push(`/buy-key?mode=renew&key=${encodeURIComponent(keyToUse)}`)
+                        } else {
+                            router.push("/buy-key?mode=renew")
+                        }
+                    }}
+                    className="flex-1 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors text-center"
+                >
+                    Продлить этот ключ
+                </button>
+                <Link
+                    href="/"
+                    className="flex-1 px-6 py-3 border border-white/20 text-gray-300 hover:text-white hover:border-white/30 rounded-lg transition-colors text-center"
+                >
+                    На главную
+                </Link>
+            </div>
+                        </div >
                     ) : error ? (
-                        <div className="bg-slate-800/60 backdrop-blur-md border border-red-500/30 rounded-xl p-6">
-                            <div className="flex items-start gap-3">
-                                <XCircle className="text-red-400 mt-0.5" size={20} />
-                                <div className="flex-1">
-                                    <h3 className="text-white font-semibold mb-1">Ошибка</h3>
-                                    <p className="text-sm text-gray-300">{error}</p>
-                                </div>
-                            </div>
-                            {paymentId && (
-                                <button
-                                    onClick={() => loadKeyByPayment(paymentId)}
-                                    className="mt-4 w-full px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors"
-                                >
-                                    Попробовать снова
-                                </button>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
-                            <div className="flex flex-col items-center justify-center py-8">
-                                <Loader2 size={32} className="animate-spin text-emerald-400 mb-4" />
-                                <p className="text-gray-400 text-center mb-2">Ожидание обработки платежа...</p>
-                                <p className="text-sm text-gray-500 text-center">Ключ будет создан автоматически после обработки платежа</p>
-                            </div>
-                            {paymentId && (
-                                <button
-                                    onClick={() => loadKeyByPayment(paymentId)}
-                                    className="mt-4 w-full px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors"
-                                >
-                                    Проверить ключ сейчас
-                                </button>
-                            )}
-                        </div>
-                    )}
+            <div className="bg-slate-800/60 backdrop-blur-md border border-red-500/30 rounded-xl p-6">
+                <div className="flex items-start gap-3">
+                    <XCircle className="text-red-400 mt-0.5" size={20} />
+                    <div className="flex-1">
+                        <h3 className="text-white font-semibold mb-1">Ошибка</h3>
+                        <p className="text-sm text-gray-300">{error}</p>
+                    </div>
                 </div>
+                {paymentId && (
+                    <button
+                        onClick={() => loadKeyByPayment(paymentId)}
+                        className="mt-4 w-full px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors"
+                    >
+                        Попробовать снова
+                    </button>
+                )}
+            </div>
+        ) : (
+            <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                <div className="flex flex-col items-center justify-center py-8">
+                    <Loader2 size={32} className="animate-spin text-emerald-400 mb-4" />
+                    <p className="text-gray-400 text-center mb-2">Ожидание обработки платежа...</p>
+                    <p className="text-sm text-gray-500 text-center">Ключ будет создан автоматически после обработки платежа</p>
+                </div>
+                {paymentId && (
+                    <button
+                        onClick={() => loadKeyByPayment(paymentId)}
+                        className="mt-4 w-full px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors"
+                    >
+                        Проверить ключ сейчас
+                    </button>
+                )}
             </div>
         )
     }
+                </div >
+            </div >
+        )
+}
 
-    // Продление ключа
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4">
-            <div className="max-w-2xl mx-auto">
-                <div className="mb-8">
-                    <button
-                        onClick={() => {
-                            setMode("select")
-                            setSearchResult(null)
-                            setKeyIdentifier("")
-                            setError(null)
-                        }}
-                        className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors mb-4"
-                    >
-                        ← Назад
-                    </button>
-                    <h1 className="text-3xl font-bold text-white mb-2">Продление ключа</h1>
-                    <p className="text-gray-400">Введите ваш ключ для продления</p>
-                </div>
+// Продление ключа
+return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4">
+        <div className="max-w-2xl mx-auto">
+            <div className="mb-8">
+                <button
+                    onClick={() => {
+                        setMode("select")
+                        setSearchResult(null)
+                        setKeyIdentifier("")
+                        setError(null)
+                    }}
+                    className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors mb-4"
+                >
+                    ← Назад
+                </button>
+                <h1 className="text-3xl font-bold text-white mb-2">Продление ключа</h1>
+                <p className="text-gray-400">Введите ваш ключ для продления</p>
+            </div>
 
-                {/* Поиск ключа */}
-                {!searchResult && (
-                    <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Введите subscription URL или идентификатор ключа
-                                </label>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        value={keyIdentifier}
-                                        onChange={(e) => setKeyIdentifier(e.target.value)}
-                                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                        placeholder="https://example.com/sub/... или идентификатор ключа"
-                                        className="flex-1 px-4 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/50"
-                                    />
-                                    <button
-                                        onClick={handleSearch}
-                                        disabled={isSearching}
-                                        className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                                    >
-                                        {isSearching ? (
-                                            <Loader2 size={16} className="animate-spin" />
-                                        ) : (
-                                            <Search size={16} />
-                                        )}
-                                        Найти
-                                    </button>
-                                </div>
-                            </div>
-                            {error && (
-                                <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
-                                    {error}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
-
-                {/* Результат поиска */}
-                {searchResult && (
-                    <div className="space-y-6">
-                        {searchResult.found && searchResult.active ? (
-                            <>
-                                <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
-                                    <div className="flex items-start gap-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg mb-4">
-                                        <CheckCircle className="text-emerald-400 mt-0.5" size={20} />
-                                        <div className="flex-1">
-                                            <h3 className="text-white font-semibold mb-1">Ключ найден</h3>
-                                            <div className="text-sm text-gray-300 space-y-1">
-                                                <p>Идентификатор: {searchResult.marzban_client_id}</p>
-                                                <p>Протокол: {searchResult.protocol?.toUpperCase() || 'N/A'}</p>
-                                                <p>Истекает: {formatDate(searchResult.expires_at)}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <h2 className="text-xl font-bold text-white mb-4">Выберите тариф для продления</h2>
-
-                                    {isLoadingTariffs ? (
-                                        <div className="flex items-center justify-center py-8">
-                                            <Loader2 size={24} className="animate-spin text-emerald-400" />
-                                        </div>
-                                    ) : tariffs.length === 0 ? (
-                                        <p className="text-gray-400">Тарифы временно недоступны</p>
-                                    ) : (
-                                        <div className="grid gap-4 mb-6">
-                                            {tariffs.map((tariff) => (
-                                                <button
-                                                    key={tariff.id}
-                                                    onClick={() => handleSelectTariff(tariff)}
-                                                    className={`p-4 rounded-lg border-2 transition-all text-left ${selectedTariff?.id === tariff.id
-                                                        ? "border-emerald-500 bg-emerald-500/10"
-                                                        : "border-white/10 bg-slate-900/50 hover:border-emerald-500/50"
-                                                        }`}
-                                                >
-                                                    <div className="flex items-center justify-between">
-                                                        <div>
-                                                            <h3 className="text-white font-semibold">{tariff.name}</h3>
-                                                            <p className="text-sm text-gray-400 mt-1">
-                                                                {formatDuration(tariff.duration_seconds)}
-                                                            </p>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <div className="text-xl font-bold text-white">
-                                                                {tariff.price_amount / 100} ₽
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    {selectedTariff && (
-                                        <div className="mt-6">
-                                            <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-white">{selectedTariff.name}</span>
-                                                    <span className="text-emerald-400 font-bold">
-                                                        {selectedTariff.price_amount / 100} ₽
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={handleCreatePayment}
-                                                disabled={isCreatingPayment}
-                                                className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                            >
-                                                {isCreatingPayment ? (
-                                                    <>
-                                                        <Loader2 size={16} className="animate-spin" />
-                                                        Создание платежа...
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        Перейти к оплате
-                                                        <ChevronRight size={16} />
-                                                    </>
-                                                )}
-                                            </button>
-                                            {error && (
-                                                <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
-                                                    {error}
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            </>
-                        ) : (
-                            <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
-                                <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-                                    <XCircle className="text-red-400 mt-0.5" size={20} />
-                                    <div className="flex-1">
-                                        <h3 className="text-white font-semibold mb-1">Ключ не найден</h3>
-                                        <p className="text-sm text-gray-300">{searchResult.message || "Проверьте правильность введенного ключа"}</p>
-                                    </div>
-                                </div>
+            {/* Поиск ключа */}
+            {!searchResult && (
+                <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                Введите subscription URL или идентификатор ключа
+                            </label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={keyIdentifier}
+                                    onChange={(e) => setKeyIdentifier(e.target.value)}
+                                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                                    placeholder="https://example.com/sub/... или идентификатор ключа"
+                                    className="flex-1 px-4 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/50"
+                                />
                                 <button
-                                    onClick={() => {
-                                        setSearchResult(null)
-                                        setKeyIdentifier("")
-                                        setError(null)
-                                    }}
-                                    className="w-full mt-4 px-6 py-2 border border-white/20 text-gray-300 hover:text-white hover:border-white/30 rounded-lg transition-colors"
+                                    onClick={handleSearch}
+                                    disabled={isSearching}
+                                    className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                 >
-                                    Начать заново
+                                    {isSearching ? (
+                                        <Loader2 size={16} className="animate-spin" />
+                                    ) : (
+                                        <Search size={16} />
+                                    )}
+                                    Найти
                                 </button>
+                            </div>
+                        </div>
+                        {error && (
+                            <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
+                                {error}
                             </div>
                         )}
                     </div>
-                )}
-            </div>
+                </div>
+            )}
+
+            {/* Результат поиска */}
+            {searchResult && (
+                <div className="space-y-6">
+                    {searchResult.found && searchResult.active ? (
+                        <>
+                            <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                                <div className="flex items-start gap-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg mb-4">
+                                    <CheckCircle className="text-emerald-400 mt-0.5" size={20} />
+                                    <div className="flex-1">
+                                        <h3 className="text-white font-semibold mb-1">Ключ найден</h3>
+                                        <div className="text-sm text-gray-300 space-y-1">
+                                            <p>Идентификатор: {searchResult.marzban_client_id}</p>
+                                            <p>Протокол: {searchResult.protocol?.toUpperCase() || 'N/A'}</p>
+                                            <p>Истекает: {formatDate(searchResult.expires_at)}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h2 className="text-xl font-bold text-white mb-4">Выберите тариф для продления</h2>
+
+                                {isLoadingTariffs ? (
+                                    <div className="flex items-center justify-center py-8">
+                                        <Loader2 size={24} className="animate-spin text-emerald-400" />
+                                    </div>
+                                ) : tariffs.length === 0 ? (
+                                    <p className="text-gray-400">Тарифы временно недоступны</p>
+                                ) : (
+                                    <div className="grid gap-4 mb-6">
+                                        {tariffs.map((tariff) => (
+                                            <button
+                                                key={tariff.id}
+                                                onClick={() => handleSelectTariff(tariff)}
+                                                className={`p-4 rounded-lg border-2 transition-all text-left ${selectedTariff?.id === tariff.id
+                                                    ? "border-emerald-500 bg-emerald-500/10"
+                                                    : "border-white/10 bg-slate-900/50 hover:border-emerald-500/50"
+                                                    }`}
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <h3 className="text-white font-semibold">{tariff.name}</h3>
+                                                        <p className="text-sm text-gray-400 mt-1">
+                                                            {formatDuration(tariff.duration_seconds)}
+                                                        </p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <div className="text-xl font-bold text-white">
+                                                            {tariff.price_amount / 100} ₽
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {selectedTariff && (
+                                    <div className="mt-6">
+                                        <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-white">{selectedTariff.name}</span>
+                                                <span className="text-emerald-400 font-bold">
+                                                    {selectedTariff.price_amount / 100} ₽
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={handleCreatePayment}
+                                            disabled={isCreatingPayment}
+                                            className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        >
+                                            {isCreatingPayment ? (
+                                                <>
+                                                    <Loader2 size={16} className="animate-spin" />
+                                                    Создание платежа...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    Перейти к оплате
+                                                    <ChevronRight size={16} />
+                                                </>
+                                            )}
+                                        </button>
+                                        {error && (
+                                            <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
+                                                {error}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    ) : (
+                        <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                            <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                                <XCircle className="text-red-400 mt-0.5" size={20} />
+                                <div className="flex-1">
+                                    <h3 className="text-white font-semibold mb-1">Ключ не найден</h3>
+                                    <p className="text-sm text-gray-300">{searchResult.message || "Проверьте правильность введенного ключа"}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setSearchResult(null)
+                                    setKeyIdentifier("")
+                                    setError(null)
+                                }}
+                                className="w-full mt-4 px-6 py-2 border border-white/20 text-gray-300 hover:text-white hover:border-white/30 rounded-lg transition-colors"
+                            >
+                                Начать заново
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
-    )
+    </div>
+)
 }
 
 export default function BuyKeyPage() {
