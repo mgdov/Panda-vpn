@@ -84,6 +84,12 @@ function DashboardPageContent() {
         // Проверяем параметр payment=success в URL
         const params = new URLSearchParams(window.location.search)
         if (params.get("payment") === "success") {
+            // Автоматически переключаемся на вкладку ключей при успешной оплате
+            const tabParam = params.get("tab")
+            if (tabParam === "keys" || !tabParam) {
+                setActiveTab("keys")
+            }
+
             // Синхронизируем последний платеж и обрабатываем его
             const syncAndLoad = async () => {
                 try {
@@ -122,8 +128,8 @@ function DashboardPageContent() {
                     // Если платеж обработан, показываем успех
                     if (syncResult && (syncResult.status === "success" || syncResult.status === "already_processed")) {
                         setPaymentSuccess(true)
-                        // Скрываем сообщение через 5 секунд
-                        setTimeout(() => setPaymentSuccess(false), 5000)
+                        // Скрываем сообщение через 8 секунд (увеличено чтобы пользователь успел увидеть новый ключ)
+                        setTimeout(() => setPaymentSuccess(false), 8000)
                     }
                 } catch (error) {
                     console.error("Failed to sync payment:", error)
@@ -133,8 +139,12 @@ function DashboardPageContent() {
             }
 
             syncAndLoad()
-            // Убираем параметр из URL
-            window.history.replaceState({}, "", "/dashboard")
+            // Убираем параметр payment из URL, но оставляем tab=keys
+            const newParams = new URLSearchParams(params)
+            newParams.delete("payment")
+            const newQuery = newParams.toString()
+            const newUrl = newQuery ? `/dashboard?${newQuery}` : "/dashboard"
+            window.history.replaceState({}, "", newUrl)
         }
     }, [loadData])
 

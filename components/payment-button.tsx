@@ -21,7 +21,7 @@ export default function PaymentButton({ price, tariffId }: PaymentButtonProps) {
     try {
       const result = await apiClient.createPayment({
         tariff_id: tariffId,
-        return_url: `${window.location.origin}/dashboard?payment=success`
+        return_url: `${window.location.origin}/dashboard?tab=keys&payment=success`
       })
 
       // Редирект на страницу оплаты YooKassa

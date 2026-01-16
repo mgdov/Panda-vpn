@@ -74,7 +74,7 @@ export default function RenewKeyPage() {
         setError(null)
 
         try {
-            const returnUrl = `${window.location.origin}/renew-key?success=true`
+            const returnUrl = `${window.location.origin}/dashboard?tab=keys&payment=success`
             const payment = await apiClient.createRenewalPayment({
                 client_id: searchResult.client_id,
                 tariff_id: selectedTariff.code,

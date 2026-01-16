@@ -119,7 +119,7 @@ function BuyKeyPageContent() {
         setError(null)
 
         try {
-            const baseReturnUrl = `${window.location.origin}/dashboard?success=true`
+            const baseReturnUrl = `${window.location.origin}/dashboard?tab=keys&payment=success`
 
             if (mode === "buy") {
                 // Покупка нового ключа

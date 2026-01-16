@@ -74,7 +74,7 @@ function BuyPageContent() {
         try {
             const result = await apiClient.createPayment({
                 tariff_id: selectedTariff.id,
-                return_url: `${window.location.origin}/dashboard?payment=success`,
+                return_url: `${window.location.origin}/dashboard?tab=keys&payment=success`,
             })
 
             if (result.confirmation_url) {
