@@ -16,54 +16,13 @@ interface AppInfo {
 const APPS: AppInfo[] = [
     {
         id: "happ",
-        name: "Happ (Hiddify)",
+        name: "Happ Vpn",
         description: "Лучший универсальный клиент для VLESS",
         icon: "🐼",
         platform: "Both",
         recommended: true,
     },
-    {
-        id: "direct",
-        name: "Прямая ссылка",
-        description: "Открыть subscription URL напрямую (автоматически перехватится приложением)",
-        icon: "🔗",
-        platform: "Both",
-    },
-    {
-        id: "v2rayng",
-        name: "v2rayNG",
-        description: "Популярный клиент для Android",
-        icon: "📱",
-        platform: "Android",
-    },
-    {
-        id: "shadowrocket",
-        name: "Shadowrocket",
-        description: "Премиум клиент для iOS (платный)",
-        icon: "🚀",
-        platform: "iOS",
-    },
-    {
-        id: "singbox",
-        name: "sing-box",
-        description: "Современный кроссплатформенный клиент",
-        icon: "📦",
-        platform: "Both",
-    },
-    {
-        id: "v2box",
-        name: "V2Box",
-        description: "Легковесный клиент для Android",
-        icon: "🔷",
-        platform: "Android",
-    },
-    {
-        id: "streisand",
-        name: "Streisand",
-        description: "VPN клиент для iOS",
-        icon: "⭐",
-        platform: "iOS",
-    },
+
 ]
 
 interface AppSelectorModalProps {
@@ -108,31 +67,28 @@ export default function AppSelectorModal({ isOpen, onClose, onSelect }: AppSelec
                     <div className="flex gap-2">
                         <button
                             onClick={() => setSelectedPlatform("All")}
-                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                                selectedPlatform === "All"
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${selectedPlatform === "All"
                                     ? "bg-green-600 text-white"
                                     : "bg-slate-700/50 text-gray-400 hover:bg-slate-700"
-                            }`}
+                                }`}
                         >
                             Все платформы
                         </button>
                         <button
                             onClick={() => setSelectedPlatform("Android")}
-                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                                selectedPlatform === "Android"
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${selectedPlatform === "Android"
                                     ? "bg-green-600 text-white"
                                     : "bg-slate-700/50 text-gray-400 hover:bg-slate-700"
-                            }`}
+                                }`}
                         >
                             📱 Android
                         </button>
                         <button
                             onClick={() => setSelectedPlatform("iOS")}
-                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                                selectedPlatform === "iOS"
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${selectedPlatform === "iOS"
                                     ? "bg-green-600 text-white"
                                     : "bg-slate-700/50 text-gray-400 hover:bg-slate-700"
-                            }`}
+                                }`}
                         >
                             🍎 iOS
                         </button>
