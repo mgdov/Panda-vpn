@@ -16,54 +16,13 @@ interface AppInfo {
 const APPS: AppInfo[] = [
     {
         id: "happ",
-        name: "Happ (Hiddify)",
+        name: "Happ",
         description: "Лучший универсальный клиент для VLESS",
         icon: "🐼",
         platform: "Both",
         recommended: true,
     },
-    {
-        id: "direct",
-        name: "Прямая ссылка",
-        description: "Открыть subscription URL напрямую (автоматически перехватится приложением)",
-        icon: "🔗",
-        platform: "Both",
-    },
-    {
-        id: "v2rayng",
-        name: "v2rayNG",
-        description: "Популярный клиент для Android",
-        icon: "📱",
-        platform: "Android",
-    },
-    {
-        id: "shadowrocket",
-        name: "Shadowrocket",
-        description: "Премиум клиент для iOS (платный)",
-        icon: "🚀",
-        platform: "iOS",
-    },
-    {
-        id: "singbox",
-        name: "sing-box",
-        description: "Современный кроссплатформенный клиент",
-        icon: "📦",
-        platform: "Both",
-    },
-    {
-        id: "v2box",
-        name: "V2Box",
-        description: "Легковесный клиент для Android",
-        icon: "🔷",
-        platform: "Android",
-    },
-    {
-        id: "streisand",
-        name: "Streisand",
-        description: "VPN клиент для iOS",
-        icon: "⭐",
-        platform: "iOS",
-    },
+    
 ]
 
 interface AppSelectorModalProps {

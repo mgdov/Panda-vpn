@@ -1,7 +1,6 @@
-import { Copy, Check, ChevronDown, ChevronUp, Smartphone } from "lucide-react"
-import { memo, useState } from "react"
+import { Copy, Check, ChevronDown, ChevronUp, Smartphone, Download, ExternalLink } from "lucide-react"
+import { memo, useState, useEffect, useRef } from "react"
 import KeyDevicesList from "./key-devices-list"
-import AppSelectorModal from "./app-selector-modal"
 import { apiClient } from "@/lib/api/client"
 import type { VPNAppType } from "@/lib/api/types"
 
@@ -33,8 +32,23 @@ interface VPNKeyCardProps {
 
 const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevoke, onRefresh }: VPNKeyCardProps) {
     const [showDevices, setShowDevices] = useState(false)
-    const [showAppSelector, setShowAppSelector] = useState(false)
     const [isAddingToApp, setIsAddingToApp] = useState(false)
+    const [showInstallOptions, setShowInstallOptions] = useState(false)
+    const installOptionsRef = useRef<HTMLDivElement>(null)
+
+    // Закрытие меню при клике вне его области
+    useEffect(() => {
+        if (!showInstallOptions) return
+
+        const handleClickOutside = (event: MouseEvent) => {
+            if (installOptionsRef.current && !installOptionsRef.current.contains(event.target as Node)) {
+                setShowInstallOptions(false)
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [showInstallOptions])
 
     const formatExpiresAt = (expiresAt: string | null) => {
         if (!expiresAt) return 'Без ограничений'
@@ -62,33 +76,39 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
     const isVLESS = vpnKey.key?.startsWith('vless://') || (!isSubscription && vpnKey.protocol === 'vless')
     const keyText = vpnKey.key || 'Генерация ключа...'
 
-    // Функция для добавления ключа в приложение
-    const handleAddToApp = async (app: VPNAppType) => {
+    // Добавить ключ в приложение Happ
+    const handleAddKeyToApp = async () => {
         setIsAddingToApp(true)
         try {
-            // Получаем deep link для выбранного приложения
-            const deepLinkData = await apiClient.getDeepLink(vpnKey.id, app)
-            
-            // ВАРИАНТ 1: Открываем в новой вкладке (для промежуточной страницы)
-            // Это позволяет пользователю легко вернуться на сайт
-            const newWindow = window.open(deepLinkData.deeplink, '_blank')
-            
-            // Проверяем открылась ли новая вкладка
-            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                // Popup blocker заблокировал - пробуем открыть в текущей вкладке
-                console.log('Popup blocked, opening in current tab')
-                window.location.href = deepLinkData.deeplink
-            } else {
-                console.log('Opened in new tab successfully')
-            }
-            
+            // Получаем deep link для Happ
+            const deepLinkData = await apiClient.getDeepLink(vpnKey.id, 'happ')
+
+            // Открываем страницу редиректа с параметром redirect_to
+            const redirectUrl = `/redirect?redirect_to=${encodeURIComponent(deepLinkData.deeplink)}`
+            window.open(redirectUrl, '_blank')
         } catch (error) {
             console.error('Failed to generate deep link:', error)
-            alert('Не удалось создать ссылку для добавления в приложение. Попробуйте скопировать ключ вручную.')
+
+            // Fallback: если API не работает, используем прямой subscription URL
+            if (vpnKey.subscription_url) {
+                console.log('Using fallback: direct subscription URL')
+                const happDeepLink = `happ://install-config?url=${encodeURIComponent(vpnKey.subscription_url)}`
+                const redirectUrl = `/redirect?redirect_to=${encodeURIComponent(happDeepLink)}`
+                window.open(redirectUrl, '_blank')
+            } else {
+                alert('Не удалось создать ссылку для добавления ключа. Попробуйте скопировать ключ вручную.')
+            }
         } finally {
             setIsAddingToApp(false)
         }
     }
+
+    const installLinks = [
+        { platform: 'iOS', url: 'https://apps.apple.com/fi/app/happ-proxy-utility/id6504287215', icon: '📱' },
+        { platform: 'Android', url: 'https://play.google.com/store/apps/details?id=com.happproxy', icon: '🤖' },
+        { platform: 'macOS', url: 'https://apps.apple.com/fi/mac/search?term=happ', icon: '💻' },
+        { platform: 'Windows', url: 'https://www.happ.su/happ/ru', icon: '🪟' },
+    ]
 
     return (
         <div className="p-4 md:p-5 bg-linear-to-br from-slate-800/60 to-slate-900/80 backdrop-blur-md border border-green-700/30 rounded-xl hover:border-green-600/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-600/20 hover:scale-[1.02] hover:-translate-y-0.5 flex flex-col gap-3 group">
@@ -167,26 +187,76 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                         🔒 VLESS протокол — безопасное подключение
                     </p>
                 ) : null}
-                
-                {/* Кнопка для добавления в приложение */}
+
+                {/* Две кнопки: Добавить ключ и Установить приложение */}
                 {keyText !== 'Генерация ключа...' && !vpnKey.device_limit_reached && (
-                    <button
-                        onClick={() => setShowAppSelector(true)}
-                        disabled={isAddingToApp}
-                        className="mt-3 w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 disabled:opacity-50 text-white rounded-lg transition-all duration-200 hover:scale-105 disabled:hover:scale-100 text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
-                    >
-                        {isAddingToApp ? (
-                            <>
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                Открытие...
-                            </>
-                        ) : (
-                            <>
-                                <Smartphone size={16} />
-                                🔥 Добавить ключ в приложение
-                            </>
-                        )}
-                    </button>
+                    <div className="mt-3 flex flex-col gap-2">
+                        {/* Кнопка добавления ключа в приложение */}
+                        <button
+                            onClick={handleAddKeyToApp}
+                            disabled={isAddingToApp}
+                            className="w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 disabled:opacity-50 text-white rounded-lg transition-all duration-200 hover:scale-105 disabled:hover:scale-100 text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
+                        >
+                            {isAddingToApp ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    Добавление ключа...
+                                </>
+                            ) : (
+                                <>
+                                    <Smartphone size={16} />
+                                    Добавить ключ в приложение
+                                </>
+                            )}
+                        </button>
+
+                        {/* Кнопка установки приложения с выпадающим списком */}
+                        <div className="relative" ref={installOptionsRef}>
+                            <button
+                                onClick={() => setShowInstallOptions(!showInstallOptions)}
+                                className="w-full px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-lg transition-all duration-200 hover:scale-105 text-sm font-semibold shadow-lg shadow-green-900/30 flex items-center justify-center gap-2"
+                            >
+                                <Download size={16} />
+                                Установить приложение Happ VPN
+                                <ChevronDown size={14} className={`transition-transform duration-300 ${showInstallOptions ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {/* Backdrop для закрытия меню */}
+                            {showInstallOptions && (
+                                <div
+                                    className="fixed inset-0 z-40"
+                                    onClick={() => setShowInstallOptions(false)}
+                                />
+                            )}
+
+                            {/* Выпадающий список платформ */}
+                            {showInstallOptions && (
+                                <div className="absolute bottom-full left-0 right-0 mb-2 bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-green-500/50 rounded-xl shadow-2xl shadow-green-900/50 overflow-hidden z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                                    <div className="p-2 bg-green-600/10 border-b-2 border-green-500/30">
+                                        <p className="text-xs font-semibold text-green-400 text-center">📱 Выберите вашу платформу</p>
+                                    </div>
+                                    {installLinks.map((link, index) => (
+                                        <a
+                                            key={link.platform}
+                                            href={link.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-3 px-4 py-3.5 hover:bg-gradient-to-r hover:from-green-600/30 hover:to-emerald-600/30 transition-all duration-200 border-b border-green-700/20 last:border-b-0 group hover:scale-[1.02] hover:shadow-lg"
+                                            onClick={() => setShowInstallOptions(false)}
+                                            style={{ animationDelay: `${index * 50}ms` }}
+                                        >
+                                            <span className="text-2xl group-hover:scale-110 transition-transform duration-200">{link.icon}</span>
+                                            <div className="flex-1">
+                                                <span className="text-sm font-semibold text-white block group-hover:text-green-300 transition-colors">{link.platform}</span>
+                                                <span className="text-xs text-gray-400">Скачать приложение</span>
+                                            </div>
+                                            <ExternalLink size={16} className="text-gray-400 group-hover:text-green-400 transition-colors" />
+                                        </a>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 )}
                 {/* Информация об устройствах */}
                 {vpnKey.active_devices_count !== undefined && vpnKey.max_devices !== undefined && (
@@ -248,14 +318,6 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                     }}
                 />
             )}
-
-            {/* Модальное окно выбора приложения */}
-            <AppSelectorModal
-                isOpen={showAppSelector}
-                onClose={() => setShowAppSelector(false)}
-                onSelect={handleAddToApp}
-                keyId={vpnKey.id}
-            />
         </div>
     )
 })
