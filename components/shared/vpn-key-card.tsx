@@ -202,16 +202,13 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                 <ol className="space-y-2 text-xs text-gray-300">
                     <li className="flex gap-2">
                         <span className="text-purple-400 font-semibold">1.</span>
-                        <span>Установите приложение для VPN</span>
+                        <span>Установите приложение для VPN нажав на первую кнопку, а затем вернитесь снова на сайт</span>
                     </li>
                     <li className="flex gap-2">
                         <span className="text-purple-400 font-semibold">2.</span>
-                        <span>Вернитесь на сайт и снова нажмите кнопку добавления</span>
+                        <span>После установки приложения нажмите вторую кнопку «Добавить VPN в приложение»</span>
                     </li>
-                    <li className="flex gap-2">
-                        <span className="text-purple-400 font-semibold">3.</span>
-                        <span>Нажмите "Добавить VPN в приложение"</span>
-                    </li>
+
                 </ol>
             </div>
 
