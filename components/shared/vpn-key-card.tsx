@@ -66,6 +66,27 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
         }
     }
 
+    const getTimeRemaining = (expiresAt: string | null) => {
+        if (!expiresAt) return null
+        try {
+            const now = new Date()
+            const expiry = new Date(expiresAt)
+            const diffMs = expiry.getTime() - now.getTime()
+
+            if (diffMs <= 0) return 'Истёк'
+
+            const days = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+            const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+            const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+
+            if (days > 0) return `Осталось ${days} дн.`
+            if (hours > 0) return `Осталось ${hours} ч.`
+            return `Осталось ${minutes} мин.`
+        } catch {
+            return null
+        }
+    }
+
     const getProtocolName = (protocol?: string) => {
         if (!protocol) return 'VPN'
         return protocol.toUpperCase()
@@ -159,34 +180,42 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                 </div>
             )}
 
-            <div className="p-3 bg-black/60 rounded-lg border border-green-700/20 hover:border-green-600/40 transition-colors duration-300">
-                <div className="flex items-center justify-between gap-2">
-                    <code className="text-xs text-gray-400 break-all flex-1 font-mono">
-                        {keyText}
-                    </code>
-                    {keyText !== 'Генерация ключа...' && !vpnKey.device_limit_reached && (
-                        <button
-                            onClick={() => onCopy(keyText, vpnKey.id)}
-                            className="shrink-0 p-2 hover:bg-green-600/30 rounded-lg transition-all duration-300 hover:scale-110 group/btn"
-                            title="Копировать ключ"
-                        >
-                            {copiedKey === vpnKey.id ? (
-                                <Check size={16} className="text-green-400 animate-in" />
-                            ) : (
-                                <Copy size={16} className="text-gray-400 group-hover/btn:text-green-400 transition-colors" />
-                            )}
-                        </button>
+            {/* Блок с датой истечения */}
+            <div className="p-3 bg-gradient-to-r from-orange-900/30 to-red-900/30 border border-orange-500/50 rounded-lg">
+                <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm text-orange-300 font-semibold flex items-center gap-2">
+                        ⏰ Истекает: <span className="text-white">{formatExpiresAt(vpnKey.expiresAt)}</span>
+                    </p>
+                    {getTimeRemaining(vpnKey.expiresAt) && (
+                        <span className="text-xs font-bold text-orange-200 bg-orange-600/30 px-2 py-1 rounded-md">
+                            {getTimeRemaining(vpnKey.expiresAt)}
+                        </span>
                     )}
                 </div>
-                {isSubscription ? (
-                    <p className="text-xs text-blue-400/70 mt-2">
-                        🔗 Subscription URL — используйте для автоматической подписки
-                    </p>
-                ) : isVLESS ? (
-                    <p className="text-xs text-green-400/70 mt-2">
-                        🔒 VLESS протокол — безопасное подключение
-                    </p>
-                ) : null}
+            </div>
+
+            {/* Блок с инструкцией */}
+            <div className="p-4 bg-gradient-to-br from-purple-900/30 to-indigo-900/30 border border-purple-500/50 rounded-lg">
+                <h4 className="text-sm font-bold text-purple-300 mb-3 flex items-center gap-2">
+                    📱 Инструкция:
+                </h4>
+                <ol className="space-y-2 text-xs text-gray-300">
+                    <li className="flex gap-2">
+                        <span className="text-purple-400 font-semibold">1.</span>
+                        <span>Установите приложение для вашего устройства</span>
+                    </li>
+                    <li className="flex gap-2">
+                        <span className="text-purple-400 font-semibold">2.</span>
+                        <span>Нажмите "Добавить VPN в приложение"</span>
+                    </li>
+                    <li className="flex gap-2">
+                        <span className="text-purple-400 font-semibold">3.</span>
+                        <span>Вернитесь на сайт и снова нажмите кнопку добавления</span>
+                    </li>
+                </ol>
+            </div>
+
+            <div>
 
                 {/* Две кнопки: Добавить ключ и Установить приложение */}
                 {keyText !== 'Генерация ключа...' && !vpnKey.device_limit_reached && (
@@ -258,18 +287,9 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                         </div>
                     </div>
                 )}
-                {/* Информация об устройствах */}
-                {vpnKey.active_devices_count !== undefined && vpnKey.max_devices !== undefined && (
-                    <p className="text-xs text-gray-500 mt-2">
-                        Устройств: {vpnKey.active_devices_count} / {vpnKey.max_devices}
-                    </p>
-                )}
             </div>
 
-            <div className="flex items-center justify-between text-xs md:text-sm flex-wrap gap-2">
-                <span className="text-gray-400 font-medium">
-                    Истекает: <span className="text-white">{formatExpiresAt(vpnKey.expiresAt)}</span>
-                </span>
+            <div className="flex items-center justify-end text-xs md:text-sm flex-wrap gap-2">
                 <div className="flex gap-2.5">
                     {/* Кнопка показа устройств */}
                     {vpnKey.active_devices_count !== undefined && vpnKey.active_devices_count > 0 && (
