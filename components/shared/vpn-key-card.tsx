@@ -202,15 +202,15 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                 <ol className="space-y-2 text-xs text-gray-300">
                     <li className="flex gap-2">
                         <span className="text-purple-400 font-semibold">1.</span>
-                        <span>Установите приложение для вашего устройства</span>
+                        <span>Установите приложение для VPN</span>
                     </li>
                     <li className="flex gap-2">
                         <span className="text-purple-400 font-semibold">2.</span>
-                        <span>Нажмите "Добавить VPN в приложение"</span>
+                        <span>Вернитесь на сайт и снова нажмите кнопку добавления</span>
                     </li>
                     <li className="flex gap-2">
                         <span className="text-purple-400 font-semibold">3.</span>
-                        <span>Вернитесь на сайт и снова нажмите кнопку добавления</span>
+                        <span>Нажмите "Добавить VPN в приложение"</span>
                     </li>
                 </ol>
             </div>
@@ -220,33 +220,16 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                 {/* Две кнопки: Добавить ключ и Установить приложение */}
                 {keyText !== 'Генерация ключа...' && !vpnKey.device_limit_reached && (
                     <div className="mt-3 flex flex-col gap-2">
-                        {/* Кнопка добавления ключа в приложение */}
-                        <button
-                            onClick={handleAddKeyToApp}
-                            disabled={isAddingToApp}
-                            className="w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 disabled:opacity-50 text-white rounded-lg transition-all duration-200 hover:scale-105 disabled:hover:scale-100 text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
-                        >
-                            {isAddingToApp ? (
-                                <>
-                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    Добавление ключа...
-                                </>
-                            ) : (
-                                <>
-                                    <Smartphone size={16} />
-                                    Добавить ключ в приложение
-                                </>
-                            )}
-                        </button>
-
                         {/* Кнопка установки приложения с выпадающим списком */}
                         <div className="relative" ref={installOptionsRef}>
                             <button
+
                                 onClick={() => setShowInstallOptions(!showInstallOptions)}
                                 className="w-full px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-lg transition-all duration-200 hover:scale-105 text-sm font-semibold shadow-lg shadow-green-900/30 flex items-center justify-center gap-2"
                             >
+                                <p>1.</p>
                                 <Download size={16} />
-                                Установить приложение Happ VPN
+                                Установить приложение для VPN
                                 <ChevronDown size={14} className={`transition-transform duration-300 ${showInstallOptions ? 'rotate-180' : ''}`} />
                             </button>
 
@@ -265,6 +248,7 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                                         <p className="text-xs font-semibold text-green-400 text-center">📱 Выберите вашу платформу</p>
                                     </div>
                                     {installLinks.map((link, index) => (
+
                                         <a
                                             key={link.platform}
                                             href={link.url}
@@ -276,6 +260,7 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                                         >
                                             <span className="text-2xl group-hover:scale-110 transition-transform duration-200">{link.icon}</span>
                                             <div className="flex-1">
+
                                                 <span className="text-sm font-semibold text-white block group-hover:text-green-300 transition-colors">{link.platform}</span>
                                                 <span className="text-xs text-gray-400">Скачать приложение</span>
                                             </div>
@@ -285,6 +270,27 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                                 </div>
                             )}
                         </div>
+                        {/* Кнопка добавления ключа в приложение */}
+                        <button
+                            onClick={handleAddKeyToApp}
+                            disabled={isAddingToApp}
+                            className="w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 disabled:opacity-50 text-white rounded-lg transition-all duration-200 hover:scale-105 disabled:hover:scale-100 text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
+                        >
+                            {isAddingToApp ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    Добавление ключа...
+                                </>
+                            ) : (
+                                <>
+                                    <p>2.</p>
+                                    <Smartphone size={16} />
+                                    Добавить VPN в приложение
+                                </>
+                            )}
+                        </button>
+
+
                     </div>
                 )}
             </div>
@@ -298,6 +304,7 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                             className="text-blue-400 hover:text-blue-300 transition-colors duration-300 font-semibold hover:scale-105 flex items-center gap-1"
                             title="Показать устройства"
                         >
+
                             {showDevices ? (
                                 <>
                                     <ChevronUp size={14} />
