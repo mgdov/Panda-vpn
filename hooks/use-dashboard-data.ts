@@ -176,24 +176,6 @@ export function useDashboardData() {
                 })
             }
 
-            // Добавляем тестовый ключ для отладки
-            formattedKeys.push({
-                id: 'test-key',
-                key: 'https://vpn-p.ru/api/subscription/VEZJVUMsMTc2ODUwNjk4NQTgd_sgc5e_',
-                location: 'Тестовый тариф',
-                status: 'active',
-                expiresAt: null,
-                marzban_client_id: 'TFIUC',
-                protocol: 'vless',
-                subscription_url: 'https://vpn-p.ru/api/subscription/VEZJVUMsMTc2ODUwNjk4NQTgd_sgc5e_',
-                config_text: null,
-                preferred_method: 'subscription',
-                device_limit_reached: false,
-                active_devices_count: 0,
-                max_devices: 1,
-                limit_message: null,
-            })
-
             setVpnKeys(formattedKeys)
         } catch (error) {
             const message = extractErrorMessage(error)
