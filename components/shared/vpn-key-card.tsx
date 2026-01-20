@@ -104,8 +104,20 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
             // Получаем deep link для Happ
             const deepLinkData = await apiClient.getDeepLink(vpnKey.id, 'happ')
 
+            // Извлекаем happ:// URL из ответа API
+            // API может вернуть либо прямой happ:// URL, либо URL с редиректом
+            let happUrl = deepLinkData.deeplink
+
+            // Если API вернул URL с редиректом (содержит redirect_to), извлекаем happ:// из него
+            if (happUrl.includes('redirect_to=')) {
+                const match = happUrl.match(/redirect_to=([^&]+)/)
+                if (match && match[1]) {
+                    happUrl = decodeURIComponent(match[1])
+                }
+            }
+
             // Открываем страницу редиректа с параметром redirect_to
-            const redirectUrl = `/redirect?redirect_to=${encodeURIComponent(deepLinkData.deeplink)}`
+            const redirectUrl = `/redirect?redirect_to=${encodeURIComponent(happUrl)}`
             window.open(redirectUrl, '_blank')
         } catch (error) {
             console.error('Failed to generate deep link:', error)
