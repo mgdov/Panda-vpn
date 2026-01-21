@@ -1,10 +1,11 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { memo, useCallback } from "react"
+import { memo, useCallback, useState } from "react"
 import Link from "next/link"
 import { useAuth } from "@/hooks/use-auth"
 import { generateTelegramLink } from "@/lib/utils/telegram"
+import { apiClient } from "@/lib/api/client"
 
 export interface Plan {
     id: string
@@ -25,10 +26,28 @@ interface DashboardPlansTabProps {
 const DashboardPlansTab = memo(function DashboardPlansTab({ plans, errorMessage }: DashboardPlansTabProps) {
     const router = useRouter()
     const { userEmail } = useAuth()
+    const [processingPlanId, setProcessingPlanId] = useState<string | null>(null)
 
-    const handlePlanSelection = useCallback((planId: string) => {
-        router.push(`/dashboard/buy?tariff=${encodeURIComponent(planId)}`)
-    }, [router])
+    const handlePlanSelection = useCallback(async (planId: string) => {
+        setProcessingPlanId(planId)
+        try {
+            const result = await apiClient.createPayment({
+                tariff_id: planId,
+                return_url: `${window.location.origin}/dashboard?payment=success&tab=keys`,
+            })
+
+            if (result.confirmation_url) {
+                window.location.href = result.confirmation_url
+            } else {
+                alert("Не удалось получить ссылку на оплату")
+                setProcessingPlanId(null)
+            }
+        } catch (error) {
+            console.error("Payment creation failed:", error)
+            alert("Не удалось создать платеж. Попробуйте еще раз.")
+            setProcessingPlanId(null)
+        }
+    }, [])
 
     const handleTelegramConnect = useCallback(() => {
         if (!userEmail) {
@@ -127,12 +146,20 @@ const DashboardPlansTab = memo(function DashboardPlansTab({ plans, errorMessage 
                                 <button
                                     type="button"
                                     onClick={() => handlePlanSelection(plan.id)}
+                                    disabled={processingPlanId !== null}
                                     className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all duration-300 sm:text-base ${plan.highlighted
                                         ? "bg-linear-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/40 hover:-translate-y-0.5 hover:shadow-xl"
                                         : "bg-white/10 text-white hover:-translate-y-0.5 hover:border-emerald-400/40 hover:bg-white/15"
-                                        }`}
+                                        } disabled:opacity-50 disabled:cursor-not-allowed`}
                                 >
-                                    {plan.highlighted ? "✨ Активировать тариф" : "Выбрать тариф"}
+                                    {processingPlanId === plan.id ? (
+                                        <>
+                                            <span className="animate-spin">⏳</span>
+                                            Создание платежа...
+                                        </>
+                                    ) : (
+                                        "💳 Оплатить тариф"
+                                    )}
                                 </button>
                             </div>
                         </article>
