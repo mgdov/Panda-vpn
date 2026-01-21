@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef, Suspense } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
@@ -22,7 +22,6 @@ function BuyPageContent() {
     const [isProcessing, setIsProcessing] = useState(false)
     const [error, setError] = useState("")
     const [sidebarOpen, setSidebarOpen] = useState(false)
-    const autoPaymentTriggered = useRef(false)
 
     const loadTariffs = useCallback(async () => {
         try {
@@ -42,9 +41,29 @@ function BuyPageContent() {
         }
     }, [searchParams])
 
-    const handlePayment = useCallback(async (tariff?: Tariff) => {
-        const tariffToUse = tariff || selectedTariff
-        if (!tariffToUse) {
+    useEffect(() => {
+        if (!isAuthenticated && !authLoading) {
+            router.push("/auth/login")
+            return
+        }
+
+        if (isAuthenticated) {
+            loadTariffs()
+        }
+    }, [isAuthenticated, authLoading, router, loadTariffs])
+
+    useEffect(() => {
+        const tariffId = searchParams.get("tariff")
+        if (tariffId && tariffs.length > 0) {
+            const tariff = tariffs.find((t) => t.id === tariffId || t.code === tariffId)
+            if (tariff) {
+                setSelectedTariff(tariff)
+            }
+        }
+    }, [searchParams, tariffs])
+
+    const handlePayment = async () => {
+        if (!selectedTariff) {
             setError("Выберите тариф")
             return
         }
@@ -54,7 +73,7 @@ function BuyPageContent() {
 
         try {
             const result = await apiClient.createPayment({
-                tariff_id: tariffToUse.id,
+                tariff_id: selectedTariff.id,
                 return_url: `${window.location.origin}/dashboard?payment=success&tab=keys`,
             })
 
@@ -73,31 +92,7 @@ function BuyPageContent() {
             setError(errorMessage)
             setIsProcessing(false)
         }
-    }, [selectedTariff])
-
-    useEffect(() => {
-        if (!isAuthenticated && !authLoading) {
-            router.push("/auth/login")
-            return
-        }
-
-        if (isAuthenticated) {
-            loadTariffs()
-        }
-    }, [isAuthenticated, authLoading, router, loadTariffs])
-
-    useEffect(() => {
-        const tariffId = searchParams.get("tariff")
-        if (tariffId && tariffs.length > 0 && !selectedTariff && !autoPaymentTriggered.current && !isProcessing) {
-            const tariff = tariffs.find((t) => t.id === tariffId || t.code === tariffId)
-            if (tariff) {
-                setSelectedTariff(tariff)
-                autoPaymentTriggered.current = true
-                // Автоматически запускаем оплату сразу после выбора тарифа
-                handlePayment(tariff)
-            }
-        }
-    }, [searchParams, tariffs, selectedTariff, isProcessing, handlePayment])
+    }
 
     const handleLogout = async () => {
         try {
@@ -237,7 +232,7 @@ function BuyPageContent() {
 
                                             {isSelected && (
                                                 <button
-                                                    onClick={() => handlePayment()}
+                                                    onClick={handlePayment}
                                                     disabled={isProcessing}
                                                     className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold bg-linear-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
