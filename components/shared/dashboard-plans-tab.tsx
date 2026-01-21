@@ -67,11 +67,7 @@ const DashboardPlansTab = memo(function DashboardPlansTab({ plans, errorMessage 
                 </div>
             )}
 
-            {!errorMessage && plans.length === 0 && (
-                <div className="mb-6 rounded-xl border border-yellow-500/40 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-100">
-                    Сервер не вернул доступные тарифы. Попробуйте обновить страницу позже.
-                </div>
-            )}
+
 
             {!errorMessage && (
                 <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">

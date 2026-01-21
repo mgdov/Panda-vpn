@@ -118,7 +118,15 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
 
             // Открываем страницу редиректа с параметром redirect_to
             const redirectUrl = `/redirect?redirect_to=${encodeURIComponent(happUrl)}`
-            window.open(redirectUrl, '_blank')
+
+            // На мобильных используем window.location.href для надежности
+            // На десктопе открываем в новой вкладке
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+            if (isMobile) {
+                window.location.href = redirectUrl
+            } else {
+                window.open(redirectUrl, '_blank')
+            }
         } catch (error) {
             console.error('Failed to generate deep link:', error)
 
@@ -127,7 +135,13 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                 console.log('Using fallback: direct subscription URL')
                 const happDeepLink = `happ://install-config?url=${encodeURIComponent(vpnKey.subscription_url)}`
                 const redirectUrl = `/redirect?redirect_to=${encodeURIComponent(happDeepLink)}`
-                window.open(redirectUrl, '_blank')
+
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+                if (isMobile) {
+                    window.location.href = redirectUrl
+                } else {
+                    window.open(redirectUrl, '_blank')
+                }
             } else {
                 alert('Не удалось создать ссылку для добавления ключа. Попробуйте скопировать ключ вручную.')
             }

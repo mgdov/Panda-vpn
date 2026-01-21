@@ -85,56 +85,59 @@ function DashboardPageContent() {
         const params = new URLSearchParams(window.location.search)
         if (params.get("payment") === "success") {
             // Автоматически переключаемся на вкладку ключей при успешной оплате
-            const tabParam = params.get("tab")
-            if (tabParam === "keys" || !tabParam) {
-                setActiveTab("keys")
-            }
+            setActiveTab("keys")
 
             // Синхронизируем последний платеж и обрабатываем его
             const syncAndLoad = async () => {
                 try {
-                    // Небольшая задержка для того чтобы платеж успел обработаться на сервере
-                    await new Promise(resolve => setTimeout(resolve, 1000))
+                    // Показываем сообщение об успехе сразу
+                    setPaymentSuccess(true)
 
-                    // Синхронизируем статус последнего платежа (до 3 попыток)
+                    // Небольшая задержка для того чтобы платеж успел обработаться на сервере
+                    await new Promise(resolve => setTimeout(resolve, 500))
+
+                    // Синхронизируем статус последнего платежа (до 5 попыток)
                     let syncResult = null
-                    for (let attempt = 0; attempt < 3; attempt++) {
+                    for (let attempt = 0; attempt < 5; attempt++) {
                         try {
                             syncResult = await apiClient.syncLatestPayment()
                             console.log(`Payment sync attempt ${attempt + 1} result:`, syncResult)
 
+                            // Обновляем данные после каждой попытки
+                            await loadData()
+
                             // Если платеж обработан или уже обработан - выходим
                             if (syncResult.status === "success" || syncResult.status === "already_processed") {
+                                console.log("Payment successfully processed!")
                                 break
                             }
 
                             // Если платеж еще pending, ждем и пробуем еще раз
-                            if (attempt < 2 && syncResult.status === "pending") {
+                            if (attempt < 4 && syncResult.status === "pending") {
+                                console.log("Payment still pending, retrying...")
                                 await new Promise(resolve => setTimeout(resolve, 2000))
                                 continue
                             }
                         } catch (error) {
                             console.error(`Payment sync attempt ${attempt + 1} failed:`, error)
-                            if (attempt < 2) {
+                            if (attempt < 4) {
                                 await new Promise(resolve => setTimeout(resolve, 2000))
                                 continue
                             }
                         }
                     }
 
-                    // Обновляем ключи после синхронизации
+                    // Финальное обновление данных
                     await loadData()
 
-                    // Если платеж обработан, показываем успех
-                    if (syncResult && (syncResult.status === "success" || syncResult.status === "already_processed")) {
-                        setPaymentSuccess(true)
-                        // Скрываем сообщение через 8 секунд (увеличено чтобы пользователь успел увидеть новый ключ)
-                        setTimeout(() => setPaymentSuccess(false), 8000)
-                    }
+                    // Скрываем сообщение через 5 секунд
+                    setTimeout(() => setPaymentSuccess(false), 5000)
                 } catch (error) {
                     console.error("Failed to sync payment:", error)
                     // В любом случае обновляем данные
                     await loadData()
+                    // Скрываем сообщение при ошибке
+                    setTimeout(() => setPaymentSuccess(false), 3000)
                 }
             }
 
@@ -142,8 +145,9 @@ function DashboardPageContent() {
             // Убираем параметр payment из URL, но оставляем tab=keys
             const newParams = new URLSearchParams(params)
             newParams.delete("payment")
+            newParams.set("tab", "keys")
             const newQuery = newParams.toString()
-            const newUrl = newQuery ? `/dashboard?${newQuery}` : "/dashboard"
+            const newUrl = `/dashboard?${newQuery}`
             window.history.replaceState({}, "", newUrl)
         }
     }, [loadData])
@@ -193,23 +197,7 @@ function DashboardPageContent() {
 
                 <StatsGrid keysCount={vpnKeys.length} />
 
-                {paymentSuccess && (
-                    <div className="mb-6 rounded-xl border border-emerald-500/50 bg-emerald-900/20 px-6 py-4 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <span className="text-2xl">✅</span>
-                            <div>
-                                <p className="text-base font-semibold text-emerald-400">Оплата успешно выполнена!</p>
-                                <p className="text-sm text-emerald-300/80">Ваш новый VLESS ключ создан. Проверьте вкладку &quot;Ключи&quot;.</p>
-                            </div>
-                        </div>
-                        <button
-                            onClick={() => setPaymentSuccess(false)}
-                            className="text-emerald-400 hover:text-emerald-300 transition-colors"
-                        >
-                            ✕
-                        </button>
-                    </div>
-                )}
+
 
                 <div className="bg-white/5 backdrop-blur-xl border border-green-700/20 rounded-xl md:rounded-2xl shadow-xl p-4 sm:p-5 md:p-6 lg:p-8">
                     {activeTab === "plans" && <DashboardPlansTab plans={plans} errorMessage={plansError} />}
