@@ -125,7 +125,13 @@ function RenewKeyPageContent() {
             }
         } catch (err: any) {
             console.error('[Renew] Payment error:', err)
-            setError(err.message || "Ошибка при создании платежа")
+            const errorMessage = err.message || "Ошибка при создании платежа"
+            // Улучшаем сообщение об ошибке для пользователя
+            if (errorMessage.includes("не найден") || errorMessage.includes("неактивен")) {
+                setError("Не удалось найти ваш ключ для продления. Пожалуйста, свяжитесь с поддержкой или попробуйте купить новый ключ.")
+            } else {
+                setError(errorMessage)
+            }
         } finally {
             setIsCreatingPayment(false)
         }
@@ -259,6 +265,16 @@ function RenewKeyPageContent() {
                 {/* Подтверждение и выбор тарифа */}
                 {isConfirming && searchResult?.found && searchResult.active && (
                     <div className="space-y-6">
+                        {/* Информация о ключе */}
+                        {searchResult.client_id && (
+                            <div className="bg-slate-800/60 backdrop-blur-md border border-emerald-500/30 rounded-xl p-4">
+                                <div className="flex items-center gap-2 text-sm text-gray-300">
+                                    <span className="text-emerald-400">🔑</span>
+                                    <span>Продление ключа: <span className="font-mono text-white">{searchResult.client_id}</span></span>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
                             <h2 className="text-xl font-bold text-white mb-4">Выберите тариф для продления</h2>
 
