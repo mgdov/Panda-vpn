@@ -119,13 +119,13 @@ function BuyKeyPageContent() {
         setError(null)
 
         try {
-            const baseReturnUrl = `${window.location.origin}/dashboard?tab=keys&payment=success`
-
             if (mode === "buy") {
-                // Покупка нового ключа
+                // Покупка нового ключа - возвращаем на страницу buy-key
+                const buyReturnUrl = `${window.location.origin}/buy-key?success=true`
+
                 const payment = await apiClient.createNewKeyPayment({
                     tariff_id: selectedTariff.code,
-                    return_url: baseReturnUrl
+                    return_url: buyReturnUrl
                 })
 
                 if (payment.confirmation_url) {
@@ -139,11 +139,13 @@ function BuyKeyPageContent() {
                     setError("Не удалось получить ссылку на оплату")
                 }
             } else if (mode === "renew" && searchResult?.client_id) {
-                // Продление существующего ключа
+                // Продление существующего ключа - возвращаем на страницу buy-key
+                const renewReturnUrl = `${window.location.origin}/buy-key?success=true`
+
                 const payment = await apiClient.createRenewalPayment({
                     client_id: searchResult.client_id,
                     tariff_id: selectedTariff.code,
-                    return_url: baseReturnUrl
+                    return_url: renewReturnUrl
                 })
 
                 if (payment.confirmation_url) {
@@ -460,66 +462,62 @@ function BuyKeyPageContent() {
                         ) : tariffs.length === 0 ? (
                             <p className="text-gray-400">Тарифы временно недоступны</p>
                         ) : (
-                            <div className="grid gap-4 mb-6">
+                            <div className="grid gap-4">
                                 {tariffs.map((tariff) => (
-                                    <button
+                                    <div
                                         key={tariff.id}
-                                        onClick={() => handleSelectTariff(tariff)}
-                                        className={`p-4 rounded-lg border-2 transition-all text-left ${selectedTariff?.id === tariff.id
+                                        className={`p-4 rounded-lg border-2 transition-all ${selectedTariff?.id === tariff.id
                                             ? "border-emerald-500 bg-emerald-500/10"
-                                            : "border-white/10 bg-slate-900/50 hover:border-emerald-500/50"
+                                            : "border-white/10 bg-slate-900/50"
                                             }`}
                                     >
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <h3 className="text-white font-semibold">{tariff.name}</h3>
-                                                <p className="text-sm text-gray-400 mt-1">
-                                                    {formatDuration(tariff.duration_seconds)}
-                                                </p>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="text-xl font-bold text-white">
-                                                    {tariff.price_amount / 100} ₽
+                                        <button
+                                            onClick={() => handleSelectTariff(tariff)}
+                                            className="w-full text-left"
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <h3 className="text-white font-semibold">{tariff.name}</h3>
+                                                    <p className="text-sm text-gray-400 mt-1">
+                                                        {formatDuration(tariff.duration_seconds)}
+                                                    </p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-xl font-bold text-white">
+                                                        {tariff.price_amount / 100} ₽
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        )}
+                                        </button>
 
-                        {selectedTariff && (
-                            <div className="mt-6">
-                                <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-white">{selectedTariff.name}</span>
-                                        <span className="text-emerald-400 font-bold">
-                                            {selectedTariff.price_amount / 100} ₽
-                                        </span>
+                                        {selectedTariff?.id === tariff.id && (
+                                            <div className="mt-4 pt-4 border-t border-emerald-500/30">
+                                                <button
+                                                    onClick={handleCreatePayment}
+                                                    disabled={isCreatingPayment}
+                                                    className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                >
+                                                    {isCreatingPayment ? (
+                                                        <>
+                                                            <Loader2 size={16} className="animate-spin" />
+                                                            Создание платежа...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            💳 Перейти к оплате
+                                                            <ChevronRight size={16} />
+                                                        </>
+                                                    )}
+                                                </button>
+                                                {error && (
+                                                    <div className="mt-3 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
+                                                        {error}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
-                                <button
-                                    onClick={handleCreatePayment}
-                                    disabled={isCreatingPayment}
-                                    className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                >
-                                    {isCreatingPayment ? (
-                                        <>
-                                            <Loader2 size={16} className="animate-spin" />
-                                            Создание платежа...
-                                        </>
-                                    ) : (
-                                        <>
-                                            Перейти к оплате
-                                            <ChevronRight size={16} />
-                                        </>
-                                    )}
-                                </button>
-                                {error && (
-                                    <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
-                                        {error}
-                                    </div>
-                                )}
+                                ))}
                             </div>
                         )}
                     </div>
@@ -788,66 +786,62 @@ function BuyKeyPageContent() {
                                     ) : tariffs.length === 0 ? (
                                         <p className="text-gray-400">Тарифы временно недоступны</p>
                                     ) : (
-                                        <div className="grid gap-4 mb-6">
+                                        <div className="grid gap-4">
                                             {tariffs.map((tariff) => (
-                                                <button
+                                                <div
                                                     key={tariff.id}
-                                                    onClick={() => handleSelectTariff(tariff)}
-                                                    className={`p-4 rounded-lg border-2 transition-all text-left ${selectedTariff?.id === tariff.id
+                                                    className={`p-4 rounded-lg border-2 transition-all ${selectedTariff?.id === tariff.id
                                                         ? "border-emerald-500 bg-emerald-500/10"
-                                                        : "border-white/10 bg-slate-900/50 hover:border-emerald-500/50"
+                                                        : "border-white/10 bg-slate-900/50"
                                                         }`}
                                                 >
-                                                    <div className="flex items-center justify-between">
-                                                        <div>
-                                                            <h3 className="text-white font-semibold">{tariff.name}</h3>
-                                                            <p className="text-sm text-gray-400 mt-1">
-                                                                {formatDuration(tariff.duration_seconds)}
-                                                            </p>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <div className="text-xl font-bold text-white">
-                                                                {tariff.price_amount / 100} ₽
+                                                    <button
+                                                        onClick={() => handleSelectTariff(tariff)}
+                                                        className="w-full text-left"
+                                                    >
+                                                        <div className="flex items-center justify-between">
+                                                            <div>
+                                                                <h3 className="text-white font-semibold">{tariff.name}</h3>
+                                                                <p className="text-sm text-gray-400 mt-1">
+                                                                    {formatDuration(tariff.duration_seconds)}
+                                                                </p>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <div className="text-xl font-bold text-white">
+                                                                    {tariff.price_amount / 100} ₽
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
+                                                    </button>
 
-                                    {selectedTariff && (
-                                        <div className="mt-6">
-                                            <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-white">{selectedTariff.name}</span>
-                                                    <span className="text-emerald-400 font-bold">
-                                                        {selectedTariff.price_amount / 100} ₽
-                                                    </span>
+                                                    {selectedTariff?.id === tariff.id && (
+                                                        <div className="mt-4 pt-4 border-t border-emerald-500/30">
+                                                            <button
+                                                                onClick={handleCreatePayment}
+                                                                disabled={isCreatingPayment}
+                                                                className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                            >
+                                                                {isCreatingPayment ? (
+                                                                    <>
+                                                                        <Loader2 size={16} className="animate-spin" />
+                                                                        Создание платежа...
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        💳 Перейти к оплате
+                                                                        <ChevronRight size={16} />
+                                                                    </>
+                                                                )}
+                                                            </button>
+                                                            {error && (
+                                                                <div className="mt-3 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
+                                                                    {error}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            </div>
-                                            <button
-                                                onClick={handleCreatePayment}
-                                                disabled={isCreatingPayment}
-                                                className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                            >
-                                                {isCreatingPayment ? (
-                                                    <>
-                                                        <Loader2 size={16} className="animate-spin" />
-                                                        Создание платежа...
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        Перейти к оплате
-                                                        <ChevronRight size={16} />
-                                                    </>
-                                                )}
-                                            </button>
-                                            {error && (
-                                                <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
-                                                    {error}
-                                                </div>
-                                            )}
+                                            ))}
                                         </div>
                                     )}
                                 </div>

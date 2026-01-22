@@ -30,6 +30,7 @@ const DashboardPlansTab = memo(function DashboardPlansTab({ plans, errorMessage 
 
     const handlePlanSelection = useCallback(async (planId: string) => {
         setProcessingPlanId(planId)
+
         try {
             const result = await apiClient.createPayment({
                 tariff_id: planId,
@@ -42,9 +43,10 @@ const DashboardPlansTab = memo(function DashboardPlansTab({ plans, errorMessage 
                 alert("Не удалось получить ссылку на оплату")
                 setProcessingPlanId(null)
             }
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Payment creation failed:", error)
-            alert("Не удалось создать платеж. Попробуйте еще раз.")
+            const errorMessage = error instanceof Error ? error.message : "Не удалось создать платеж. Попробуйте еще раз."
+            alert(errorMessage)
             setProcessingPlanId(null)
         }
     }, [])
@@ -148,14 +150,14 @@ const DashboardPlansTab = memo(function DashboardPlansTab({ plans, errorMessage 
                                     onClick={() => handlePlanSelection(plan.id)}
                                     disabled={processingPlanId !== null}
                                     className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all duration-300 sm:text-base ${plan.highlighted
-                                        ? "bg-linear-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/40 hover:-translate-y-0.5 hover:shadow-xl"
-                                        : "bg-white/10 text-white hover:-translate-y-0.5 hover:border-emerald-400/40 hover:bg-white/15"
-                                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                        ? "bg-linear-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/40 hover:-translate-y-0.5 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                                        : "bg-white/10 text-white hover:-translate-y-0.5 hover:border-emerald-400/40 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        }`}
                                 >
                                     {processingPlanId === plan.id ? (
                                         <>
                                             <span className="animate-spin">⏳</span>
-                                            Создание платежа...
+                                            Переход к оплате...
                                         </>
                                     ) : (
                                         "💳 Оплатить тариф"

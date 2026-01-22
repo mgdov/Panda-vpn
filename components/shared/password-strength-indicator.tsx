@@ -7,10 +7,10 @@ interface PasswordStrength {
 export function calculatePasswordStrength(pwd: string): PasswordStrength {
     let score = 0
 
-    // Упрощенная система: 3 уровня сложности
+    // Минимальная система: 3 уровня сложности
+    if (pwd.length >= 6) score++
+    if (pwd.length >= 8) score++
     if (pwd.length >= 10) score++
-    if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) score++ // Есть и строчные и заглавные
-    if (/\d/.test(pwd)) score++ // Есть цифры
 
     if (score === 1) return { score, label: "Слабый", color: "from-red-500 to-red-600" }
     if (score === 2) return { score, label: "Средний", color: "from-yellow-500 to-yellow-600" }

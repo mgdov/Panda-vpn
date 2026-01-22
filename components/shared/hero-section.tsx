@@ -54,10 +54,10 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                         href="/auth/signup"
                         className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 p-1 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-green-500/50 backdrop-blur-sm"
                     >
-                        <div className="relative flex h-full min-h-[140px] flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-green-500/[0.03] to-emerald-600/[0.03] px-8 py-6 text-center backdrop-blur-sm">
-                            <span className="text-3xl">🎁</span>
-                            <span className="text-xl font-bold text-white sm:text-2xl">Попробовать бесплатно</span>
-                            <ChevronRight size={24} className="text-white/80 transition-transform group-hover:translate-x-2" />
+                        <div className="relative flex h-full min-h-[110px] sm:min-h-[140px] flex-col items-center justify-center gap-1.5 sm:gap-2 rounded-xl bg-gradient-to-br from-green-500/[0.03] to-emerald-600/[0.03] px-6 py-4 sm:px-8 sm:py-6 text-center backdrop-blur-sm">
+                            <span className="text-2xl sm:text-3xl">🎁</span>
+                            <span className="text-lg sm:text-xl font-bold text-white sm:text-2xl">Попробовать бесплатно</span>
+                            <ChevronRight size={20} className="text-white/80 transition-transform group-hover:translate-x-2 sm:w-6 sm:h-6" />
                         </div>
                     </Link>
 
@@ -66,10 +66,10 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                         href="/renew-key"
                         className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 p-1 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-purple-500/50 backdrop-blur-sm"
                     >
-                        <div className="relative flex h-full min-h-[140px] flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-purple-500/[0.03] to-pink-600/[0.03] px-8 py-6 text-center backdrop-blur-sm">
-                            <span className="text-3xl">⏰</span>
-                            <span className="text-xl font-bold text-white sm:text-2xl">Продлить мой VPN</span>
-                            <ChevronRight size={24} className="text-white/80 transition-transform group-hover:translate-x-2" />
+                        <div className="relative flex h-full min-h-[110px] sm:min-h-[140px] flex-col items-center justify-center gap-1.5 sm:gap-2 rounded-xl bg-gradient-to-br from-purple-500/[0.03] to-pink-600/[0.03] px-6 py-4 sm:px-8 sm:py-6 text-center backdrop-blur-sm">
+                            <span className="text-2xl sm:text-3xl">⏰</span>
+                            <span className="text-lg sm:text-xl font-bold text-white sm:text-2xl">Продлить мой VPN</span>
+                            <ChevronRight size={20} className="text-white/80 transition-transform group-hover:translate-x-2 sm:w-6 sm:h-6" />
                         </div>
                     </Link>
 
@@ -78,10 +78,10 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                         href="/auth/login"
                         className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 p-1 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-blue-500/50 backdrop-blur-sm"
                     >
-                        <div className="relative flex h-full min-h-[140px] flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-blue-500/[0.03] to-cyan-600/[0.03] px-8 py-6 text-center backdrop-blur-sm">
-                            <User size={36} className="text-white" />
-                            <span className="text-xl font-bold text-white sm:text-2xl">Войти в аккаунт</span>
-                            <ChevronRight size={24} className="text-white/80 transition-transform group-hover:translate-x-2" />
+                        <div className="relative flex h-full min-h-[110px] sm:min-h-[140px] flex-col items-center justify-center gap-1.5 sm:gap-2 rounded-xl bg-gradient-to-br from-blue-500/[0.03] to-cyan-600/[0.03] px-6 py-4 sm:px-8 sm:py-6 text-center backdrop-blur-sm">
+                            <User size={30} className="text-white sm:w-9 sm:h-9" />
+                            <span className="text-lg sm:text-xl font-bold text-white sm:text-2xl">Войти в аккаунт</span>
+                            <ChevronRight size={20} className="text-white/80 transition-transform group-hover:translate-x-2 sm:w-6 sm:h-6" />
                         </div>
                     </Link>
 
@@ -91,10 +91,10 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                         onClick={openGuide}
                         className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 p-1 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-orange-500/50 backdrop-blur-sm"
                     >
-                        <div className="relative flex h-full min-h-[140px] flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-orange-500/[0.03] to-red-600/[0.03] px-8 py-6 text-center backdrop-blur-sm">
-                            <PlayCircle size={36} className="text-white" />
-                            <span className="text-xl font-bold text-white sm:text-2xl">Видео-инструкция</span>
-                            <span className="text-sm font-medium text-white/90">как подключить?</span>
+                        <div className="relative flex h-full min-h-[110px] sm:min-h-[140px] flex-col items-center justify-center gap-1 sm:gap-2 rounded-xl bg-gradient-to-br from-orange-500/[0.03] to-red-600/[0.03] px-6 py-4 sm:px-8 sm:py-6 text-center backdrop-blur-sm">
+                            <PlayCircle size={30} className="text-white sm:w-9 sm:h-9" />
+                            <span className="text-lg sm:text-xl font-bold text-white sm:text-2xl">Видео-инструкция</span>
+                            <span className="text-xs sm:text-sm font-medium text-white/90">как подключить?</span>
                         </div>
                     </button>
                 </div>

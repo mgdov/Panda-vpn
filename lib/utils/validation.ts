@@ -14,7 +14,7 @@ export const validateEmail = (email: string): boolean => {
   if (!email || email.trim().length === 0) {
     return false
   }
-  
+
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return re.test(email.trim())
 }
@@ -35,28 +35,12 @@ export const validatePassword = (password: string): {
     return { valid: false, errors }
   }
 
-  if (password.length < 8) {
-    errors.push('Пароль должен быть не менее 8 символов')
+  if (password.length < 6) {
+    errors.push('Пароль должен быть не менее 6 символов')
   }
 
   if (password.length > 128) {
     errors.push('Пароль не должен превышать 128 символов')
-  }
-
-  if (!/[A-Z]/.test(password)) {
-    errors.push('Пароль должен содержать хотя бы одну заглавную букву')
-  }
-
-  if (!/[a-z]/.test(password)) {
-    errors.push('Пароль должен содержать хотя бы одну строчную букву')
-  }
-
-  if (!/[0-9]/.test(password)) {
-    errors.push('Пароль должен содержать хотя бы одну цифру')
-  }
-
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
-    errors.push('Пароль должен содержать хотя бы один специальный символ')
   }
 
   return {
@@ -78,8 +62,8 @@ export const validatePasswordSimple = (password: string): {
     return { valid: false, message: 'Пароль обязателен' }
   }
 
-  if (password.length < 8) {
-    return { valid: false, message: 'Пароль должен быть не менее 8 символов' }
+  if (password.length < 6) {
+    return { valid: false, message: 'Пароль должен быть не менее 6 символов' }
   }
 
   if (password.length > 128) {
@@ -119,7 +103,7 @@ export const validateUUID = (uuid: string): boolean => {
  */
 export const validateReferralCode = (code: string): boolean => {
   if (!code) return true // Реферальный код опционален
-  
+
   const trimmed = code.trim()
   return trimmed.length > 0 && trimmed.length <= 50
 }
