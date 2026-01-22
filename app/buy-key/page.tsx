@@ -176,6 +176,9 @@ function BuyKeyPageContent() {
             for (let attempt = 0; attempt < 15; attempt++) {
                 try {
                     console.log(`[DEBUG] Attempt ${attempt + 1}: Requesting key for payment ${paymentIdToLoad}`)
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'buy-key/page.tsx:loadKeyByPayment','message':'Requesting key by payment','data':{paymentId:paymentIdToLoad,attempt:attempt+1},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+                    // #endregion
                     const key = await apiClient.getKeyByPayment(paymentIdToLoad)
                     console.log(`[DEBUG] Key received:`, {
                         expires_at: key.expires_at,
@@ -183,6 +186,9 @@ function BuyKeyPageContent() {
                         is_renewal: key.is_renewal,
                         client_id: key.client_id
                     })
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'buy-key/page.tsx:loadKeyByPayment','message':'Key received successfully','data':{hasExpiresAt:!!key.expires_at,hasSubscriptionUrl:!!key.subscription_url,isRenewal:key.is_renewal,hasClientId:!!key.client_id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+                    // #endregion
                     setKeyData(key)
                     setIsLoadingKey(false)
                     // Определяем режим в зависимости от того, было ли это продление
@@ -478,49 +484,49 @@ function BuyKeyPageContent() {
                                         <button
                                             onClick={() => handleSelectTariff(tariff)}
                                             className="w-full text-left"
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <h3 className="text-white font-semibold">{tariff.name}</h3>
-                                                    <p className="text-sm text-gray-400 mt-1">
-                                                        {formatDuration(tariff.duration_seconds)}
-                                                    </p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <div className="text-xl font-bold text-white">
-                                                        {tariff.price_amount / 100} ₽
-                                                    </div>
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h3 className="text-white font-semibold">{tariff.name}</h3>
+                                                <p className="text-sm text-gray-400 mt-1">
+                                                    {formatDuration(tariff.duration_seconds)}
+                                                </p>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-xl font-bold text-white">
+                                                    {tariff.price_amount / 100} ₽
                                                 </div>
                                             </div>
-                                        </button>
+                                        </div>
+                                    </button>
 
                                         {selectedTariff?.id === tariff.id && (
                                             <div className="mt-4 pt-4 border-t border-emerald-500/30">
-                                                <button
-                                                    onClick={handleCreatePayment}
-                                                    disabled={isCreatingPayment}
-                                                    className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                                >
-                                                    {isCreatingPayment ? (
-                                                        <>
-                                                            <Loader2 size={16} className="animate-spin" />
-                                                            Создание платежа...
-                                                        </>
-                                                    ) : (
-                                                        <>
+                                <button
+                                    onClick={handleCreatePayment}
+                                    disabled={isCreatingPayment}
+                                    className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {isCreatingPayment ? (
+                                        <>
+                                            <Loader2 size={16} className="animate-spin" />
+                                            Создание платежа...
+                                        </>
+                                    ) : (
+                                        <>
                                                             💳 Перейти к оплате
-                                                            <ChevronRight size={16} />
-                                                        </>
-                                                    )}
-                                                </button>
-                                                {error && (
+                                            <ChevronRight size={16} />
+                                        </>
+                                    )}
+                                </button>
+                                {error && (
                                                     <div className="mt-3 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
-                                                        {error}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
+                                        {error}
                                     </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                                 ))}
                             </div>
                         )}
@@ -700,7 +706,176 @@ function BuyKeyPageContent() {
 
     // Страница успешной оплаты (новый ключ)
     if (mode === "success") {
-        return <RedirectToDashboard />
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4">
+                <div className="max-w-2xl mx-auto">
+                    <div className="mb-8">
+                        <Link
+                            href="/"
+                            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors mb-4"
+                        >
+                            ← На главную
+                        </Link>
+                        <h1 className="text-3xl font-bold text-white mb-2">Ключ успешно приобретен!</h1>
+                        <p className="text-gray-400">Ваш ключ готов к использованию</p>
+                    </div>
+
+                    {isLoadingKey ? (
+                        <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <Loader2 size={48} className="animate-spin text-emerald-400 mb-4" />
+                                <p className="text-gray-400">Обработка платежа и создание ключа...</p>
+                                <p className="text-sm text-gray-500 mt-2">Это может занять несколько секунд</p>
+                            </div>
+                        </div>
+                    ) : keyData ? (
+                        <div className="space-y-6">
+                            <div className="bg-slate-800/60 backdrop-blur-md border border-emerald-500/30 rounded-xl p-6">
+                                <div className="flex items-start gap-3 mb-6">
+                                    <div className="p-2 bg-emerald-500/20 rounded-lg">
+                                        <CheckCircle className="text-emerald-400" size={24} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h2 className="text-xl font-bold text-white mb-1">Ключ успешно создан!</h2>
+                                        <p className="text-sm text-gray-400">
+                                            Срок действия: {formatDate(keyData.expires_at)}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* НАПОМИНАНИЕ О СОХРАНЕНИИ КЛЮЧА */}
+                                <div className="mb-6 p-4 bg-red-500/20 border-2 border-red-500 rounded-lg">
+                                    <div className="flex items-start gap-3">
+                                        <div className="p-2 bg-red-500/30 rounded-lg flex-shrink-0">
+                                            <svg className="w-5 h-5 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-red-200 text-sm mb-1">💾 ВАЖНО! Сохраните ваш ключ!</p>
+                                            <p className="text-xs text-red-100">
+                                                Скопируйте subscription URL и сохраните его в надежном месте. Без ключа вы не сможете подключиться к VPN и продлить подписку.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Subscription URL */}
+                                {keyData.subscription_url ? (
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                                            Subscription URL
+                                        </label>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={keyData.subscription_url}
+                                                readOnly
+                                                className="flex-1 px-4 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-white text-sm font-mono"
+                                            />
+                                            <button
+                                                onClick={() => copyToClipboard(keyData.subscription_url, "subscription")}
+                                                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                                            >
+                                                {copiedField === "subscription" ? (
+                                                    <>
+                                                        <Check size={16} />
+                                                        Скопировано
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Copy size={16} />
+                                                        Копировать
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                        {/* Кнопка для добавления в happ приложение */}
+                                        <button
+                                            onClick={() => handleAddToHapp(keyData.subscription_url)}
+                                            className="mt-3 w-full px-4 py-3 bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg transition-all duration-200 hover:scale-[1.02] text-sm font-semibold shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2"
+                                        >
+                                            <span>🐼</span>
+                                            Вставить в VPN приложение
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="mb-4 p-4 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
+                                        <p className="text-sm text-yellow-200">
+                                            ⚠️ Subscription URL еще генерируется. Пожалуйста, обновите страницу через несколько секунд.
+                                        </p>
+                                    </div>
+                                )}
+
+                                <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                                    <p className="text-sm text-blue-200">
+                                        💡 <strong>Используйте subscription URL</strong> в вашем VPN приложении для подключения.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={() => {
+                                        // Переходим на страницу продления с предзаполненным ключом
+                                        const keyToUse = keyData.subscription_url || keyData.marzban_client_id || keyData.client_id
+                                        if (keyToUse) {
+                                            router.push(`/buy-key?mode=renew&key=${encodeURIComponent(keyToUse)}`)
+                                        } else {
+                                            router.push("/buy-key?mode=renew")
+                                        }
+                                    }}
+                                    className="flex-1 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <Key size={20} />
+                                    Продлить ключ
+                                </button>
+                                <Link
+                                    href="/"
+                                    className="flex-1 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                                >
+                                    На главную
+                                </Link>
+                            </div>
+                        </div>
+                    ) : error ? (
+                        <div className="bg-slate-800/60 backdrop-blur-md border border-red-500/30 rounded-xl p-6">
+                            <div className="flex items-start gap-3">
+                                <XCircle className="text-red-400 flex-shrink-0 mt-0.5" size={24} />
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-semibold text-white mb-2">Ошибка</h3>
+                                    <p className="text-red-300 mb-4">{error}</p>
+                                    {paymentId && (
+                                        <button
+                                            onClick={() => loadKeyByPayment(paymentId)}
+                                            className="mt-4 w-full px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors"
+                                        >
+                                            Попробовать снова
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                            <div className="flex flex-col items-center justify-center py-8">
+                                <Loader2 size={32} className="animate-spin text-emerald-400 mb-4" />
+                                <p className="text-gray-400 text-center mb-2">Ожидание обработки платежа...</p>
+                                <p className="text-sm text-gray-500 text-center">Ключ будет создан автоматически после обработки платежа</p>
+                            </div>
+                            {paymentId && (
+                                <button
+                                    onClick={() => loadKeyByPayment(paymentId)}
+                                    className="mt-4 w-full px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors"
+                                >
+                                    Проверить ключ сейчас
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+        )
     }
 
     // Продление ключа
@@ -802,46 +977,46 @@ function BuyKeyPageContent() {
                                                     <button
                                                         onClick={() => handleSelectTariff(tariff)}
                                                         className="w-full text-left"
-                                                    >
-                                                        <div className="flex items-center justify-between">
-                                                            <div>
-                                                                <h3 className="text-white font-semibold">{tariff.name}</h3>
-                                                                <p className="text-sm text-gray-400 mt-1">
-                                                                    {formatDuration(tariff.duration_seconds)}
-                                                                </p>
-                                                            </div>
-                                                            <div className="text-right">
-                                                                <div className="text-xl font-bold text-white">
-                                                                    {tariff.price_amount / 100} ₽
-                                                                </div>
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <div>
+                                                            <h3 className="text-white font-semibold">{tariff.name}</h3>
+                                                            <p className="text-sm text-gray-400 mt-1">
+                                                                {formatDuration(tariff.duration_seconds)}
+                                                            </p>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <div className="text-xl font-bold text-white">
+                                                                {tariff.price_amount / 100} ₽
                                                             </div>
                                                         </div>
-                                                    </button>
+                                                    </div>
+                                                </button>
 
                                                     {selectedTariff?.id === tariff.id && (
                                                         <div className="mt-4 pt-4 border-t border-emerald-500/30">
-                                                            <button
-                                                                onClick={handleCreatePayment}
-                                                                disabled={isCreatingPayment}
-                                                                className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                                            >
-                                                                {isCreatingPayment ? (
-                                                                    <>
-                                                                        <Loader2 size={16} className="animate-spin" />
-                                                                        Создание платежа...
-                                                                    </>
-                                                                ) : (
-                                                                    <>
+                                            <button
+                                                onClick={handleCreatePayment}
+                                                disabled={isCreatingPayment}
+                                                className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                            >
+                                                {isCreatingPayment ? (
+                                                    <>
+                                                        <Loader2 size={16} className="animate-spin" />
+                                                        Создание платежа...
+                                                    </>
+                                                ) : (
+                                                    <>
                                                                         💳 Перейти к оплате
-                                                                        <ChevronRight size={16} />
-                                                                    </>
-                                                                )}
-                                                            </button>
-                                                            {error && (
+                                                        <ChevronRight size={16} />
+                                                    </>
+                                                )}
+                                            </button>
+                                            {error && (
                                                                 <div className="mt-3 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
-                                                                    {error}
-                                                                </div>
-                                                            )}
+                                                    {error}
+                                                </div>
+                                            )}
                                                         </div>
                                                     )}
                                                 </div>
