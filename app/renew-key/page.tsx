@@ -7,7 +7,7 @@ import type { KeySearchResponse, Tariff } from "@/lib/api/types"
 import { ChevronRight, Search, CheckCircle, XCircle, Loader2 } from "lucide-react"
 import Link from "next/link"
 
-export default function RenewKeyPage() {
+function RenewKeyPageContent() {
     const [keyIdentifier, setKeyIdentifier] = useState("")
     const [searchResult, setSearchResult] = useState<KeySearchResponse | null>(null)
     const [isSearching, setIsSearching] = useState(false)
@@ -263,8 +263,8 @@ export default function RenewKeyPage() {
                                             key={tariff.id}
                                             onClick={() => handleSelectTariff(tariff)}
                                             className={`p-4 rounded-lg border-2 transition-all text-left ${selectedTariff?.id === tariff.id
-                                                    ? "border-emerald-500 bg-emerald-500/10"
-                                                    : "border-white/10 bg-slate-900/50 hover:border-emerald-500/50"
+                                                ? "border-emerald-500 bg-emerald-500/10"
+                                                : "border-white/10 bg-slate-900/50 hover:border-emerald-500/50"
                                                 }`}
                                         >
                                             <div className="flex items-center justify-between">
@@ -327,5 +327,26 @@ export default function RenewKeyPage() {
                 )}
             </div>
         </div>
+    )
+}
+
+import { Suspense } from "react"
+
+function RenewKeyPageSkeleton() {
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4">
+            <div className="max-w-2xl mx-auto">
+                <div className="h-8 bg-slate-700 rounded mb-4 w-32 animate-pulse"></div>
+                <div className="h-12 bg-slate-700 rounded mb-8 animate-pulse"></div>
+            </div>
+        </div>
+    )
+}
+
+export default function RenewKeyPage() {
+    return (
+        <Suspense fallback={<RenewKeyPageSkeleton />}>
+            <RenewKeyPageContent />
+        </Suspense>
     )
 }
