@@ -240,8 +240,8 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
 
             <div>
 
-                {/* Две кнопки: Добавить ключ и Установить приложение */}
-                {keyText !== 'Генерация ключа...' && !vpnKey.device_limit_reached && (
+                {/* Две кнопки: Добавить ключ и Установить приложение - показываем только если ключ активен */}
+                {keyText !== 'Генерация ключа...' && !vpnKey.device_limit_reached && vpnKey.status === 'active' && (
                     <div className="mt-3 flex flex-col gap-2">
                         {/* Кнопка установки приложения с выпадающим списком */}
                         <div className="relative" ref={installOptionsRef}>
@@ -314,6 +314,19 @@ const VPNKeyCard = memo(function VPNKeyCard({ vpnKey, copiedKey, onCopy, onRevok
                         </button>
 
 
+                    </div>
+                )}
+
+                {/* Кнопка продления ключа - показываем только если ключ истек */}
+                {vpnKey.status === 'expired' && (
+                    <div className="mt-3">
+                        <a
+                            href={`/renew-key?key=${encodeURIComponent(vpnKey.subscription_url || vpnKey.key || '')}`}
+                            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white rounded-lg transition-all duration-200 hover:scale-105 text-sm font-semibold shadow-lg shadow-orange-900/30"
+                        >
+                            <span>⏰</span>
+                            Продлить ключ
+                        </a>
                     </div>
                 )}
             </div>
