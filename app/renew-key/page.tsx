@@ -30,10 +30,12 @@ function RenewKeyPageContent() {
             // client_id здесь это marzban_client_id (например "ENBBP", "TQBAX")
             setSearchResult({
                 found: true,
-                active: false, // Не важно, так как мы продлеваем истекший ключ
+                active: true, // Устанавливаем true чтобы пройти проверку и показать тарифы
                 client_id: clientId,
                 expires_at: null
             })
+            // Сразу переходим к выбору тарифа
+            setIsConfirming(true)
             // Загружаем тарифы
             loadTariffs()
         } else if (key) {
