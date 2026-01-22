@@ -47,19 +47,21 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                     Panda VPN — быстрый и лёгкий VPN‑сервис
                 </div>
 
-                {/* Сетка кнопок 2x2 */}
-                <div className="grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-                    {/* Кнопка 1: Попробовать бесплатно */}
-                    <Link
-                        href="/auth/signup"
-                        className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 p-1 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-green-500/50 backdrop-blur-sm"
-                    >
-                        <div className="relative flex h-full min-h-[110px] sm:min-h-[140px] flex-col items-center justify-center gap-1.5 sm:gap-2 rounded-xl bg-gradient-to-br from-green-500/[0.03] to-emerald-600/[0.03] px-6 py-4 sm:px-8 sm:py-6 text-center backdrop-blur-sm">
-                            <span className="text-2xl sm:text-3xl">🎁</span>
-                            <span className="text-lg sm:text-xl font-bold text-white sm:text-2xl">Попробовать бесплатно</span>
-                            <ChevronRight size={20} className="text-white/80 transition-transform group-hover:translate-x-2 sm:w-6 sm:h-6" />
-                        </div>
-                    </Link>
+                {/* Сетка кнопок - 2 колонки на больших экранах, адаптивная */}
+                <div className={`grid w-full max-w-4xl gap-4 ${isAuthenticated ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'} sm:gap-6`}>
+                    {/* Кнопка 1: Попробовать бесплатно - только для неавторизованных */}
+                    {!isAuthenticated && (
+                        <Link
+                            href="/auth/signup"
+                            className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 p-1 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-green-500/50 backdrop-blur-sm"
+                        >
+                            <div className="relative flex h-full min-h-[110px] sm:min-h-[140px] flex-col items-center justify-center gap-1.5 sm:gap-2 rounded-xl bg-gradient-to-br from-green-500/[0.03] to-emerald-600/[0.03] px-6 py-4 sm:px-8 sm:py-6 text-center backdrop-blur-sm">
+                                <span className="text-2xl sm:text-3xl">🎁</span>
+                                <span className="text-lg sm:text-xl font-bold text-white sm:text-2xl">Попробовать бесплатно</span>
+                                <ChevronRight size={20} className="text-white/80 transition-transform group-hover:translate-x-2 sm:w-6 sm:h-6" />
+                            </div>
+                        </Link>
+                    )}
 
                     {/* Кнопка 2: Продлить мой VPN */}
                     <Link
@@ -73,17 +75,33 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                         </div>
                     </Link>
 
-                    {/* Кнопка 3: Войти в аккаунт */}
-                    <Link
-                        href="/auth/login"
-                        className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 p-1 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-blue-500/50 backdrop-blur-sm"
-                    >
-                        <div className="relative flex h-full min-h-[110px] sm:min-h-[140px] flex-col items-center justify-center gap-1.5 sm:gap-2 rounded-xl bg-gradient-to-br from-blue-500/[0.03] to-cyan-600/[0.03] px-6 py-4 sm:px-8 sm:py-6 text-center backdrop-blur-sm">
-                            <User size={30} className="text-white sm:w-9 sm:h-9" />
-                            <span className="text-lg sm:text-xl font-bold text-white sm:text-2xl">Войти в аккаунт</span>
-                            <ChevronRight size={20} className="text-white/80 transition-transform group-hover:translate-x-2 sm:w-6 sm:h-6" />
-                        </div>
-                    </Link>
+                    {/* Кнопка 5: Купить без регистрации - только для неавторизованных, растянута на 2 ряда */}
+                    {!isAuthenticated && (
+                        <Link
+                            href="/buy-key"
+                            className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-600 p-1 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-yellow-500/50 backdrop-blur-sm lg:row-span-2"
+                        >
+                            <div className="relative flex h-full min-h-[110px] sm:min-h-[140px] lg:min-h-[296px] flex-col items-center justify-center gap-1.5 sm:gap-2 rounded-xl bg-gradient-to-br from-yellow-500/[0.03] to-orange-600/[0.03] px-6 py-4 sm:px-8 sm:py-6 text-center backdrop-blur-sm">
+                                <span className="text-2xl sm:text-3xl">💳</span>
+                                <span className="text-lg sm:text-xl font-bold text-white sm:text-2xl">Купить без регистрации</span>
+                                <ChevronRight size={20} className="text-white/80 transition-transform group-hover:translate-x-2 sm:w-6 sm:h-6" />
+                            </div>
+                        </Link>
+                    )}
+
+                    {/* Кнопка 3: Войти в аккаунт - только для неавторизованных */}
+                    {!isAuthenticated && (
+                        <Link
+                            href="/auth/login"
+                            className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 p-1 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-blue-500/50 backdrop-blur-sm"
+                        >
+                            <div className="relative flex h-full min-h-[110px] sm:min-h-[140px] flex-col items-center justify-center gap-1.5 sm:gap-2 rounded-xl bg-gradient-to-br from-blue-500/[0.03] to-cyan-600/[0.03] px-6 py-4 sm:px-8 sm:py-6 text-center backdrop-blur-sm">
+                                <User size={30} className="text-white sm:w-9 sm:h-9" />
+                                <span className="text-lg sm:text-xl font-bold text-white sm:text-2xl">Войти в аккаунт</span>
+                                <ChevronRight size={20} className="text-white/80 transition-transform group-hover:translate-x-2 sm:w-6 sm:h-6" />
+                            </div>
+                        </Link>
+                    )}
 
                     {/* Кнопка 4: Видео-инструкция */}
                     <button

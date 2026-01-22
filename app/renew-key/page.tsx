@@ -27,9 +27,10 @@ function RenewKeyPageContent() {
 
         if (clientId) {
             // Если передан client_id, устанавливаем его как searchResult напрямую
+            // client_id здесь это marzban_client_id (например "ENBBP", "TQBAX")
             setSearchResult({
                 found: true,
-                active: true,
+                active: false, // Не важно, так как мы продлеваем истекший ключ
                 client_id: clientId,
                 expires_at: null
             })
@@ -100,6 +101,12 @@ function RenewKeyPageContent() {
         setError(null)
 
         try {
+            console.log('[Renew] Creating renewal payment with:', {
+                client_id: searchResult.client_id,
+                tariff_id: selectedTariff.code,
+                tariff_name: selectedTariff.name
+            })
+
             const returnUrl = `${window.location.origin}/dashboard?tab=keys&payment=success`
             const payment = await apiClient.createRenewalPayment({
                 client_id: searchResult.client_id,
@@ -107,12 +114,15 @@ function RenewKeyPageContent() {
                 return_url: returnUrl
             })
 
+            console.log('[Renew] Payment created:', payment)
+
             if (payment.confirmation_url) {
                 window.location.href = payment.confirmation_url
             } else {
                 setError("Не удалось получить ссылку на оплату")
             }
         } catch (err: any) {
+            console.error('[Renew] Payment error:', err)
             setError(err.message || "Ошибка при создании платежа")
         } finally {
             setIsCreatingPayment(false)
@@ -259,70 +269,63 @@ function RenewKeyPageContent() {
                             ) : (
                                 <div className="grid gap-4">
                                     {tariffs.map((tariff) => (
-                                        <button
+                                        <div
                                             key={tariff.id}
-                                            onClick={() => handleSelectTariff(tariff)}
-                                            className={`p-4 rounded-lg border-2 transition-all text-left ${selectedTariff?.id === tariff.id
+                                            className={`p-4 rounded-lg border-2 transition-all ${selectedTariff?.id === tariff.id
                                                 ? "border-emerald-500 bg-emerald-500/10"
-                                                : "border-white/10 bg-slate-900/50 hover:border-emerald-500/50"
+                                                : "border-white/10 bg-slate-900/50"
                                                 }`}
                                         >
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <h3 className="text-white font-semibold">{tariff.name}</h3>
-                                                    <p className="text-sm text-gray-400 mt-1">
-                                                        {formatDuration(tariff.duration_seconds)}
-                                                    </p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <div className="text-xl font-bold text-white">
-                                                        {tariff.price_amount / 100} ₽
+                                            <button
+                                                onClick={() => handleSelectTariff(tariff)}
+                                                className="w-full text-left"
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <h3 className="text-white font-semibold">{tariff.name}</h3>
+                                                        <p className="text-sm text-gray-400 mt-1">
+                                                            {formatDuration(tariff.duration_seconds)}
+                                                        </p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <div className="text-xl font-bold text-white">
+                                                            {tariff.price_amount / 100} ₽
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </button>
+                                            </button>
+
+                                            {selectedTariff?.id === tariff.id && (
+                                                <div className="mt-4 pt-4 border-t border-emerald-500/30">
+                                                    <button
+                                                        onClick={handleCreatePayment}
+                                                        disabled={isCreatingPayment}
+                                                        className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                    >
+                                                        {isCreatingPayment ? (
+                                                            <>
+                                                                <Loader2 size={16} className="animate-spin" />
+                                                                Создание платежа...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                💳 Перейти к оплате
+                                                                <ChevronRight size={16} />
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                    {error && (
+                                                        <div className="mt-3 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
+                                                            {error}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
                                     ))}
                                 </div>
                             )}
                         </div>
-
-                        {selectedTariff && (
-                            <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
-                                <div className="mb-4">
-                                    <h3 className="text-white font-semibold mb-2">Выбранный тариф</h3>
-                                    <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-white">{selectedTariff.name}</span>
-                                            <span className="text-emerald-400 font-bold">
-                                                {selectedTariff.price_amount / 100} ₽
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={handleCreatePayment}
-                                    disabled={isCreatingPayment}
-                                    className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                >
-                                    {isCreatingPayment ? (
-                                        <>
-                                            <Loader2 size={16} className="animate-spin" />
-                                            Создание платежа...
-                                        </>
-                                    ) : (
-                                        <>
-                                            Перейти к оплате
-                                            <ChevronRight size={16} />
-                                        </>
-                                    )}
-                                </button>
-                                {error && (
-                                    <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
-                                        {error}
-                                    </div>
-                                )}
-                            </div>
-                        )}
                     </div>
                 )}
             </div>
