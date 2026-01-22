@@ -121,7 +121,8 @@ function BuyKeyPageContent() {
         try {
             if (mode === "buy") {
                 // Покупка нового ключа - возвращаем на страницу buy-key
-                const buyReturnUrl = `${window.location.origin}/buy-key?success=true`
+                // ЮКасса заменит {payment_id} на реальный ID платежа
+                const buyReturnUrl = `${window.location.origin}/buy-key?success=true&payment_id={payment_id}`
 
                 const payment = await apiClient.createNewKeyPayment({
                     tariff_id: selectedTariff.code,
@@ -129,7 +130,7 @@ function BuyKeyPageContent() {
                 })
 
                 if (payment.confirmation_url) {
-                    // Сохраняем payment_id в localStorage для получения после возврата
+                    // Сохраняем payment_id в localStorage для получения после возврата (резервный метод)
                     const paymentIdToSave = payment.id || payment.payment_id || ""
                     if (paymentIdToSave) {
                         localStorage.setItem("last_payment_id", paymentIdToSave)
@@ -140,7 +141,8 @@ function BuyKeyPageContent() {
                 }
             } else if (mode === "renew" && searchResult?.client_id) {
                 // Продление существующего ключа - возвращаем на страницу buy-key
-                const renewReturnUrl = `${window.location.origin}/buy-key?success=true`
+                // ЮКасса заменит {payment_id} на реальный ID платежа
+                const renewReturnUrl = `${window.location.origin}/buy-key?success=true&payment_id={payment_id}`
 
                 const payment = await apiClient.createRenewalPayment({
                     client_id: searchResult.client_id,
@@ -209,12 +211,14 @@ function BuyKeyPageContent() {
                     if (isProcessingError) {
                         // Платеж еще обрабатывается, ждем
                         if (attempt < 14) {
+                            console.log(`[DEBUG] Payment still processing, waiting 2 seconds...`)
                             await new Promise(resolve => setTimeout(resolve, 2000))
                             continue
                         }
-                    } else if (isNotFoundError && payment.status === "processing") {
-                        // Ключ не найден, но платеж обрабатывается - ждем
+                    } else if (isNotFoundError) {
+                        // Ключ не найден - возможно платеж еще обрабатывается
                         if (attempt < 14) {
+                            console.log(`[DEBUG] Key not found, waiting 2 seconds...`)
                             await new Promise(resolve => setTimeout(resolve, 2000))
                             continue
                         }

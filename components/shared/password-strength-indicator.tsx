@@ -12,7 +12,7 @@ export function calculatePasswordStrength(pwd: string): PasswordStrength {
     if (pwd.length >= 8) score++
     if (pwd.length >= 10) score++
 
-    if (score === 1) return { score, label: "Слабый", color: "from-red-500 to-red-600" }
+    if (score === 0 || score === 1) return { score: 1, label: "Слабый", color: "from-red-500 to-red-600" }
     if (score === 2) return { score, label: "Средний", color: "from-yellow-500 to-yellow-600" }
     return { score, label: "Надежный", color: "from-green-500 to-emerald-600" }
 }
