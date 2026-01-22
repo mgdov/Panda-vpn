@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
 import type { KeySearchResponse, Tariff } from "@/lib/api/types"
 import { ChevronRight, Search, CheckCircle, XCircle, Loader2 } from "lucide-react"
@@ -18,6 +18,40 @@ export default function RenewKeyPage() {
     const [isCreatingPayment, setIsCreatingPayment] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
+    const searchParams = useSearchParams()
+
+    // Проверяем URL параметры при загрузке
+    useEffect(() => {
+        const clientId = searchParams?.get("client_id")
+        const key = searchParams?.get("key")
+
+        if (clientId) {
+            // Если передан client_id, устанавливаем его как searchResult напрямую
+            setSearchResult({
+                found: true,
+                active: true,
+                client_id: clientId,
+                expires_at: null
+            })
+            // Загружаем тарифы
+            loadTariffs()
+        } else if (key) {
+            // Если передан ключ, заполняем поле поиска
+            setKeyIdentifier(decodeURIComponent(key))
+        }
+    }, [searchParams])
+
+    const loadTariffs = async () => {
+        setIsLoadingTariffs(true)
+        try {
+            const tariffsData = await apiClient.getTariffs()
+            setTariffs(tariffsData)
+        } catch (err) {
+            console.error("Failed to load tariffs:", err)
+        } finally {
+            setIsLoadingTariffs(false)
+        }
+    }
 
     const handleSearch = async () => {
         if (!keyIdentifier.trim()) {
@@ -32,18 +66,10 @@ export default function RenewKeyPage() {
         try {
             const result = await apiClient.searchKey({ key_identifier: keyIdentifier.trim() })
             setSearchResult(result)
-            
+
             if (result.found && result.active) {
                 // Загружаем тарифы для продления
-                setIsLoadingTariffs(true)
-                try {
-                    const tariffsData = await apiClient.getTariffs()
-                    setTariffs(tariffsData)
-                } catch (err) {
-                    console.error("Failed to load tariffs:", err)
-                } finally {
-                    setIsLoadingTariffs(false)
-                }
+                await loadTariffs()
             }
         } catch (err: any) {
             setError(err.message || "Ошибка при поиске ключа")
@@ -223,7 +249,7 @@ export default function RenewKeyPage() {
                     <div className="space-y-6">
                         <div className="bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
                             <h2 className="text-xl font-bold text-white mb-4">Выберите тариф для продления</h2>
-                            
+
                             {isLoadingTariffs ? (
                                 <div className="flex items-center justify-center py-8">
                                     <Loader2 size={24} className="animate-spin text-emerald-400" />
@@ -236,11 +262,10 @@ export default function RenewKeyPage() {
                                         <button
                                             key={tariff.id}
                                             onClick={() => handleSelectTariff(tariff)}
-                                            className={`p-4 rounded-lg border-2 transition-all text-left ${
-                                                selectedTariff?.id === tariff.id
+                                            className={`p-4 rounded-lg border-2 transition-all text-left ${selectedTariff?.id === tariff.id
                                                     ? "border-emerald-500 bg-emerald-500/10"
                                                     : "border-white/10 bg-slate-900/50 hover:border-emerald-500/50"
-                                            }`}
+                                                }`}
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div>
