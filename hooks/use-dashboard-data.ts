@@ -75,6 +75,25 @@ export function useDashboardData() {
     const [plansError, setPlansError] = useState<string | null>(null)
     const [keysError, setKeysError] = useState<string | null>(null)
 
+    // Функция для определения статуса ключа
+    const determineKeyStatus = (key: any): 'active' | 'expired' => {
+        // Если есть дата истечения, проверяем её
+        if (key.expires_at) {
+            try {
+                const expiresDate = new Date(key.expires_at)
+                const now = new Date()
+                if (expiresDate <= now) {
+                    return 'expired'
+                }
+            } catch (e) {
+                console.error('Error parsing expires_at:', e)
+            }
+        }
+
+        // Если нет даты или дата ещё не наступила, проверяем флаг active
+        return key.active ? 'active' : 'expired'
+    }
+
 
     const loadData = useCallback(async () => {
         setIsLoading(true)
@@ -164,7 +183,7 @@ export function useDashboardData() {
                         config_text: key.config_text || null,
                         preferred_method: prefersSubscription ? 'subscription' : 'config',
                         location: tariffName,
-                        status: key.active ? 'active' : 'expired',
+                        status: determineKeyStatus(key),
                         expiresAt: key.expires_at || null,
                         marzban_client_id: key.marzban_client_id,
                         protocol: key.protocol || 'vless',
