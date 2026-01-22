@@ -55,11 +55,30 @@ function BuyKeyPageContent() {
                 }, 500)
             }
         } else if (success === "true") {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'buy-key/page.tsx:useEffect','message':'Processing success redirect','data':{paymentIdParam,paymentIdParamDecoded:paymentIdParam?decodeURIComponent(paymentIdParam):null,localStoragePaymentId:localStorage.getItem("last_payment_id")},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+            // #endregion
             // Пробуем получить payment_id из URL или localStorage
-            const idToUse = paymentIdParam || localStorage.getItem("last_payment_id")
+            // Проверяем, что paymentIdParam не является плейсхолдером {payment_id}
+            let idToUse = paymentIdParam
+            if (idToUse && (idToUse === "{payment_id}" || decodeURIComponent(idToUse) === "{payment_id}")) {
+                // YooKassa не заменила плейсхолдер - используем значение из localStorage
+                console.warn("[DEBUG] YooKassa did not replace {payment_id} placeholder, using localStorage value")
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'buy-key/page.tsx:useEffect','message':'Placeholder detected, using localStorage','data':{localStoragePaymentId:localStorage.getItem("last_payment_id")},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+                // #endregion
+                idToUse = localStorage.getItem("last_payment_id")
+            }
+            // Если все еще нет, пробуем localStorage
+            if (!idToUse) {
+                idToUse = localStorage.getItem("last_payment_id")
+            }
             if (idToUse) {
                 setPaymentId(idToUse)
                 // Загружаем ключ сразу - режим будет определен после загрузки
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'buy-key/page.tsx:useEffect','message':'Loading key by payment','data':{paymentIdToUse:idToUse},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+                // #endregion
                 loadKeyByPayment(idToUse)
             } else {
                 // Если нет payment_id, показываем сообщение
@@ -132,8 +151,14 @@ function BuyKeyPageContent() {
                 if (payment.confirmation_url) {
                     // Сохраняем payment_id в localStorage для получения после возврата (резервный метод)
                     const paymentIdToSave = payment.id || payment.payment_id || ""
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'buy-key/page.tsx:handleCreatePayment','message':'Saving payment_id to localStorage','data':{paymentId:paymentIdToSave,paymentObject:{id:payment.id,payment_id:payment.payment_id}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+                    // #endregion
                     if (paymentIdToSave) {
                         localStorage.setItem("last_payment_id", paymentIdToSave)
+                        console.log(`[DEBUG] Saved payment_id to localStorage: ${paymentIdToSave}`)
+                    } else {
+                        console.error("[DEBUG] No payment_id to save! Payment object:", payment)
                     }
                     window.location.href = payment.confirmation_url
                 } else {
