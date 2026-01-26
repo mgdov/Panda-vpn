@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { apiClient } from '@/lib/api/client'
 import { isAuthError } from '@/lib/api/errors'
+import { TOKEN_STORAGE_KEY, REFRESH_TOKEN_STORAGE_KEY } from '@/lib/api/config'
 import type { Tariff, VPNKey as ApiVPNKey } from '@/lib/api/types'
 
 export type DashboardPlan = {
@@ -132,7 +133,7 @@ export function useDashboardData() {
 
     const loadData = useCallback(async () => {
         // Проверяем наличие токена перед запросами
-        const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+        const token = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_STORAGE_KEY) : null
         if (!token) {
             console.warn('[useDashboardData] No access token found, skipping API requests')
             setIsLoading(false)
@@ -258,8 +259,8 @@ export function useDashboardData() {
             if (isAuthError(error)) {
                 localStorage.removeItem('isAuthenticated')
                 localStorage.removeItem('userEmail')
-                localStorage.removeItem('accessToken')
-                localStorage.removeItem('refreshToken')
+                localStorage.removeItem(TOKEN_STORAGE_KEY)
+                localStorage.removeItem(REFRESH_TOKEN_STORAGE_KEY)
                 window.location.href = '/auth/login'
                 return
             }

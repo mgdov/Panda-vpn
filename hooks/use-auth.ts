@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { TOKEN_STORAGE_KEY, REFRESH_TOKEN_STORAGE_KEY } from '@/lib/api/config'
 
 interface AuthState {
     isAuthenticated: boolean
@@ -18,14 +19,17 @@ export function useAuth() {
     const checkAuth = useCallback(() => {
         const auth = localStorage.getItem('isAuthenticated')
         const email = localStorage.getItem('userEmail')
+        const token = localStorage.getItem(TOKEN_STORAGE_KEY)
 
-        if (auth === 'true' && email) {
+        if (auth === 'true' && email && token) {
             setAuthState({
                 isAuthenticated: true,
                 userEmail: email,
                 isLoading: false,
             })
         } else {
+            localStorage.removeItem('isAuthenticated')
+            localStorage.removeItem('userEmail')
             setAuthState(prev => ({ ...prev, isLoading: false }))
         }
     }, [])
@@ -37,8 +41,8 @@ export function useAuth() {
     const logout = useCallback(() => {
         localStorage.removeItem('isAuthenticated')
         localStorage.removeItem('userEmail')
-        localStorage.removeItem('accessToken')
-        localStorage.removeItem('refreshToken')
+        localStorage.removeItem(TOKEN_STORAGE_KEY)
+        localStorage.removeItem(REFRESH_TOKEN_STORAGE_KEY)
         setAuthState({
             isAuthenticated: false,
             userEmail: '',

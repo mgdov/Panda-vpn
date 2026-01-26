@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, Suspense } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
+import { TOKEN_STORAGE_KEY } from "@/lib/api/config"
 import { useAuth } from "@/hooks/use-auth"
 import { useDashboardData } from "@/hooks/use-dashboard-data"
 import { useClipboard } from "@/hooks/use-clipboard"
@@ -138,7 +139,7 @@ function DashboardPageContent() {
 
         // Дополнительная проверка токена при монтировании компонента
         if (!authLoading && isAuthenticated) {
-            const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+            const token = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_STORAGE_KEY) : null
             if (!token) {
                 console.warn('[Dashboard] No access token found, redirecting to login')
                 localStorage.removeItem('isAuthenticated')

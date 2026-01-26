@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth"
 import { generateTelegramLink } from "@/lib/utils/telegram"
 import { apiClient } from "@/lib/api/client"
 import { getErrorMessage } from "@/lib/api/errors"
+import { TOKEN_STORAGE_KEY } from "@/lib/api/config"
 
 export interface Plan {
     id: string
@@ -33,7 +34,7 @@ const DashboardPlansTab = memo(function DashboardPlansTab({ plans, errorMessage 
         setProcessingPlanId(planId)
 
         // Проверяем наличие токена перед запросом
-        const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+        const token = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_STORAGE_KEY) : null
         if (!token) {
             alert('Требуется авторизация. Перенаправление на страницу входа...')
             window.location.href = '/auth/login'

@@ -12,6 +12,7 @@ import MobileSidebarToggle from "@/components/shared/mobile-sidebar-toggle"
 import LoadingScreen from "@/components/shared/loading-screen"
 import type { Tariff } from "@/lib/api/types"
 import { generateTelegramLink } from "@/lib/utils/telegram"
+import { TOKEN_STORAGE_KEY } from "@/lib/api/config"
 
 function BuyPageContent() {
     const router = useRouter()
@@ -70,7 +71,7 @@ function BuyPageContent() {
         }
 
         // Проверяем наличие токена перед запросом
-        const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+        const token = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_STORAGE_KEY) : null
         if (!token) {
             setError('Требуется авторизация. Перенаправление на страницу входа...')
             setTimeout(() => {

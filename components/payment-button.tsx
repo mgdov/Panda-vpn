@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { apiClient } from "@/lib/api/client"
 import { getErrorMessage } from "@/lib/api/errors"
+import { TOKEN_STORAGE_KEY } from "@/lib/api/config"
 
 interface PaymentButtonProps {
   planName?: string
@@ -20,7 +21,7 @@ export default function PaymentButton({ price, tariffId }: PaymentButtonProps) {
     setError("")
 
     // Проверяем наличие токена перед запросом
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+    const token = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_STORAGE_KEY) : null
     if (!token) {
       setError('Требуется авторизация. Перенаправление на страницу входа...')
       setTimeout(() => {

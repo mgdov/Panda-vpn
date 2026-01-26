@@ -5,6 +5,7 @@ import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
 import { getErrorMessage } from "@/lib/api/errors"
+import { TOKEN_STORAGE_KEY } from "@/lib/api/config"
 import type { KeySearchResponse, Tariff } from "@/lib/api/types"
 import { ChevronRight, Search, CheckCircle, XCircle, Loader2, Key, CreditCard, Copy, Check } from "lucide-react"
 import Link from "next/link"
@@ -137,7 +138,7 @@ function BuyKeyPageContent() {
         }
 
         // Проверяем наличие токена перед запросом
-        const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+        const token = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_STORAGE_KEY) : null
         if (!token) {
             setError('Требуется авторизация. Перенаправление на страницу входа...')
             setTimeout(() => {
