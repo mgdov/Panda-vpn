@@ -4,6 +4,7 @@
 import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
+import { getErrorMessage } from "@/lib/api/errors"
 import type { KeySearchResponse, Tariff } from "@/lib/api/types"
 import { ChevronRight, Search, CheckCircle, XCircle, Loader2, Key, CreditCard, Copy, Check } from "lucide-react"
 import Link from "next/link"
@@ -56,7 +57,7 @@ function BuyKeyPageContent() {
             }
         } else if (success === "true") {
             // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'buy-key/page.tsx:useEffect','message':'Processing success redirect','data':{paymentIdParam,paymentIdParamDecoded:paymentIdParam?decodeURIComponent(paymentIdParam):null,localStoragePaymentId:localStorage.getItem("last_payment_id")},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'buy-key/page.tsx:useEffect', 'message': 'Processing success redirect', 'data': { paymentIdParam, paymentIdParamDecoded: paymentIdParam ? decodeURIComponent(paymentIdParam) : null, localStoragePaymentId: localStorage.getItem("last_payment_id") }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H1' }) }).catch(() => { });
             // #endregion
             // Пробуем получить payment_id из URL или localStorage
             // Проверяем, что paymentIdParam не является плейсхолдером {payment_id}
@@ -65,7 +66,7 @@ function BuyKeyPageContent() {
                 // YooKassa не заменила плейсхолдер - используем значение из localStorage
                 console.warn("[DEBUG] YooKassa did not replace {payment_id} placeholder, using localStorage value")
                 // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'buy-key/page.tsx:useEffect','message':'Placeholder detected, using localStorage','data':{localStoragePaymentId:localStorage.getItem("last_payment_id")},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+                fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'buy-key/page.tsx:useEffect', 'message': 'Placeholder detected, using localStorage', 'data': { localStoragePaymentId: localStorage.getItem("last_payment_id") }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H1' }) }).catch(() => { });
                 // #endregion
                 idToUse = localStorage.getItem("last_payment_id")
             }
@@ -77,7 +78,7 @@ function BuyKeyPageContent() {
                 setPaymentId(idToUse)
                 // Загружаем ключ сразу - режим будет определен после загрузки
                 // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'buy-key/page.tsx:useEffect','message':'Loading key by payment','data':{paymentIdToUse:idToUse},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+                fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'buy-key/page.tsx:useEffect', 'message': 'Loading key by payment', 'data': { paymentIdToUse: idToUse }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H1' }) }).catch(() => { });
                 // #endregion
                 loadKeyByPayment(idToUse)
             } else {
@@ -114,10 +115,11 @@ function BuyKeyPageContent() {
             const result = await apiClient.searchKey({ key_identifier: keyIdentifier.trim() })
             setSearchResult(result)
         } catch (err: any) {
-            setError(err.message || "Ошибка при поиске ключа")
+            const errorMessage = getErrorMessage(err)
+            setError(errorMessage)
             setSearchResult({
                 found: false,
-                message: "Ошибка при поиске ключа"
+                message: errorMessage
             })
         } finally {
             setIsSearching(false)
@@ -152,7 +154,7 @@ function BuyKeyPageContent() {
                     // Сохраняем payment_id в localStorage для получения после возврата (резервный метод)
                     const paymentIdToSave = payment.id || payment.payment_id || ""
                     // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'buy-key/page.tsx:handleCreatePayment','message':'Saving payment_id to localStorage','data':{paymentId:paymentIdToSave,paymentObject:{id:payment.id,payment_id:payment.payment_id}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+                    fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'buy-key/page.tsx:handleCreatePayment', 'message': 'Saving payment_id to localStorage', 'data': { paymentId: paymentIdToSave, paymentObject: { id: payment.id, payment_id: payment.payment_id } }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H1' }) }).catch(() => { });
                     // #endregion
                     if (paymentIdToSave) {
                         localStorage.setItem("last_payment_id", paymentIdToSave)
@@ -186,7 +188,8 @@ function BuyKeyPageContent() {
                 }
             }
         } catch (err: any) {
-            setError(err.message || "Ошибка при создании платежа")
+            const errorMessage = getErrorMessage(err)
+            setError(errorMessage)
         } finally {
             setIsCreatingPayment(false)
         }
@@ -202,7 +205,7 @@ function BuyKeyPageContent() {
                 try {
                     console.log(`[DEBUG] Attempt ${attempt + 1}: Requesting key for payment ${paymentIdToLoad}`)
                     // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'buy-key/page.tsx:loadKeyByPayment','message':'Requesting key by payment','data':{paymentId:paymentIdToLoad,attempt:attempt+1},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+                    fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'buy-key/page.tsx:loadKeyByPayment', 'message': 'Requesting key by payment', 'data': { paymentId: paymentIdToLoad, attempt: attempt + 1 }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H1' }) }).catch(() => { });
                     // #endregion
                     const key = await apiClient.getKeyByPayment(paymentIdToLoad)
                     console.log(`[DEBUG] Key received:`, {
@@ -212,7 +215,7 @@ function BuyKeyPageContent() {
                         client_id: key.client_id
                     })
                     // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'buy-key/page.tsx:loadKeyByPayment','message':'Key received successfully','data':{hasExpiresAt:!!key.expires_at,hasSubscriptionUrl:!!key.subscription_url,isRenewal:key.is_renewal,hasClientId:!!key.client_id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+                    fetch('http://127.0.0.1:7242/ingest/7ff428f3-5f7e-46d8-967f-bf80b747f512', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'buy-key/page.tsx:loadKeyByPayment', 'message': 'Key received successfully', 'data': { hasExpiresAt: !!key.expires_at, hasSubscriptionUrl: !!key.subscription_url, isRenewal: key.is_renewal, hasClientId: !!key.client_id }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H1' }) }).catch(() => { });
                     // #endregion
                     setKeyData(key)
                     setIsLoadingKey(false)
@@ -509,49 +512,49 @@ function BuyKeyPageContent() {
                                         <button
                                             onClick={() => handleSelectTariff(tariff)}
                                             className="w-full text-left"
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <h3 className="text-white font-semibold">{tariff.name}</h3>
-                                                <p className="text-sm text-gray-400 mt-1">
-                                                    {formatDuration(tariff.duration_seconds)}
-                                                </p>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="text-xl font-bold text-white">
-                                                    {tariff.price_amount / 100} ₽
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <h3 className="text-white font-semibold">{tariff.name}</h3>
+                                                    <p className="text-sm text-gray-400 mt-1">
+                                                        {formatDuration(tariff.duration_seconds)}
+                                                    </p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-xl font-bold text-white">
+                                                        {tariff.price_amount / 100} ₽
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </button>
+                                        </button>
 
                                         {selectedTariff?.id === tariff.id && (
                                             <div className="mt-4 pt-4 border-t border-emerald-500/30">
-                                <button
-                                    onClick={handleCreatePayment}
-                                    disabled={isCreatingPayment}
-                                    className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                >
-                                    {isCreatingPayment ? (
-                                        <>
-                                            <Loader2 size={16} className="animate-spin" />
-                                            Создание платежа...
-                                        </>
-                                    ) : (
-                                        <>
+                                                <button
+                                                    onClick={handleCreatePayment}
+                                                    disabled={isCreatingPayment}
+                                                    className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                >
+                                                    {isCreatingPayment ? (
+                                                        <>
+                                                            <Loader2 size={16} className="animate-spin" />
+                                                            Создание платежа...
+                                                        </>
+                                                    ) : (
+                                                        <>
                                                             💳 Перейти к оплате
-                                            <ChevronRight size={16} />
-                                        </>
-                                    )}
-                                </button>
-                                {error && (
+                                                            <ChevronRight size={16} />
+                                                        </>
+                                                    )}
+                                                </button>
+                                                {error && (
                                                     <div className="mt-3 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
-                                        {error}
+                                                        {error}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
                                 ))}
                             </div>
                         )}
@@ -1002,46 +1005,46 @@ function BuyKeyPageContent() {
                                                     <button
                                                         onClick={() => handleSelectTariff(tariff)}
                                                         className="w-full text-left"
-                                                >
-                                                    <div className="flex items-center justify-between">
-                                                        <div>
-                                                            <h3 className="text-white font-semibold">{tariff.name}</h3>
-                                                            <p className="text-sm text-gray-400 mt-1">
-                                                                {formatDuration(tariff.duration_seconds)}
-                                                            </p>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <div className="text-xl font-bold text-white">
-                                                                {tariff.price_amount / 100} ₽
+                                                    >
+                                                        <div className="flex items-center justify-between">
+                                                            <div>
+                                                                <h3 className="text-white font-semibold">{tariff.name}</h3>
+                                                                <p className="text-sm text-gray-400 mt-1">
+                                                                    {formatDuration(tariff.duration_seconds)}
+                                                                </p>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <div className="text-xl font-bold text-white">
+                                                                    {tariff.price_amount / 100} ₽
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </button>
+                                                    </button>
 
                                                     {selectedTariff?.id === tariff.id && (
                                                         <div className="mt-4 pt-4 border-t border-emerald-500/30">
-                                            <button
-                                                onClick={handleCreatePayment}
-                                                disabled={isCreatingPayment}
-                                                className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                            >
-                                                {isCreatingPayment ? (
-                                                    <>
-                                                        <Loader2 size={16} className="animate-spin" />
-                                                        Создание платежа...
-                                                    </>
-                                                ) : (
-                                                    <>
+                                                            <button
+                                                                onClick={handleCreatePayment}
+                                                                disabled={isCreatingPayment}
+                                                                className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                            >
+                                                                {isCreatingPayment ? (
+                                                                    <>
+                                                                        <Loader2 size={16} className="animate-spin" />
+                                                                        Создание платежа...
+                                                                    </>
+                                                                ) : (
+                                                                    <>
                                                                         💳 Перейти к оплате
-                                                        <ChevronRight size={16} />
-                                                    </>
-                                                )}
-                                            </button>
-                                            {error && (
+                                                                        <ChevronRight size={16} />
+                                                                    </>
+                                                                )}
+                                                            </button>
+                                                            {error && (
                                                                 <div className="mt-3 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
-                                                    {error}
-                                                </div>
-                                            )}
+                                                                    {error}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     )}
                                                 </div>

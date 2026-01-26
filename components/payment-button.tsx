@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { apiClient } from "@/lib/api/client"
+import { getErrorMessage } from "@/lib/api/errors"
 
 interface PaymentButtonProps {
   planName?: string
@@ -17,7 +18,7 @@ export default function PaymentButton({ price, tariffId }: PaymentButtonProps) {
   const handlePayment = async () => {
     setIsLoading(true)
     setError("")
-    
+
     try {
       const result = await apiClient.createPayment({
         tariff_id: tariffId,
@@ -31,7 +32,7 @@ export default function PaymentButton({ price, tariffId }: PaymentButtonProps) {
         setError("Не удалось получить ссылку на оплату")
       }
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Ошибка при создании платежа"
+      const errorMessage = getErrorMessage(err)
       setError(errorMessage)
       console.error("Payment error:", err)
     } finally {
@@ -44,13 +45,13 @@ export default function PaymentButton({ price, tariffId }: PaymentButtonProps) {
       {error && (
         <div className="mb-2 text-sm text-red-400">{error}</div>
       )}
-      <button 
-        onClick={handlePayment} 
-        disabled={isLoading} 
+      <button
+        onClick={handlePayment}
+        disabled={isLoading}
         className="btn-primary w-full"
       >
-      {isLoading ? "Обработка..." : `Выбрать: ${price}₽`}
-    </button>
+        {isLoading ? "Обработка..." : `Выбрать: ${price}₽`}
+      </button>
     </div>
   )
 }

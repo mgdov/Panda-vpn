@@ -253,7 +253,17 @@ function DashboardPageContent() {
 
                 <StatsGrid keysCount={vpnKeys.length} />
 
-
+                {paymentSuccess && (
+                    <div className="mb-6 rounded-xl border border-green-500/50 bg-green-900/30 px-4 py-3 text-sm text-green-300 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="flex items-center gap-2">
+                            <span className="text-lg">✅</span>
+                            <div>
+                                <p className="font-semibold">Оплата прошла успешно!</p>
+                                <p className="text-xs text-green-400/80 mt-0.5">Ваш VPN ключ создается и появится ниже через несколько секунд...</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="bg-white/5 backdrop-blur-xl border border-green-700/20 rounded-xl md:rounded-2xl shadow-xl p-4 sm:p-5 md:p-6 lg:p-8">
                     {activeTab === "plans" && <DashboardPlansTab plans={plans} errorMessage={plansError} />}

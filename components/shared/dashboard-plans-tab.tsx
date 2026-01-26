@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useAuth } from "@/hooks/use-auth"
 import { generateTelegramLink } from "@/lib/utils/telegram"
 import { apiClient } from "@/lib/api/client"
+import { getErrorMessage } from "@/lib/api/errors"
 
 export interface Plan {
     id: string
@@ -45,7 +46,7 @@ const DashboardPlansTab = memo(function DashboardPlansTab({ plans, errorMessage 
             }
         } catch (error: unknown) {
             console.error("Payment creation failed:", error)
-            const errorMessage = error instanceof Error ? error.message : "Не удалось создать платеж. Попробуйте еще раз."
+            const errorMessage = getErrorMessage(error)
             alert(errorMessage)
             setProcessingPlanId(null)
         }

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
+import { getErrorMessage } from "@/lib/api/errors"
 import AuthBackground from "@/components/shared/auth-background"
 import AuthLogo from "@/components/shared/auth-logo"
 import FormInput from "@/components/shared/form-input"
@@ -53,7 +54,7 @@ export default function SignupPage() {
       setIsLoading(false)
     } catch (err: unknown) {
       setIsLoading(false)
-      const errorMessage = err instanceof Error ? err.message : "Ошибка регистрации"
+      const errorMessage = getErrorMessage(err)
       setError(errorMessage)
     }
   }, [email, password, passwordsMatch, strength.score])
@@ -80,7 +81,7 @@ export default function SignupPage() {
       router.push("/dashboard")
     } catch (err: unknown) {
       setIsVerifying(false)
-      const errorMessage = err instanceof Error ? err.message : "Неверный код верификации"
+      const errorMessage = getErrorMessage(err)
       setError(errorMessage)
     }
   }, [email, verificationCode, router])
@@ -92,7 +93,7 @@ export default function SignupPage() {
       setError("") // Очищаем ошибки
       // Можно показать успешное сообщение
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Не удалось отправить код повторно"
+      const errorMessage = getErrorMessage(err)
       setError(errorMessage)
     }
   }, [email])

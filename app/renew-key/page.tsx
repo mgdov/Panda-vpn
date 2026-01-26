@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
+import { getErrorMessage } from "@/lib/api/errors"
 import type { KeySearchResponse, Tariff } from "@/lib/api/types"
 import { ChevronRight, Search, CheckCircle, XCircle, Loader2 } from "lucide-react"
 import Link from "next/link"
@@ -75,10 +76,11 @@ function RenewKeyPageContent() {
                 await loadTariffs()
             }
         } catch (err: any) {
-            setError(err.message || "Ошибка при поиске ключа")
+            const errorMessage = getErrorMessage(err)
+            setError(errorMessage)
             setSearchResult({
                 found: false,
-                message: "Ошибка при поиске ключа"
+                message: errorMessage
             })
         } finally {
             setIsSearching(false)
@@ -125,7 +127,7 @@ function RenewKeyPageContent() {
             }
         } catch (err: any) {
             console.error('[Renew] Payment error:', err)
-            const errorMessage = err.message || "Ошибка при создании платежа"
+            const errorMessage = getErrorMessage(err)
             // Улучшаем сообщение об ошибке для пользователя
             if (errorMessage.includes("не найден") || errorMessage.includes("неактивен")) {
                 setError("Не удалось найти ваш ключ для продления. Пожалуйста, свяжитесь с поддержкой или попробуйте купить новый ключ.")

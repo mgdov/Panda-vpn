@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
+import { getErrorMessage } from "@/lib/api/errors"
 import { useAuth } from "@/hooks/use-auth"
 import DashboardLayout from "@/components/shared/dashboard-layout"
 import DashboardSidebar from "@/components/shared/dashboard-sidebar"
@@ -85,10 +86,7 @@ function BuyPageContent() {
             }
         } catch (error: unknown) {
             console.error("Payment creation failed:", error)
-            const errorMessage =
-                error instanceof Error
-                    ? error.message
-                    : "Не удалось создать платеж. Попробуйте еще раз."
+            const errorMessage = getErrorMessage(error)
             setError(errorMessage)
             setIsProcessing(false)
         }

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { apiClient } from "@/lib/api/client"
+import { getErrorMessage } from "@/lib/api/errors"
 import AuthBackground from "@/components/shared/auth-background"
 import AuthLogo from "@/components/shared/auth-logo"
 import FormInput from "@/components/shared/form-input"
@@ -37,7 +38,7 @@ export default function LoginPage() {
         router.push("/dashboard")
       }, 1500)
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Ошибка входа"
+      const errorMessage = getErrorMessage(err)
       setError(errorMessage)
       setIsLoading(false)
     }
@@ -83,7 +84,7 @@ export default function LoginPage() {
           </FormSubmitButton>
         </form>
 
-      
+
 
         <p className="text-center text-sm font-medium text-gray-300">
           Нет аккаунта?{" "}
