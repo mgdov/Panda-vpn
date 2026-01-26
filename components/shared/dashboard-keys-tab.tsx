@@ -89,7 +89,7 @@ export default function DashboardKeysTab({ vpnKeys, copiedKey, onCopyKey, onRefr
                             Возникла ошибка при загрузке ключей. Отображаем доступные данные.
                         </div>
                     )}
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-5">
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-5 items-start">
                         {vpnKeys.map((vpnKey) => (
                             <VPNKeyCard
                                 key={vpnKey.id}

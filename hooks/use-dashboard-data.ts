@@ -32,6 +32,41 @@ export type DashboardVPNKey = {
     limit_message?: string | null
 }
 
+// Демо-ключи для показа в dev/preview или при флаге NEXT_PUBLIC_ENABLE_TEST_VPN_KEY
+const TEST_VPN_KEY_ACTIVE: DashboardVPNKey = {
+    id: 'test-key-demo-active',
+    key: 'vless://11111111-2222-3333-4444-555555555555@demo.pandavpn.test:443?encryption=none&security=tls&type=grpc&serviceName=pandavpn&fp=chrome&sni=demo.pandavpn.test#PandaVPN-Test',
+    subscription_url: 'https://example.com/subscription/pandavpn-test',
+    config_text: 'vless://11111111-2222-3333-4444-555555555555@demo.pandavpn.test:443?encryption=none&security=tls&type=grpc&serviceName=pandavpn&fp=chrome&sni=demo.pandavpn.test#PandaVPN-Test',
+    preferred_method: 'subscription',
+    location: 'Тестовый ключ',
+    status: 'active',
+    expiresAt: null,
+    marzban_client_id: 'DEMO1',
+    protocol: 'vless',
+    device_limit_reached: false,
+    active_devices_count: 0,
+    max_devices: 1,
+    limit_message: 'Демо-ключ для тестирования интерфейса',
+}
+
+const TEST_VPN_KEY_EXPIRED: DashboardVPNKey = {
+    id: 'test-key-demo-expired',
+    key: 'vless://99999999-aaaa-bbbb-cccc-dddddddddddd@demo.pandavpn.test:443?encryption=none&security=tls&type=grpc&serviceName=pandavpn&fp=chrome&sni=demo.pandavpn.test#PandaVPN-Expired',
+    subscription_url: 'https://example.com/subscription/pandavpn-test-expired',
+    config_text: 'vless://99999999-aaaa-bbbb-cccc-dddddddddddd@demo.pandavpn.test:443?encryption=none&security=tls&type=grpc&serviceName=pandavpn&fp=chrome&sni=demo.pandavpn.test#PandaVPN-Expired',
+    preferred_method: 'subscription',
+    location: 'Истекший тестовый ключ',
+    status: 'expired',
+    expiresAt: '2024-01-01T00:00:00Z',
+    marzban_client_id: 'DEMO2',
+    protocol: 'vless',
+    device_limit_reached: false,
+    active_devices_count: 0,
+    max_devices: 1,
+    limit_message: 'Истёкший демо-ключ для тестирования UI',
+}
+
 const getIconForDuration = (duration: number): string => {
     const days = Math.floor(duration / 86400)
     if (days <= 31) return '🌿'
@@ -193,6 +228,13 @@ export function useDashboardData() {
                         limit_message: key.limit_message || null,
                     }
                 })
+            }
+
+            const shouldAttachTestKey = process.env.NEXT_PUBLIC_ENABLE_TEST_VPN_KEY === 'true'
+                || process.env.NODE_ENV !== 'production'
+
+            if (shouldAttachTestKey && formattedKeys.length === 0) {
+                formattedKeys = [TEST_VPN_KEY_ACTIVE, TEST_VPN_KEY_EXPIRED]
             }
 
             setVpnKeys(formattedKeys)
