@@ -47,6 +47,27 @@ function DashboardPageContent() {
         }
     }, [isAuthenticated, loadData])
 
+    // Обновляем данные при возврате на вкладку/фокус, чтобы новые ключи появлялись без ручного F5
+    useEffect(() => {
+        if (!isAuthenticated) return
+
+        const handleFocus = () => {
+            loadData()
+        }
+
+        const handleVisibility = () => {
+            if (document.visibilityState === 'visible') handleFocus()
+        }
+
+        window.addEventListener('focus', handleFocus)
+        document.addEventListener('visibilitychange', handleVisibility)
+
+        return () => {
+            window.removeEventListener('focus', handleFocus)
+            document.removeEventListener('visibilitychange', handleVisibility)
+        }
+    }, [isAuthenticated, loadData])
+
     useEffect(() => {
         const tabParam = searchParams?.get("tab")
         if (tabParam === "plans" || tabParam === "keys" || tabParam === "support") {
