@@ -47,6 +47,41 @@ function DashboardPageContent() {
         }
     }, [isAuthenticated, loadData])
 
+    // Подгружаем ключи при переключении на вкладку «keys», если пользователь уже авторизован
+    useEffect(() => {
+        if (!isAuthenticated) return
+        if (activeTab !== "keys") return
+        loadData()
+    }, [isAuthenticated, activeTab, loadData])
+
+    // Короткое авто-обновление вкладки «Ключи» после возвращения/оплаты, чтобы новые ключи подхватывались без F5
+    useEffect(() => {
+        if (!isAuthenticated || activeTab !== "keys") return
+
+        let attempts = 0
+        let inFlight = false
+        const maxAttempts = 6 // ~30 секунд при шаге 5с
+
+        const tick = async () => {
+            if (inFlight) return
+            inFlight = true
+            attempts += 1
+            try {
+                await loadData()
+            } finally {
+                inFlight = false
+                if (attempts >= maxAttempts && intervalId) {
+                    clearInterval(intervalId)
+                }
+            }
+        }
+
+        const intervalId: ReturnType<typeof setInterval> = setInterval(tick, 5000)
+        tick()
+
+        return () => clearInterval(intervalId)
+    }, [isAuthenticated, activeTab, loadData])
+
     // Обновляем данные при возврате на вкладку/фокус, чтобы новые ключи появлялись без ручного F5
     useEffect(() => {
         if (!isAuthenticated) return
