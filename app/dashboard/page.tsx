@@ -133,6 +133,18 @@ function DashboardPageContent() {
         // Редирект на логин если не авторизован (после загрузки)
         if (!authLoading && !isAuthenticated) {
             window.location.href = '/auth/login'
+            return
+        }
+
+        // Дополнительная проверка токена при монтировании компонента
+        if (!authLoading && isAuthenticated) {
+            const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+            if (!token) {
+                console.warn('[Dashboard] No access token found, redirecting to login')
+                localStorage.removeItem('isAuthenticated')
+                localStorage.removeItem('userEmail')
+                window.location.href = '/auth/login'
+            }
         }
     }, [authLoading, isAuthenticated])
 

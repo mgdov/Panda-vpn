@@ -131,6 +131,20 @@ export function useDashboardData() {
 
 
     const loadData = useCallback(async () => {
+        // Проверяем наличие токена перед запросами
+        const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+        if (!token) {
+            console.warn('[useDashboardData] No access token found, skipping API requests')
+            setIsLoading(false)
+            setPlansError('Требуется авторизация')
+            setKeysError('Требуется авторизация')
+            // Редиректим на страницу логина
+            if (typeof window !== 'undefined' && window.location.pathname !== '/auth/login') {
+                window.location.href = '/auth/login'
+            }
+            return
+        }
+
         setIsLoading(true)
         setPlansError(null)
         setKeysError(null)

@@ -101,6 +101,16 @@ function RenewKeyPageContent() {
             return
         }
 
+        // Проверяем наличие токена перед запросом
+        const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+        if (!token) {
+            setError('Требуется авторизация. Перенаправление на страницу входа...')
+            setTimeout(() => {
+                window.location.href = '/auth/login'
+            }, 1000)
+            return
+        }
+
         setIsCreatingPayment(true)
         setError(null)
 

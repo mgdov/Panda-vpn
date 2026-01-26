@@ -130,6 +130,24 @@ class APIClient {
                 }
             }
 
+            // Обработка 403 - пользователь не авторизован
+            // Очищаем токены и редиректим на страницу логина
+            if (response.status === 403) {
+                console.warn('[API] 403 Forbidden - clearing auth and redirecting to login')
+                this.clearTokens()
+                if (typeof window !== 'undefined') {
+                    localStorage.removeItem('isAuthenticated')
+                    localStorage.removeItem('userEmail')
+                    // Редиректим на страницу логина с сохранением текущего URL
+                    const currentPath = window.location.pathname
+                    if (currentPath !== '/auth/login' && currentPath !== '/auth/signup') {
+                        window.location.href = `/auth/login?redirect=${encodeURIComponent(currentPath)}`
+                        return {} as T // возвращаем пустой объект, чтобы предотвратить дальнейшую обработку
+                    }
+                }
+                throw new Error("Not authenticated")
+            }
+
             if (!response.ok) {
                 const error = await response.json().catch(() => ({
                     detail: `HTTP ${response.status}`
@@ -365,7 +383,7 @@ class APIClient {
             node_id: null,      // Используем дефолтный узел
             meta: null
         }
-        
+
         // ВАЖНО: client_id и uuid - это РАЗНЫЕ UUID
         // client_id - для revoke
         // uuid - для конфигурации VPN

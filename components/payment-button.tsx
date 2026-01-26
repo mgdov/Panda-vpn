@@ -19,6 +19,17 @@ export default function PaymentButton({ price, tariffId }: PaymentButtonProps) {
     setIsLoading(true)
     setError("")
 
+    // Проверяем наличие токена перед запросом
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+    if (!token) {
+      setError('Требуется авторизация. Перенаправление на страницу входа...')
+      setTimeout(() => {
+        window.location.href = '/auth/login'
+      }, 1000)
+      setIsLoading(false)
+      return
+    }
+
     try {
       const result = await apiClient.createPayment({
         tariff_id: tariffId,

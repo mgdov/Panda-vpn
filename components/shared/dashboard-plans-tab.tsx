@@ -32,6 +32,14 @@ const DashboardPlansTab = memo(function DashboardPlansTab({ plans, errorMessage 
     const handlePlanSelection = useCallback(async (planId: string) => {
         setProcessingPlanId(planId)
 
+        // Проверяем наличие токена перед запросом
+        const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+        if (!token) {
+            alert('Требуется авторизация. Перенаправление на страницу входа...')
+            window.location.href = '/auth/login'
+            return
+        }
+
         try {
             const result = await apiClient.createPayment({
                 tariff_id: planId,
