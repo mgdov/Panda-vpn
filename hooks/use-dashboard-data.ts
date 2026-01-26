@@ -252,6 +252,13 @@ export function useDashboardData() {
                 formattedKeys = [TEST_VPN_KEY_ACTIVE, TEST_VPN_KEY_EXPIRED]
             }
 
+            // Сортируем ключи: активные сначала, истекшие в конце
+            formattedKeys.sort((a, b) => {
+                if (a.status === 'active' && b.status === 'expired') return -1
+                if (a.status === 'expired' && b.status === 'active') return 1
+                return 0
+            })
+
             setVpnKeys(formattedKeys)
         } catch (error) {
             const message = extractErrorMessage(error)
